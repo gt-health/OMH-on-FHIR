@@ -1,0 +1,42 @@
+version: '3.0'
+services:
+  resource-server:
+    image: openmhealth/shimmer-resource-server
+    environment:
+      SPRING_PROFILES_ACTIVE: development
+    depends_on:
+      - mongo
+    env_file:
+      - shimmer-resource-server.env
+    ports:
+      - "8084:8083"
+
+  mongo:
+    image: mongo
+
+  console:
+    image: openmhealth/shimmer-console
+    ports:
+      - "8083:8083"
+    depends_on:
+      - resource-server
+
+  mdata-db:
+    image: postgres:latest
+    restart: always
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_DB=mdata
+      - POSTGRES_USER=mdata
+      - POSTGRES_PASSWORD=mdata11!
+
+  mdata-app:
+    build: .
+    restart: always
+    ports:
+      - "8888:8080"
+    environment:
+      - SHIMMER_SERVER_URL=http://console:8083/authorize/{shimKey}?username={userId}
+    depends_on:
+      - mdata-db
