@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -30,16 +31,20 @@ public class PatientDataControllerIntegrationTest {
 
     private URL base;
 
+    @Value("${server.servlet.contextPath}")
+    private String deploymentContext;
+
     @Autowired
     private TestRestTemplate template;
 
     @Before
     public void setUp() throws Exception {
-        this.base = new URL("http://localhost:" + port + "/");
+        this.base = new URL("http://localhost:" + port + deploymentContext + "/");
     }
 
     @Test
     public void getHello() throws Exception {
+        System.out.println("Base URL: " + base.toString());
         ResponseEntity<String> response = template.getForEntity(base.toString(),
                 String.class);
         assertThat(response.getBody(), equalTo("Greetings from Spring Boot!"));
