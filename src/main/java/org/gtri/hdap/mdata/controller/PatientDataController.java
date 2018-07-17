@@ -192,8 +192,8 @@ public class PatientDataController {
     private String processShimmerDataRequest(HttpUriRequest request){
         String jsonResp = null;
         try {
-            CloseableHttpResponse shimmerAuthResponse = getHttpClient().execute(request, getHttpClientContext());
-            jsonResp = checkShimmerAuthResponse(shimmerAuthResponse);
+            CloseableHttpResponse shimmerDataResponse = getHttpClient().execute(request, getHttpClientContext());
+            jsonResp = checkShimmerDataResponse(shimmerDataResponse);
         }
         catch(IOException ioe){
             ioe.printStackTrace();
@@ -202,6 +202,7 @@ public class PatientDataController {
     }
 
     private String checkShimmerDataResponse(CloseableHttpResponse shimmerAuthResponse) throws IOException {
+        logger.debug("Looking for Data");
         String jsonResp = null;
         try {
             int statusCode = shimmerAuthResponse.getStatusLine().getStatusCode();
