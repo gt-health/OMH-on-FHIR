@@ -34,7 +34,7 @@ public class PatientDataController {
     /* Constants */
     /*========================================================================*/
     public static String SHIMMER_SERVER_URL_BASE_ENV = "SHIMMER_SERVER_URL";
-    public static String SHIMMER_AUTH_URL = "/authorize/{shimKey}?username={username}";
+    public static String SHIMMER_AUTH_URL = "/authorize/{shim-key}?username={username}";
     public static String SHIMMER_DATA_RANGE_URL = "/data/{shim-key}/physical_activity?username={username}&normalize={normalize}&dateStart={start-date}&dateEnd={end-date}";
 
     /*========================================================================*/
@@ -92,7 +92,7 @@ public class PatientDataController {
         // The username query parameter can be set to any unique identifier you'd like to use to identify the user.
 
         String shimmerAuthUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_AUTH_URL;
-        shimmerAuthUrl = shimmerAuthUrl.replace("{shimKey}", "fitbit");
+        shimmerAuthUrl = shimmerAuthUrl.replace("{shim-key}", "fitbit");
         shimmerAuthUrl = shimmerAuthUrl.replace("{username}", "3f6625db-8cc7-4d25-9bf4-9febdc7028cd");
         HttpGet httpGet = new HttpGet(shimmerAuthUrl);
         String fitbitAuthUrl = processShimmerAuthRequest(httpGet);
@@ -110,7 +110,7 @@ public class PatientDataController {
     @GetMapping("/activity")
     public ResponseEntity<?> retrievePatientData(){
         String shimmerAuthUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_DATA_RANGE_URL;
-        shimmerAuthUrl = shimmerAuthUrl.replace("{shimKey}", "fitbit");
+        shimmerAuthUrl = shimmerAuthUrl.replace("{shim-key}", "fitbit");
         shimmerAuthUrl = shimmerAuthUrl.replace("{username}", "3f6625db-8cc7-4d25-9bf4-9febdc7028cd");
         shimmerAuthUrl = shimmerAuthUrl.replace("{normalize}", "true");
         shimmerAuthUrl = shimmerAuthUrl.replace("{start-date}", "2018-06-01");
