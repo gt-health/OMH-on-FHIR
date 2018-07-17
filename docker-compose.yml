@@ -35,6 +35,6 @@ services:
     ports:
       - "8888:8080"
     environment:
-      - SHIMMER_SERVER_URL=http://console:8083/authorize/{shimKey}?username={userId}
+      - SHIMMER_SERVER_URL=http://console:8083
     depends_on:
       - mdata-db

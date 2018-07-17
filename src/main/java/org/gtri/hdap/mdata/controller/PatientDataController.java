@@ -109,7 +109,7 @@ public class PatientDataController {
 
     @GetMapping("/activity")
     public ResponseEntity<?> retrievePatientData(){
-        String shimmerAuthUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_AUTH_URL;
+        String shimmerAuthUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_DATA_RANGE_URL;
         shimmerAuthUrl = shimmerAuthUrl.replace("{shimKey}", "fitbit");
         shimmerAuthUrl = shimmerAuthUrl.replace("{username}", "3f6625db-8cc7-4d25-9bf4-9febdc7028cd");
         shimmerAuthUrl = shimmerAuthUrl.replace("{normalize}", "true");
