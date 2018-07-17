@@ -16,7 +16,9 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -82,7 +84,8 @@ public class PatientDataController {
         return "Greetings from Spring Boot!";
     }
 
-    @RequestMapping(value="/shimmerAuthentication", method= RequestMethod.GET)
+//    @RequestMapping(value="/shimmerAuthentication", method= RequestMethod.GET)
+    @GetMapping("/shimmerAuthentication")
     public ModelAndView authenticateWithShimmer(ModelMap model){
         logger.debug("Trying to connect to FitBit API");
         // Make a request to http://<shimmer-host>:8083/authorize/{shimKey}?username={userId}
