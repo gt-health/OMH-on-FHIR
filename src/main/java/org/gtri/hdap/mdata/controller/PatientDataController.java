@@ -100,9 +100,12 @@ public class PatientDataController {
         }
         catch(Exception e){
             //TODO redirect to no auth URL page
+            //read this link http://www.baeldung.com/spring-boot-custom-error-page
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
+        model.addAttribute("shimmerId", shimmerId);
+
         String redirectUrl = "redirect:" + fitbitAuthUrl;
         return new ModelAndView(redirectUrl, model);
     }
@@ -117,7 +120,7 @@ public class PatientDataController {
     //GET https://apps.hdap.gatech.edu/hapiR4/baseR4/DocumentReference?subject=EXxcda
     @GetMapping("/DocumentReference")
     public ResponseEntity findDocumentReference(@RequestParam(name="subject", required=true) String shimmerId,
-                                                                   @RequestParam(name="date") List<String> dateQueries){
+                                                @RequestParam(name="date") List<String> dateQueries){
         logger.debug("processing document request");
         //look up the user
         ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
@@ -165,8 +168,9 @@ public class PatientDataController {
     }
 
     @RequestMapping("/authorize/fitbit/callback")
-    public String handleFitbitRedirect(){
+    public String handleFitbitRedirect(ModelMap model){
         logger.debug("Handling successful Fitbit auth redirect");
+        logger.debug("Model " + model);
         return "TODO handle successful Fitbit auth redirect";
     }
 

@@ -68,17 +68,30 @@ public class PatientDataControllerTest {
     public void getFindDocumentReference() throws Exception {
         logger.debug("========== Entering getFindDocumentReference ==========");
         //Mock the application repository and shimmer service
-        ApplicationUser applicationUser = new ApplicationUser("123", "345", "fitbit");
-        List<String> validQueryDates = createDateList("2018-06-01", "2018-07-01");
+        String ehrId = "123";
+        String shimmerId = "345";
+        String shimkey = "fitbit";
+        String docId = "789";
+        String validDate1 = "2018-06-01";
+        String validDate2 = "2018-07-01";
+        String inValidDate1 = "le2018-06-01";
+        String inValidDate2 = "ge2018-07-01";
+        ApplicationUser applicationUser = new ApplicationUser(ehrId, shimmerId, shimkey);
+        List<String> validQueryDates = createDateList(validDate1, validDate2);
+        List<String> inValidQueryDates = createDateList(inValidDate1, inValidDate2);
 
-        given(applicationUserRepository.findByShimmerId("345")).willReturn(applicationUser);
-        given(shimmerService.retrievePatientData(applicationUser, validQueryDates)).willReturn("789");
+        given(applicationUserRepository.findByShimmerId(shimmerId)).willReturn(applicationUser);
+        given(shimmerService.retrievePatientData(applicationUser, validQueryDates)).willReturn(docId);
 
-        ResultActions resultActions =
-            mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=345&date=2018-06-01&date=2018-07-01"))
-            .andExpect(status().isOk());
-//        logger.debug(resultActions.toString());
-//        .andExpect(content().json("{\"data\": \"activity data here\"}"));
+        mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + validDate1 + "&date=" + validDate2))
+        .andExpect(status().isOk());
+//            .andExpect(content().json("{\"data\": \"activity data here\"}"));
+
+        given(shimmerService.retrievePatientData(applicationUser, inValidQueryDates)).willThrow(new Exception("Unsupported FHIR date prefix only GE is supported for start dates."));
+
+        mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + inValidDate1 + "&date=" + inValidDate2))
+                .andExpect(status().is4xxClientError());
+
         logger.debug("========== Entering getFindDocumentReference ==========");
     }
 

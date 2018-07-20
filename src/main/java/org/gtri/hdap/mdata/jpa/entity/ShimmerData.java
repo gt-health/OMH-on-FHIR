@@ -16,6 +16,7 @@ public class ShimmerData {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
     private String documentId;
+    @Lob
     private String jsonData;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
