@@ -4,6 +4,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 /**
  * Created by es130 on 7/9/2018.
@@ -14,6 +15,7 @@ public class ShimmerData {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
+    private String documentId;
     private String jsonData;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -27,8 +29,13 @@ public class ShimmerData {
     protected ShimmerData(){}
 
     public ShimmerData(ApplicationUser applicationUser, String jsonData){
+        this(applicationUser, UUID.randomUUID().toString(), jsonData);
+    }
+
+    public ShimmerData(ApplicationUser applicationUser, String documentId, String jsonData){
         this.applicationUser = applicationUser;
         this.jsonData = jsonData;
+        this.documentId = documentId;
     }
 
     /*========================================================================*/
@@ -47,6 +54,10 @@ public class ShimmerData {
         return jsonData;
     }
 
+    public String getDocumentId() {
+        return documentId;
+    }
+
     /*========================================================================*/
     /* Setters */
     /*========================================================================*/
@@ -63,11 +74,15 @@ public class ShimmerData {
         this.jsonData = jsonData;
     }
 
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
+    }
+
     /*========================================================================*/
     /* Methods */
     /*========================================================================*/
     @Override
     public String toString(){
-        return String.format("ShimmerData[id='%d', json=%s", id, jsonData);
+        return String.format("ShimmerData[id='%d', docId='%s', json=%s", id, documentId, jsonData);
     }
 }

@@ -8,6 +8,9 @@
         </encoder>
     </appender>
 
+    <logger name="org.gtri.hdap.mdata.controller" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.conf" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.jackson" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.controller.PatientDataController" level="DEBUG"/>
 
     <root level="ERROR">
