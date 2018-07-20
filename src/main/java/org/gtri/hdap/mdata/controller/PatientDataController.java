@@ -98,6 +98,7 @@ public class PatientDataController {
             fitbitAuthUrl = shimmerService.requestShimmerAuthUrl(shimmerId, shimkey);
         }
         catch(Exception e){
+            e.printStackTrace();
             //TODO redirect to no auth URL page
             //read this link http://www.baeldung.com/spring-boot-custom-error-page
         }

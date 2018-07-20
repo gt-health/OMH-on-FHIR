@@ -42,7 +42,7 @@ public class ShimmerService {
     /* Constants*/
     /*========================================================================*/
     public static String SHIMMER_SERVER_URL_BASE_ENV = "SHIMMER_SERVER_URL";
-    public static String SHIMMER_SERVER_REDIRECT_URL_ENV = " ";
+    public static String SHIMMER_SERVER_REDIRECT_URL_ENV = "SHIMMER_REDIRECT_URL";
     public static String SHIMMER_AUTH_URL = "/authorize/{shim-key}?username={username}&redirect_url={redirect-url}";
     public static String SHIMMER_AUTH_CALLBACK = "/authorize/{shim-key}/callback?code={code}&state={state}";
     public static String SHIMMER_DATA_RANGE_URL = "/data/{shim-key}/physical_activity?username={username}&normalize={normalize}";
