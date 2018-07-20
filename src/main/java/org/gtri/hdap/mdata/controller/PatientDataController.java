@@ -31,11 +31,9 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.*;
@@ -84,6 +82,7 @@ public class PatientDataController {
     //TODO: Do we really need to pass in the ModelMap
     @GetMapping("/shimmerAuthentication")
     public ModelAndView authenticateWithShimmer(ModelMap model,
+                                                RedirectAttributes redirectAttributes,
                                                 @RequestParam(name="ehrId", required=true) String ehrId,
                                                 @RequestParam(name="shimkey", required=true) String shimkey){
         logger.debug("Trying to connect to " + shimkey + " API");
@@ -105,6 +104,9 @@ public class PatientDataController {
 
         logger.debug("Finished connection to " + shimkey + " API");
         model.addAttribute("shimmerId", shimmerId);
+
+        redirectAttributes.addFlashAttribute("shimmerId", shimmerId);
+        redirectAttributes.addAttribute("shimmerId", shimmerId);
 
         String redirectUrl = "redirect:" + fitbitAuthUrl;
         return new ModelAndView(redirectUrl, model);
@@ -167,11 +169,23 @@ public class PatientDataController {
         return new Observation();
     }
 
-    @RequestMapping("/authorize/fitbit/callback")
-    public String handleFitbitRedirect(ModelMap model){
+    @RequestMapping("/authorize/{shimkey}/callback")
+    public String handleFitbitRedirect(ModelMap model,
+                                       @ModelAttribute("shimmerId") Object flashShimmerIdAttribute,
+                                       @PathVariable String shimkey,
+                                       @RequestParam(name="code") String code,
+                                       @RequestParam(name="state") String state){
         logger.debug("Handling successful Fitbit auth redirect");
         logger.debug("Model " + model);
-        return "TODO handle successful Fitbit auth redirect";
+        logger.debug("Flash Attribute " + flashShimmerIdAttribute);
+        try {
+            shimmerService.completeShimmerAuth(shimkey, code, state);
+        }
+        catch(Exception e){
+            //TODO redirect to error page
+        }
+
+        return "TODO handle successful Fitbit auth redirect with redirect to UI";
     }
 
     /*========================================================================*/

@@ -42,7 +42,9 @@ public class ShimmerService {
     /* Constants*/
     /*========================================================================*/
     public static String SHIMMER_SERVER_URL_BASE_ENV = "SHIMMER_SERVER_URL";
-    public static String SHIMMER_AUTH_URL = "/authorize/{shim-key}?username={username}";
+    public static String SHIMMER_SERVER_REDIRECT_URL_ENV = " ";
+    public static String SHIMMER_AUTH_URL = "/authorize/{shim-key}?username={username}&redirect_url={redirect-url}";
+    public static String SHIMMER_AUTH_CALLBACK = "/authorize/{shim-key}/callback?code={code}&state={state}";
     public static String SHIMMER_DATA_RANGE_URL = "/data/{shim-key}/physical_activity?username={username}&normalize={normalize}";
     public static String SHIMMER_START_DATE_URL_PARAM = "&dateStart={start-date}";
     public static String SHIMMER_END_DATE_URL_PARAM = "&dateEnd={end-date}";
@@ -115,14 +117,31 @@ public class ShimmerService {
 
     public String requestShimmerAuthUrl(String shimmerId, String shimkey) throws Exception{
         String shimmerAuthUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_AUTH_URL;
+        String shimmerRedirectUrl = System.getenv(SHIMMER_SERVER_REDIRECT_URL_ENV);
         shimmerAuthUrl = shimmerAuthUrl.replace("{shim-key}", shimkey);
         shimmerAuthUrl = shimmerAuthUrl.replace("{username}", shimmerId);
+        shimmerAuthUrl = shimmerAuthUrl.replace("{redirect-url}", shimmerRedirectUrl);
+
         HttpGet httpGet = new HttpGet(shimmerAuthUrl);
         String authUrl = processShimmerAuthRequest(httpGet);
         if( authUrl == null ){
             throw new Exception("Could not retrieve authorization URL for " + shimkey);
         }
         return authUrl;
+    }
+
+    public void completeShimmerAuth(String shimkey, String code, String state) throws Exception{
+        String shimmerAuthCallbackUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_AUTH_CALLBACK;
+        shimmerAuthCallbackUrl = shimmerAuthCallbackUrl.replace("{shim-key}", shimkey);
+        shimmerAuthCallbackUrl = shimmerAuthCallbackUrl.replace("{code}", code);
+        shimmerAuthCallbackUrl = shimmerAuthCallbackUrl.replace("{state}", state);
+        HttpGet httpGet = new HttpGet(shimmerAuthCallbackUrl);
+        CloseableHttpResponse shimmerAuthResponse = getHttpClient().execute(httpGet, getHttpClientContext());
+        int statusCode = shimmerAuthResponse.getStatusLine().getStatusCode();
+        if(statusCode != 200) {
+            logger.debug("Auth Callback Resulted in Response Code " + statusCode);
+            throw new Exception("Authorization did not complete");
+        }
     }
 
     /**
