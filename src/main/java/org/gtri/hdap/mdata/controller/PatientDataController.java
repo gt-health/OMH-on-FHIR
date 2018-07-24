@@ -178,6 +178,7 @@ public class PatientDataController {
                                        @RequestParam(name="state") String state){
         logger.debug("Handling successful Fitbit auth redirect");
         logger.debug("Model " + model);
+
         logger.debug("Flash Attribute " + flashShimmerIdAttribute);
         try {
             shimmerService.completeShimmerAuth(shimkey, code, state);
