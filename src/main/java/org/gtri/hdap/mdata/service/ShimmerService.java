@@ -143,6 +143,7 @@ public class ShimmerService {
             logger.debug("Auth Callback Resulted in Response Code " + statusCode);
             throw new Exception("Authorization did not complete");
         }
+
         logger.debug("Completed Shimmer Auth");
     }
 

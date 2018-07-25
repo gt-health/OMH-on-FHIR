@@ -49,7 +49,8 @@ public class PatientDataController {
     /*========================================================================*/
     /* Constants */
     /*========================================================================*/
-
+    public static String OMH_ON_FHIR_CALLBACK_ENV = "OMH_ON_FHIR_CALLBACK";
+    public static String OMH_ON_FHIR_LOGIN_ENV = "OMH_ON_FHIR_LOGIN";
 
     /*========================================================================*/
     /* Variables */
@@ -104,9 +105,8 @@ public class PatientDataController {
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
-        model.addAttribute("shimmerId", shimmerId);
-
-        redirectAttributes.addFlashAttribute("shimmerId", shimmerId);
+//        model.addAttribute("shimmerId", shimmerId);
+//        redirectAttributes.addFlashAttribute("shimmerId", shimmerId);
         redirectAttributes.addAttribute("shimmerId", shimmerId);
 
         String redirectUrl = "redirect:" + fitbitAuthUrl;
@@ -157,10 +157,14 @@ public class PatientDataController {
 
     //handles requests of the format
     //GET https://apps.hdap.gatech.edu/hapiR4/baseR4/Binary?_id=EXexample
+    @GetMapping("/Binary/{documentId}")
+    public Bundle retrieveBinary(@PathVariable String documentId){
+        return makeBundleForDocument(documentId);
+    }
+
     @GetMapping("/Binary")
-    public Binary retrieveBinary(@RequestParam(name="id", required=true) String documentId){
-        //get fitbit data for binary resource
-        return new Binary();
+    public Bundle retrieveBinaryFile(@RequestParam(name="_id", required = true)String documentId){
+        return makeBundleForDocument(documentId);
     }
 
     //handles requests of the format
@@ -171,23 +175,31 @@ public class PatientDataController {
     }
 
     @RequestMapping("/authorize/{shimkey}/callback")
-    public String handleFitbitRedirect(ModelMap model,
-                                       @ModelAttribute("shimmerId") Object flashShimmerIdAttribute,
+    public ModelAndView handleFitbitRedirect(ModelMap model,
+//                                       @ModelAttribute("shimmerId") Object flashShimmerIdAttribute,
                                        @PathVariable String shimkey,
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
         logger.debug("Handling successful Fitbit auth redirect");
         logger.debug("Model " + model);
 
-        logger.debug("Flash Attribute " + flashShimmerIdAttribute);
+        String omhOnFhirUi;
+//        logger.debug("Flash Attribute " + flashShimmerIdAttribute);
         try {
             shimmerService.completeShimmerAuth(shimkey, code, state);
         }
         catch(Exception e){
-            //TODO redirect to error page
+            e.printStackTrace();
+            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
+            model.addAttribute("loginSuccess", false);
+            logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
+            return new ModelAndView(omhOnFhirUi, model);
         }
 
-        return "TODO handle successful Fitbit auth redirect with redirect to UI";
+        omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_CALLBACK_ENV);
+        model.addAttribute("loginSuccess", true);
+        logger.debug("Redirecting to: " + omhOnFhirUi);
+        return new ModelAndView(omhOnFhirUi, model);
     }
 
     /*========================================================================*/
@@ -223,6 +235,44 @@ public class PatientDataController {
     /*========================================================================*/
     /* Private Methods */
     /*========================================================================*/
+
+    private Bundle makeBundleForDocument(String documentId){
+        //get fitbit data for binary resource
+        ShimmerData shimmerData = shimmerDataRepository.findByDocumentId(documentId);
+
+        //get shimmer data
+        String jsonData = shimmerData.getJsonData();
+
+        //convert to base64
+        byte[] base64EncodedData = Base64.getEncoder().encode(jsonData.getBytes());
+
+        //make the Binary object
+        Binary binary = makeBinary(base64EncodedData);
+
+        //convert to a bundle
+        Bundle bundle = makeBundle(binary);
+
+        //return the bundle
+        return bundle;
+    }
+
+    private Binary makeBinary(byte[] base64EncodedData){
+        Binary binary = new Binary();
+        binary.setContentType("application/json");
+        binary.setContent(base64EncodedData);
+        return binary;
+    }
+
+    private Bundle makeBundle(Resource fhirResource){
+        Bundle bundle = new Bundle();
+        Bundle.BundleEntryComponent bundleEntryComponent = new Bundle.BundleEntryComponent();
+        bundleEntryComponent.setResource(fhirResource);
+        List<Bundle.BundleEntryComponent> bundleEntryComponentList = new ArrayList<Bundle.BundleEntryComponent>();
+        bundleEntryComponentList.add(bundleEntryComponent);
+        bundle.setType(Bundle.BundleType.SEARCHSET);
+        bundle.setEntry(bundleEntryComponentList);
+        return bundle;
+    }
 
     private String getShimmerId(String ehrId, String shimkey){
         ApplicationUser user = applicationUserRepository.findByEhrId(ehrId);

@@ -37,5 +37,7 @@ services:
     environment:
       - SHIMMER_SERVER_URL=http://console:8083
       - SHIMMER_REDIRECT_URL=https://apps.hdap.gatech.edu/mdata/authorize/fitbit/callback
+      - OMH_ON_FHIR_CALLBACK=https://apps.hdap.gatech.edu/ohmonfhir/activity
+      - OMH_ON_FHIR_LOGIN=https://apps.hdap.gatech.edu/ohmonfhir/login
     depends_on:
       - mdata-db
