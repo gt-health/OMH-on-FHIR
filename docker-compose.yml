@@ -2,20 +2,23 @@ version: '3.0'
 services:
   resource-server:
     image: openmhealth/shimmer-resource-server
+    restart: always
     environment:
       SPRING_PROFILES_ACTIVE: development
     depends_on:
       - mongo
     env_file:
-      - shimmer-resource-server.env
+      - ./web-api/shimmer-resource-server.env
     ports:
       - "8084:8083"
 
   mongo:
     image: mongo
+    restart: always
 
   console:
     image: openmhealth/shimmer-console
+    restart: always
     ports:
       - "8083:8083"
     depends_on:
@@ -27,10 +30,12 @@ services:
     expose:
       - 5432
     env_file:
-      - postgres.env
+      - ./web-api/postgres.env
 
   mdata-app:
-    build: .
+    build:
+      context: ./web-api
+      dockerfile: Dockerfile
     restart: always
     ports:
       - "8888:8080"
@@ -41,3 +46,14 @@ services:
       - OMH_ON_FHIR_LOGIN=https://apps.hdap.gatech.edu/ohmonfhir/login
     depends_on:
       - mdata-db
+
+  omh_on_fhir_client:
+      build:
+        #specifiy the project build context
+        context: ./omhclient
+        #specifiy the Dockerfile to use
+        dockerfile: Dockerfile
+      restart: always
+      #bind host port 4200 to container port 4200
+      ports:
+         - 8989:8080
