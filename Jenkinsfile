@@ -15,11 +15,11 @@ pipeline{
                 script{
                     docker.withRegistry('https://build.hdap.gatech.edu'){
                         //Build and push the database image
-                        def webApiImage = docker.build("omhonfhirapp:1.0", "-f Dockerfile ./web-api")
+                        def webApiImage = docker.build("omhonfhirapp:1.0", "-f ./omhserver/Dockerfile ./omhserver")
                         webApiImage.push('latest')
 
                         //Build and push the database image
-                        def uiImage = docker.build("omhonfhirui:1.0", "-f Dockerfile ./omhclient")
+                        def uiImage = docker.build("omhonfhirui:1.0", "-f ./omhclient/Dockerfile ./omhclient")
                         uiImage.push('latest')
                     }
                 }
