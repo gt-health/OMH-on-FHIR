@@ -26,7 +26,8 @@ COPY . /usr/local/app
 ENV NODE_ENV production
 
 #new build code
-RUN $(npm bin)/ng build --base-href .
+#RUN $(npm bin)/ng build --base-href .
+RUN ng build --base-href .
 
 FROM tomcat:latest
 COPY --from=builder /usr/local/app/dist/omhclient /usr/local/tomcat/webapps/omhonfhir
