@@ -38,7 +38,6 @@ export class LoginComponent implements OnInit {
         "&shimkey=fitbit";
     console.log("Authorizing with Shimmer " + shimmerAuthUrl);
     window.location.href = shimmerAuthUrl;
-    console.log("window url");
-    console.log(window.location.href);
+    console.log("window url " + window.location.href);
   }
 }
