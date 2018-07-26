@@ -23,11 +23,12 @@ COPY . /usr/local/app
 #Start the server
 #CMD ["npm", "start", "--host 0.0.0.0", "--disable-host-check true"]
 # set environment variables
-ENV NODE_ENV production
+#ENV NODE_ENV production
+#CMD ["ng", "serve"]
 
 #new build code
 #RUN $(npm bin)/ng build --base-href .
-RUN ng build --base-href .
+RUN ng build --prod --base-href .
 
 FROM tomcat:latest
 COPY --from=builder /usr/local/app/dist/omhclient /usr/local/tomcat/webapps/omhonfhir
