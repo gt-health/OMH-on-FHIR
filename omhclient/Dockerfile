@@ -12,7 +12,7 @@ COPY package.json /usr/local/app
 
 # install dependencies
 #RUN npm install
-RUN npm install -g @angular/cli
+RUN npm install && npm install -g @angular/cli && npm update -g @angular/cli
 
 # copy over code
 COPY . /usr/local/app
