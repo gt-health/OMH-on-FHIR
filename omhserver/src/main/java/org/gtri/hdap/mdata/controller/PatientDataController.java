@@ -105,8 +105,8 @@ public class PatientDataController {
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
-//        model.addAttribute("shimmerId", shimmerId);
-//        redirectAttributes.addFlashAttribute("shimmerId", shimmerId);
+        model.addAttribute("shimmerId", shimmerId);
+        redirectAttributes.addFlashAttribute("shimmerId", shimmerId);
         redirectAttributes.addAttribute("shimmerId", shimmerId);
 
         String redirectUrl = "redirect:" + fitbitAuthUrl;
@@ -176,7 +176,7 @@ public class PatientDataController {
 
     @RequestMapping("/authorize/{shimkey}/callback")
     public ModelAndView handleFitbitRedirect(ModelMap model,
-//                                       @ModelAttribute("shimmerId") Object flashShimmerIdAttribute,
+                                       @ModelAttribute("shimmerId") Object flashShimmerIdAttribute,
                                        @PathVariable String shimkey,
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
@@ -185,16 +185,16 @@ public class PatientDataController {
 
         String omhOnFhirUi;
 //        logger.debug("Flash Attribute " + flashShimmerIdAttribute);
-        try {
-            shimmerService.completeShimmerAuth(shimkey, code, state);
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
-            model.addAttribute("loginSuccess", false);
-            logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
-            return new ModelAndView(omhOnFhirUi, model);
-        }
+//        try {
+//            shimmerService.completeShimmerAuth(shimkey, code, state);
+//        }
+//        catch(Exception e){
+//            e.printStackTrace();
+//            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
+//            model.addAttribute("loginSuccess", false);
+//            logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
+//            return new ModelAndView(omhOnFhirUi, model);
+//        }
 
         omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_CALLBACK_ENV);
         model.addAttribute("loginSuccess", true);
