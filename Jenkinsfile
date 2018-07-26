@@ -35,7 +35,7 @@ pipeline{
                     rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'openmhealth/shimmer-console', ports: '', service: 'OMHonFHIR/console', timeout: 50
                     rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'postgres:latest', ports: '', service: 'OMHonFHIR/mdata-db', timeout: 50
                     rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'build.hdap.gatech.edu/omhonfhirapp:latest', ports: '', service: 'OMHonFHIR/mdata-app', timeout: 50
-                    rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'build.hdap.gatech.edu/omhonfhirui:latest', ports: '', service: 'OMHonFHIR/omh_on_fhir_client', timeout: 50
+                    rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'build.hdap.gatech.edu/omhonfhirui:latest', ports: '', service: 'OMHonFHIR/omh-on-fhir-client', timeout: 50
                 }
             }
         }
