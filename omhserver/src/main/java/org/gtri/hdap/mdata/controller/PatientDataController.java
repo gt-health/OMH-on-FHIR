@@ -181,7 +181,7 @@ public class PatientDataController {
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
         logger.debug("Handling successful Fitbit auth redirect");
-        String modelShimmerId = (String)model.get("shimmerId");
+        String modelShimmerId = String.valueOf(model.get("shimmerId"));
         logger.debug("Model " + modelShimmerId);
 
         logger.debug("Flash Attribute " + flashShimmerIdAttribute);
@@ -200,7 +200,7 @@ public class PatientDataController {
 
         omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_CALLBACK_ENV);
         model.addAttribute("loginSuccess", true);
-        model.addAttribute("shimmerId", modelShimmerId);
+        model.addAttribute("shimmerId", flashShimmerIdAttribute);
         logger.debug("Redirecting to: " + omhOnFhirUi);
         return new ModelAndView(omhOnFhirUi, model);
     }
