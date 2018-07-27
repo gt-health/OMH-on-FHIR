@@ -105,7 +105,7 @@ public class PatientDataController {
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
-        model.addAttribute("shimmerId", shimmerId);
+//        model.addAttribute("shimmerId", shimmerId);
         redirectAttributes.addFlashAttribute("shimmerId", shimmerId);
         redirectAttributes.addAttribute("shimmerId", shimmerId);
 
@@ -181,19 +181,21 @@ public class PatientDataController {
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
         logger.debug("Handling successful Fitbit auth redirect");
-        logger.debug("Model " + shimmerId);
+        logger.debug("Flash Model " + shimmerId);
 
         String omhOnFhirUi;
-        try {
-            shimmerService.completeShimmerAuth(shimkey, code, state);
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
-            model.addAttribute("loginSuccess", false);
-            logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
-            return new ModelAndView(omhOnFhirUi, model);
-        }
+
+        //TODO: Why is this call to the shimmer API not working
+//        try {
+//            shimmerService.completeShimmerAuth(shimkey, code, state);
+//        }
+//        catch(Exception e){
+//            e.printStackTrace();
+//            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
+//            model.addAttribute("loginSuccess", false);
+//            logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
+//            return new ModelAndView(omhOnFhirUi, model);
+//        }
 
         omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_CALLBACK_ENV);
         model.addAttribute("loginSuccess", true);
