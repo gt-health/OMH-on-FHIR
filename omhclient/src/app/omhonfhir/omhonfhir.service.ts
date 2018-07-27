@@ -32,7 +32,7 @@ export class OmhonfhirService {
 
     console.log("Requesting Document Reference " + shimmerDocRefUrl);
 
-    return null;
+    return this.http.get(shimmerDocRefUrl);
   }
 
   requestBinary(documentId): Observable<Object>{
