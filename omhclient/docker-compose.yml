@@ -1,0 +1,12 @@
+version: '3.0'
+services:
+  omh_on_fhir_client:
+      build:
+        #specifiy the project build context
+        context: .
+        #specifiy the Dockerfile to use
+        dockerfile: Dockerfile
+      restart: always
+      #bind host port 4200 to container port 4200
+      ports:
+         - 8989:8080

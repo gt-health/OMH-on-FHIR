@@ -181,23 +181,26 @@ public class PatientDataController {
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
         logger.debug("Handling successful Fitbit auth redirect");
-        logger.debug("Model " + model);
+        String modelShimmerId = (String)model.get("shimmerId");
+        logger.debug("Model " + modelShimmerId);
+
+        logger.debug("Flash Attribute " + flashShimmerIdAttribute);
 
         String omhOnFhirUi;
-//        logger.debug("Flash Attribute " + flashShimmerIdAttribute);
-//        try {
-//            shimmerService.completeShimmerAuth(shimkey, code, state);
-//        }
-//        catch(Exception e){
-//            e.printStackTrace();
-//            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
-//            model.addAttribute("loginSuccess", false);
-//            logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
-//            return new ModelAndView(omhOnFhirUi, model);
-//        }
+        try {
+            shimmerService.completeShimmerAuth(shimkey, code, state);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
+            model.addAttribute("loginSuccess", false);
+            logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
+            return new ModelAndView(omhOnFhirUi, model);
+        }
 
         omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_CALLBACK_ENV);
         model.addAttribute("loginSuccess", true);
+        model.addAttribute("shimmerId", modelShimmerId);
         logger.debug("Redirecting to: " + omhOnFhirUi);
         return new ModelAndView(omhOnFhirUi, model);
     }
