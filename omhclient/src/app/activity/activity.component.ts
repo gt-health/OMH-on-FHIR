@@ -33,8 +33,8 @@ export class ActivityComponent implements OnInit {
     this.omhonfhirService.requestDocumentReference(this.shimmerId, this.startDate, this.endDate)
       .subscribe(activityJson => {
         console.log("Processing response");
-        this.activityJson = activityJson;
-        console.log("Finished processing response");
+        this.activityJson = activityJson.toString();
+        console.log("Finished processing response " + this.activityJson);
       });
   }
 }
