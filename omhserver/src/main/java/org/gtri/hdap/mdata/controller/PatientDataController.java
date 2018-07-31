@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
  * Created by es130 on 6/27/2018.
  */
 @RestController
+@SessionAttributes("shimmerId")
 public class PatientDataController {
 
     /*========================================================================*/
@@ -64,6 +65,11 @@ public class PatientDataController {
     @Autowired
     private ShimmerDataRepository shimmerDataRepository;
 
+    @ModelAttribute("shimmerId")
+    public String shimmerId(){
+        return "";
+    }
+
     /*========================================================================*/
     /* Service Endpoint Methods */
     /*========================================================================*/
@@ -83,7 +89,8 @@ public class PatientDataController {
     //TODO: Do we really need to pass in the ModelMap
     @GetMapping("/shimmerAuthentication")
     public ModelAndView authenticateWithShimmer(ModelMap model,
-//                                                RedirectAttributes redirectAttributes,
+                                                @ModelAttribute("shimmerId") String shimmerId,
+                                                RedirectAttributes attributes,
                                                 @RequestParam(name="ehrId", required=true) String ehrId,
                                                 @RequestParam(name="shimkey", required=true) String shimkey){
         logger.debug("Trying to connect to " + shimkey + " API");
@@ -92,8 +99,7 @@ public class PatientDataController {
         // for example https://gt-apps.hdap.gatech.edu:8083/authorize/fitbit?username={userId}
         // The username query parameter can be set to any unique identifier you'd like to use to identify the user.
 
-        String shimmerId = getShimmerId(ehrId, shimkey);
-
+        String userShimmerId = getShimmerId(ehrId, shimkey);
         String fitbitAuthUrl = null;
         try {
             fitbitAuthUrl = shimmerService.requestShimmerAuthUrl(shimmerId, shimkey);
@@ -105,9 +111,14 @@ public class PatientDataController {
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
-        model.addAttribute("shimmerId", shimmerId);
-//        redirectAttributes.addFlashAttribute("flashShimmerId", shimmerId);
-//        redirectAttributes.addAttribute("shimmerId", shimmerId);
+
+        //see if the session attribute needs to be updated
+        if(shimmerId.isEmpty()){
+            model.addAttribute("shimmerId", userShimmerId);
+        }
+        //tell spring we want the attribute to survive the redirect
+        attributes.addFlashAttribute("shimmerId", userShimmerId);
+//        attributes.addAttribute("shimmerId", userShimmerId);
 
         String redirectUrl = "redirect:" + fitbitAuthUrl;
         return new ModelAndView(redirectUrl, model);
@@ -184,7 +195,7 @@ public class PatientDataController {
         logger.debug("Handling successful Fitbit auth redirect");
         logger.debug("MODEL shimmer id " + model.get("shimmerId"));
         logger.debug("Passed in shimmer id " + shimmerId);
-//        logger.debug("Passing in Flash shimmer id " + flashShimmerId);
+//        logger.debug("Passed in Flash shimmer id " + flashShimmerId);
 
         String omhOnFhirUi;
 
