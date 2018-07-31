@@ -20,7 +20,6 @@ export class OmhonfhirService {
   }
 
   requestDocumentReference(shimmerId, startDate, endDate): Observable<Object>{
-
     var shimmerDocRefUrl = environment.omhOnFhirAPIBase + "/DocumentReference?subject=" + shimmerId;
 
     if(startDate){
