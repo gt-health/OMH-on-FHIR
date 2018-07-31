@@ -13,7 +13,11 @@ export class ActivityComponent implements OnInit {
   startDate: string;
   endDate: string;
   shimmerId: string;
-  activityJson ;
+  activityJson;
+  activityJsonString: string;
+  activityResourceType: string;
+  activityDataType: string;
+  activityBinaryUrl: string;
 
   constructor( private omhonfhirService: OmhonfhirService,
                private route: ActivatedRoute) { }
@@ -33,8 +37,22 @@ export class ActivityComponent implements OnInit {
     this.omhonfhirService.requestDocumentReference(this.shimmerId, this.startDate, this.endDate)
       .subscribe(activityJson => {
         console.log("Processing response");
-        this.activityJson = activityJson.toString();
-        console.log("Finished processing response " + this.activityJson);
+        this.activityJson = activityJson;
+        this.activityJsonString = JSON.stringify(activityJson);
+        //sample response
+        //{"resourceType":"DocumentReference","status":"current","type":{"text":"OMH fitbit data"},"indexed":"2018-07-31T22:02:11.408+00:00","content":[{"attachment":{"contentType":"application/json","url":"Binary/1d1ddd60-0c42-4ed2-b0e3-8b43876ceb9b","title":"OMH fitbit data","creation":"2018-07-31T22:02:11+00:00"}}]}
+        //make title
+        this.activityResourceType = activityJson.resourceType;
+        //make type
+        this.activityDataType = activityJson.type.text;
+        //make url
+        this.activityBinaryUrl = activityJson.type.content[0].url;
+        console.log("Finished processing response " + this.activityJsonString);
       });
+  }
+
+  queryBinary(): void{
+    console.log("Querying binary " + this.activityUrl);
+    this.omhonfhirService.requestBinary(this.activityBinaryUrl);
   }
 }

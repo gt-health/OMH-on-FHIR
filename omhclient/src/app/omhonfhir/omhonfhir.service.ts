@@ -34,8 +34,8 @@ export class OmhonfhirService {
     return this.http.get(shimmerDocRefUrl);
   }
 
-  requestBinary(documentId): Observable<Object>{
-    var shimmerBinaryUrl = environment.omhOnFhirAPIBase + "/Binary/" + documentId;
+  requestBinary(binaryUrl): Observable<Object>{
+    var shimmerBinaryUrl = environment.omhOnFhirAPIBase + "/" + binaryUrl;
     return this.http.get<Object>(shimmerBinaryUrl);
   }
 }

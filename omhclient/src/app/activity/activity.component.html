@@ -15,4 +15,23 @@
   </div>
   <button class="btn btn-default" (click)="queryActivity()">Get Activity</button>
 </form>
-<div id="activityResponse">{{activityJson}}</div>
+<div id="activityResponse">
+  {{activityJsonString}}
+  <table class="table table-info">
+    <tbody>
+      <tr>
+        <td>Resource Type:</td>
+        <td>{{activityResourceType}}</td>
+      </tr>
+      <tr>
+        <td>Data Type:</td>
+        <td>{{activityDataType}}</td>
+      </tr>
+      <tr>
+        <td>Download:</td>
+        <td><button class="btn btn-default" (click)="queryBinary()">Download Binary</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
