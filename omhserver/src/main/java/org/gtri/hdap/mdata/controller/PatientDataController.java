@@ -105,7 +105,7 @@ public class PatientDataController {
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
-        model.addAttribute("shimmerId", shimmerId);
+//        model.addAttribute("shimmerId", shimmerId);
         redirectAttributes.addFlashAttribute("flashShimmerId", shimmerId);
         redirectAttributes.addAttribute("shimmerId", shimmerId);
 
@@ -177,11 +177,13 @@ public class PatientDataController {
     @RequestMapping("/authorize/{shimkey}/callback")
     public ModelAndView handleFitbitRedirect(ModelMap model,
                                        @ModelAttribute("shimmerId") String shimmerId,
+                                       @ModelAttribute("flashShimmerId") String flashShimmerId,
                                        @PathVariable String shimkey,
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
         logger.debug("Handling successful Fitbit auth redirect");
         logger.debug("Passing in shimmer id " + shimmerId);
+        logger.debug("Passing in Flash shimmer id " + flashShimmerId);
 
         String omhOnFhirUi;
 
