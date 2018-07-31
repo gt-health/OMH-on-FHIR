@@ -7,6 +7,6 @@ services:
         #specifiy the Dockerfile to use
         dockerfile: Dockerfile
       restart: always
-      #bind host port 4200 to container port 4200
+      #bind host port 8989 to container port 8080
       ports:
-         - 8989:8080
+         - 8989:80

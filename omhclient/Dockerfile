@@ -14,12 +14,13 @@ COPY package.json /usr/local/app
 #RUN npm install
 RUN npm install && npm install -g @angular/cli && npm update -g @angular/cli
 
-# copy over code
+# copy over project
 COPY . /usr/local/app
 
-#new build code
-#RUN $(npm bin)/ng build --base-href .
-RUN ng build --prod --base-href .
+#build code
+RUN ng build --prod --base-href=/omhonfhir/
 
-FROM tomcat:latest
-COPY --from=builder /usr/local/app/dist/omhclient /usr/local/tomcat/webapps/omhonfhir
+#deploy to NGINX
+FROM nginx
+COPY --from=builder /usr/local/app/dist/omhclient /etc/nginx/html/omhonfhir
+COPY --from=builder ./usr/local/app/nginx.conf /etc/nginx/conf.d/default.conf
