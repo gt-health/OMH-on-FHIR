@@ -105,7 +105,7 @@ public class PatientDataController {
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
-//        model.addAttribute("shimmerId", shimmerId);
+        model.addAttribute("shimmerId", shimmerId);
         redirectAttributes.addFlashAttribute("flashShimmerId", shimmerId);
         redirectAttributes.addAttribute("shimmerId", shimmerId);
 
@@ -176,12 +176,12 @@ public class PatientDataController {
 
     @RequestMapping("/authorize/{shimkey}/callback")
     public ModelAndView handleFitbitRedirect(ModelMap model,
-                                       @ModelAttribute("flashShimmerId") String shimmerId,
+                                       @ModelAttribute("shimmerId") String shimmerId,
                                        @PathVariable String shimkey,
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
         logger.debug("Handling successful Fitbit auth redirect");
-        logger.debug("Flash Model " + shimmerId);
+        logger.debug("Passing in shimmer id " + shimmerId);
 
         String omhOnFhirUi;
 
@@ -277,15 +277,19 @@ public class PatientDataController {
     }
 
     private String getShimmerId(String ehrId, String shimkey){
+        logger.debug("Checking User");
         ApplicationUser user = applicationUserRepository.findByEhrId(ehrId);
         String shimmerId;
         if(user == null){
             //create a mapping
+            logger.debug("User does not exist, creating");
             shimmerId = UUID.randomUUID().toString();
             ApplicationUser newUser = new ApplicationUser(ehrId, shimmerId, shimkey);
             applicationUserRepository.save(newUser);
+            logger.debug("finished creating user");
         }
         else{
+            logger.debug("Using existing user");
             shimmerId = user.getShimmerId();
         }
         return shimmerId;
