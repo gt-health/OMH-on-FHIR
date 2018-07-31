@@ -19,14 +19,11 @@ export class ActivityComponent implements OnInit {
                private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.route.paramMap.pipe(
-      switchMap((params: ParamMap) => {
-        // (+) before `params.get()` turns the string into a number
-        console.log("Parsing params for activity request");
-        this.shimmerId = params.get('shimmerId');
-        console.log("shimmerId: " + this.shimmerId);
-      })
-    );
+    this.route.queryParamMap.subscribe(params => {
+      console.log("Activity Component parsing params: " + params.keys);
+      this.shimmerId = params.get("shimmerId");
+      console.log("ShimmerId: " + this.shimmerId);
+    });
   }
 
   queryActivity(): void{
