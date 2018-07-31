@@ -83,7 +83,7 @@ public class PatientDataController {
     //TODO: Do we really need to pass in the ModelMap
     @GetMapping("/shimmerAuthentication")
     public ModelAndView authenticateWithShimmer(ModelMap model,
-                                                RedirectAttributes redirectAttributes,
+//                                                RedirectAttributes redirectAttributes,
                                                 @RequestParam(name="ehrId", required=true) String ehrId,
                                                 @RequestParam(name="shimkey", required=true) String shimkey){
         logger.debug("Trying to connect to " + shimkey + " API");
@@ -105,9 +105,9 @@ public class PatientDataController {
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
-//        model.addAttribute("shimmerId", shimmerId);
-        redirectAttributes.addFlashAttribute("flashShimmerId", shimmerId);
-        redirectAttributes.addAttribute("shimmerId", shimmerId);
+        model.addAttribute("shimmerId", shimmerId);
+//        redirectAttributes.addFlashAttribute("flashShimmerId", shimmerId);
+//        redirectAttributes.addAttribute("shimmerId", shimmerId);
 
         String redirectUrl = "redirect:" + fitbitAuthUrl;
         return new ModelAndView(redirectUrl, model);
@@ -177,13 +177,14 @@ public class PatientDataController {
     @RequestMapping("/authorize/{shimkey}/callback")
     public ModelAndView handleFitbitRedirect(ModelMap model,
                                        @ModelAttribute("shimmerId") String shimmerId,
-                                       @ModelAttribute("flashShimmerId") String flashShimmerId,
+//                                       @ModelAttribute("flashShimmerId") String flashShimmerId,
                                        @PathVariable String shimkey,
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
         logger.debug("Handling successful Fitbit auth redirect");
-        logger.debug("Passing in shimmer id " + shimmerId);
-        logger.debug("Passing in Flash shimmer id " + flashShimmerId);
+        logger.debug("MODEL shimmer id " + model.get("shimmerId"));
+        logger.debug("Passed in shimmer id " + shimmerId);
+//        logger.debug("Passing in Flash shimmer id " + flashShimmerId);
 
         String omhOnFhirUi;
 
