@@ -200,16 +200,16 @@ public class PatientDataController {
         String omhOnFhirUi;
 
         //TODO: Why is this call to the shimmer API not working
-//        try {
-//            shimmerService.completeShimmerAuth(shimkey, code, state);
-//        }
-//        catch(Exception e){
-//            e.printStackTrace();
-//            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
-//            model.addAttribute("loginSuccess", false);
-//            logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
-//            return new ModelAndView(omhOnFhirUi, model);
-//        }
+        try {
+            shimmerService.completeShimmerAuth(shimkey, code, state);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
+            model.addAttribute("loginSuccess", false);
+            logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
+            return new ModelAndView(omhOnFhirUi, model);
+        }
 
         omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_CALLBACK_ENV);
         model.addAttribute("loginSuccess", true);
