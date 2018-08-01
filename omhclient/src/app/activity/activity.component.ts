@@ -42,11 +42,11 @@ export class ActivityComponent implements OnInit {
         //sample response
         //{"resourceType":"DocumentReference","status":"current","type":{"text":"OMH fitbit data"},"indexed":"2018-07-31T22:02:11.408+00:00","content":[{"attachment":{"contentType":"application/json","url":"Binary/1d1ddd60-0c42-4ed2-b0e3-8b43876ceb9b","title":"OMH fitbit data","creation":"2018-07-31T22:02:11+00:00"}}]}
         //make title
-        this.activityResourceType = activityJson.resourceType;
+        this.activityResourceType = activityJson['resourceType'];
         //make type
-        this.activityDataType = activityJson.type.text;
+        this.activityDataType = activityJson['type']['text'];
         //make url
-        this.activityBinaryUrl = activityJson.type.content[0].url;
+        this.activityBinaryUrl = activityJson['type']['content'][0]['url'];
         console.log("Finished processing response " + this.activityJsonString);
       });
   }
