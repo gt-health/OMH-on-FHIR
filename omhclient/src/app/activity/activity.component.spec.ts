@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ActivityComponent } from './activity.component';
+//import { OmhonfhirService } from '../omhonfhir/omhonfhir.service';
 
 describe('ActivityComponent', () => {
   let component: ActivityComponent;
@@ -8,7 +9,8 @@ describe('ActivityComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ActivityComponent ]
+      declarations: [ ActivityComponent ]//,
+      //providers: [ {provide: OmhonfhirService, useClass: MockDoc}]
     })
     .compileComponents();
   }));
