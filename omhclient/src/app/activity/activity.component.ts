@@ -52,7 +52,7 @@ export class ActivityComponent implements OnInit {
   }
 
   queryBinary(): void{
-    console.log("Querying binary " + this.activityUrl);
+    console.log("Querying binary " + this.activityBinaryUrl);
     this.omhonfhirService.requestBinary(this.activityBinaryUrl);
   }
 }
