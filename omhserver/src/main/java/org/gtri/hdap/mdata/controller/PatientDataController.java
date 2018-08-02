@@ -188,7 +188,6 @@ public class PatientDataController {
     @RequestMapping("/authorize/{shimkey}/callback")
     public ModelAndView handleFitbitRedirect(ModelMap model,
                                        @ModelAttribute("shimmerId") String shimmerId,
-//                                       @ModelAttribute("flashShimmerId") String flashShimmerId,
                                        @PathVariable String shimkey,
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
@@ -197,8 +196,6 @@ public class PatientDataController {
         logger.debug("Passed in shimmer id " + shimmerId);
         logger.debug("Code " + code);
         logger.debug("State " + state);
-
-//        logger.debug("Passed in Flash shimmer id " + flashShimmerId);
 
         //TODO: YOU ARE HERE DO YOU NEED TO MAKE IT HANDLE A CALL BACK LIKE WHAT IS USED WITH POSTMAN?
         //"authorizationUrl": "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=22D3DR&
