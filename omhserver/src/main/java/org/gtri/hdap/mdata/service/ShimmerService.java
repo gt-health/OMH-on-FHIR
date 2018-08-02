@@ -136,7 +136,9 @@ public class ShimmerService {
         shimmerAuthCallbackUrl = shimmerAuthCallbackUrl.replace("{shim-key}", shimkey);
         shimmerAuthCallbackUrl = shimmerAuthCallbackUrl.replace("{code}", code);
         shimmerAuthCallbackUrl = shimmerAuthCallbackUrl.replace("{state}", state);
+
         logger.debug("Completing Shimmer Auth: " + shimmerAuthCallbackUrl);
+
         HttpGet httpGet = new HttpGet(shimmerAuthCallbackUrl);
         CloseableHttpResponse shimmerAuthResponse = getHttpClient().execute(httpGet, getHttpClientContext());
         int statusCode = shimmerAuthResponse.getStatusLine().getStatusCode();

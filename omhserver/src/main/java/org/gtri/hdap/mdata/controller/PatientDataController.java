@@ -195,7 +195,17 @@ public class PatientDataController {
         logger.debug("Handling successful Fitbit auth redirect");
         logger.debug("MODEL shimmer id " + model.get("shimmerId"));
         logger.debug("Passed in shimmer id " + shimmerId);
+        logger.debug("Code " + code);
+        logger.debug("State " + state);
+
 //        logger.debug("Passed in Flash shimmer id " + flashShimmerId);
+
+        //TODO: YOU ARE HERE DO YOU NEED TO MAKE IT HANDLE A CALL BACK LIKE WHAT IS USED WITH POSTMAN?
+        //"authorizationUrl": "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=22D3DR&
+        // redirect_uri=https://apps.hdap.gatech.edu/mdata/authorize/fitbit/callback&scope=activity%20heartrate%20sleep%20weight&state=qdm1q7&prompt=login%20consent",
+
+        //call made by fitbit to auth server
+        //https://shimmer.apps.hdap.gatech.edu/authorize/fitbit/callback?code=bab6a0ebfaa5ff046bfc4e61e6461822be6d7f17&state=NVEcXD#_=_
 
         String omhOnFhirUi;
 
