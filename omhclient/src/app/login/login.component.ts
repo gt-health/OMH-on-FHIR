@@ -35,7 +35,8 @@ export class LoginComponent implements OnInit {
         environment.omhOnFhirAPIBase +
         environment.omhOnFhirAPIShimmerAuth +
         "?ehrId=" + patientId +
-        "&shimkey=fitbit";
+        "&shimkey=googlefit";
+        //"&shimkey=fitbit";
     console.log("Authorizing with Shimmer " + shimmerAuthUrl);
     window.location.href = shimmerAuthUrl;
     console.log("window url " + window.location.href);
