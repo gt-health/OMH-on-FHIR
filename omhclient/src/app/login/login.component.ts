@@ -29,14 +29,21 @@ export class LoginComponent implements OnInit {
   //the user has authorized access to that account.
 
   loginWithFitbit(): void{
+    this.login("fitbit");
+  }
+
+  loginWithGoogleFit(): void{
+    this.login("googlefit");
+  }
+
+  login( shimKey ): void{
     var patientId = this.omhonfhirService.getPatietId();
 
     var shimmerAuthUrl =
-        environment.omhOnFhirAPIBase +
-        environment.omhOnFhirAPIShimmerAuth +
-        "?ehrId=" + patientId +
-        "&shimkey=googlefit";
-        //"&shimkey=fitbit";
+      environment.omhOnFhirAPIBase +
+      environment.omhOnFhirAPIShimmerAuth +
+      "?ehrId=" + patientId +
+      "&shimkey=" + shimKey;
     console.log("Authorizing with Shimmer " + shimmerAuthUrl);
     window.location.href = shimmerAuthUrl;
     console.log("window url " + window.location.href);
