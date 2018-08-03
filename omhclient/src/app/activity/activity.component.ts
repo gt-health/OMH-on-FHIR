@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OmhonfhirService } from '../omhonfhir/omhonfhir.service';
 import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import {DocumentReference} from "../omhonfhir/omhonfhir.service";
+import {DocumentReference, Binary, OmhActivity} from "../omhonfhir/omhonfhir.service";
 
 @Component({
   selector: 'app-activity',
@@ -10,15 +10,16 @@ import {DocumentReference} from "../omhonfhir/omhonfhir.service";
   styleUrls: ['./activity.component.css']
 })
 export class ActivityComponent implements OnInit {
-
+  waitingForSearch = false;
+  waitingForData = false;
   startDate: string;
   endDate: string;
   shimmerId: string;
   activityDocumentRef: DocumentReference;
-  activityJsonString: string;
   activityResourceType: string = "application/json";
   activityDataType: string = "OMH JSON";
   activityBinaryUrl: string;
+  omhActivity: OmhActivity;
 
   constructor( private omhonfhirService: OmhonfhirService,
                private route: ActivatedRoute) { }
@@ -34,12 +35,11 @@ export class ActivityComponent implements OnInit {
   queryActivity(): void{
     //var patientId = this.omhonfhirService.getPatietId();
     console.log("Querying patient " + this.shimmerId+ "activity from " + this.startDate + " to " + this.endDate);
-
+    this.waitingForSearch = true;
     this.omhonfhirService.requestDocumentReference(this.shimmerId, this.startDate, this.endDate)
       .subscribe((documentReference: DocumentReference) => {
         console.log("Processing response");
         this.activityDocumentRef = documentReference;
-        this.activityJsonString = JSON.stringify(documentReference);
         //sample response
         //{
         // "resourceType":"DocumentReference",
@@ -66,12 +66,20 @@ export class ActivityComponent implements OnInit {
         this.activityDataType = documentReference.type.text;//documentReference['type']['text'];
         //make url
         this.activityBinaryUrl = documentReference.content[0].attachment.url;//documentReference['type']['content'][0]['url'];
-        console.log("Finished processing response " + this.activityJsonString);
+        this.waitingForSearch = false;
       });
   }
 
   queryBinary(): void{
     console.log("Querying binary " + this.activityBinaryUrl);
-    this.omhonfhirService.requestBinary(this.activityBinaryUrl);
+    this.waitingForData = true;
+    //this.omhonfhirService.requestBinary(this.activityBinaryUrl).subscribe((binary: Binary) => {
+    this.omhonfhirService.requestBinaryAsJson(this.activityBinaryUrl).subscribe((omhActivity: OmhActivity) => {
+      console.log("Processing Binary response");
+      console.log(omhActivity);
+      this.omhActivity = omhActivity; //to convert OmhActivity to JSON string use JSON.stringify(omhActivity)
+      console.log("processed response");
+      this.waitingForData = false;
+    });
   }
 }

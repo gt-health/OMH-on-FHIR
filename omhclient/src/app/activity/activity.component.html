@@ -13,19 +13,62 @@
     <!-- input value is of the format yyyy-MM-dd by default -->
     <input [(ngModel)]="endDate" type="date" id="endDate" name="endDate">
   </div>
-  <button class="btn btn-default" (click)="queryActivity()">Get Activity</button>
+  <button class="btn btn-default" (click)="queryActivity()">Search</button>
 </form>
 
+<div *ngIf="waitingForSearch" class="alert alert-info">
+  <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+  Searching for activities...
+</div>
+
 <div *ngIf="activityDocumentRef" class="container-fluid" id="activityResponse">
-  {{activityJsonString}}
   <div class="row">
     <label>Resource Type: </label>{{activityResourceType}}
   </div>
   <div class="row">
     <label>Data Type: </label>{{activityDataType}}
   </div>
+
   <div class="row">
-    <button class="btn btn-default" (click)="queryBinary()">Download Binary</button>
+    <button class="btn btn-default" (click)="queryBinary()">Retrieve Activity Data</button>
+
+    <div *ngIf="waitingForData" class="alert alert-info">
+      <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+      Retrieving Activities...
+    </div>
+
+    <table *ngIf="omhActivity" class="table table-striped">
+      <thead>
+        <tr>
+          <td>Name</td>
+          <td>Start Time</td>
+          <td>End Time</td>
+          <td>Source</td>
+          <td>Origin</td>
+          <td>Creation Date</td>
+          <td>Schema</td>
+          <td>Schema Namespace</td>
+          <td>Schema Version</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let activityBody of omhActivity.body">
+          <td>{{activityBody.body.activity_name}}</td>
+          <td>{{activityBody.body.effective_time_frame.time_interval.start_date_time}}</td>
+          <td>{{activityBody.body.effective_time_frame.time_interval.end_date_time}}</td>
+          <td>{{activityBody.header.acquisition_provenance.source_name}}</td>
+          <td>{{activityBody.header.acquisition_provenance.source_origin_id}}</td>
+          <td>{{activityBody.header.creation_date_time}}</td>
+          <td>{{activityBody.header.schema_id.name}}</td>
+          <td>{{activityBody.header.schema_id.namespace}}</td>
+          <td>{{activityBody.header.schema_id.version}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="activityBinaryJson" class="row">
+        {{activityBinaryJson}}
+    </div>
   </div>
 </div>
 

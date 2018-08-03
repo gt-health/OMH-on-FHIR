@@ -3,6 +3,15 @@ import { Observable, of } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment'
 
+const headerDict = {
+  //'Content-Type': 'application/json',
+  'Accept': 'application/json',
+  //'Access-Control-Allow-Headers': 'Content-Type',
+};
+const requestOptions = {
+  headers: new HttpHeaders(headerDict)
+};
+
 export interface DocumentReference{
   resourceType: string;
   status: string;
@@ -21,6 +30,53 @@ export interface DocumentReferenceAttachment{
   url: string;
   title: string;
   creation: string;
+}
+
+export interface Binary{
+  resourceType: string;
+  contentType: string;
+  content: string;
+}
+
+export interface OmhActivity{
+  shim: string;
+  timeStamp: string;
+  body: OmhActivityBody[];
+}
+export interface OmhActivityBody{
+  body: OmhActivityBodyBody;
+  header: OmhActivityHeader;
+}
+export interface OmhActivityBodyBody{
+  activity_name: string;
+  effective_time_frame: OmhActivityEffectiveTimeFrame;
+}
+
+export interface OmhActivityHeader{
+  acquisition_provenance: OmhActivityAcquisitionProvenance;
+  creation_date_time: string;
+  id: string;
+  schema_id: OmhActivitySchemaId;
+}
+
+export interface OmhActivityEffectiveTimeFrame{
+  time_interval: OmhActivityTimeInterval;
+}
+
+export interface OmhActivityTimeInterval{
+  end_date_time: string;
+  start_date_time: string;
+}
+
+export interface OmhActivityAcquisitionProvenance{
+  source_name: string;
+  source_origin_id: string;
+}
+
+export interface OmhActivitySchemaId{
+  name: string;
+  namespace: string;
+  version: string;
 }
 
 @Injectable({
@@ -75,9 +131,17 @@ export class OmhonfhirService {
     return this.http.get<DocumentReference>(shimmerDocRefUrl);
   }
 
-  requestBinary(binaryUrl): Observable<Object>{
-    var shimmerBinaryUrl = environment.omhOnFhirAPIBase + "/" + binaryUrl;
+  //requestBinaryAsJson(binaryUrl): Observable<Binary>{
+  requestBinaryAsJson(binaryUrl): Observable<OmhActivity>{
+    //var shimmerBinaryUrl = environment.omhOnFhirAPIBase + "/" + binaryUrl;
+    var shimmerBinaryUrl = "https://apps.hdap.gatech.edu/mdata/Binary/b365e896-86a8-4fa8-96b7-11ee9160b372";
     console.log("Requesting Binary " + shimmerBinaryUrl);
-    return this.http.get(shimmerBinaryUrl);
+     return this.http.get<OmhActivity>(shimmerBinaryUrl, requestOptions );
   }
+
+  requestBinaryAsBase64(binaryUrl): Observable<Binary>{
+    var shimmerBinaryUrl = environment.omhOnFhirAPIBase + "/" + binaryUrl;
+    return this.http.get<Binary>(shimmerBinaryUrl);
+  }
+
 }
