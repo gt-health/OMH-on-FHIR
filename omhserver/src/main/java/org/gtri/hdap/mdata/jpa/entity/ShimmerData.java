@@ -2,6 +2,7 @@ package org.gtri.hdap.mdata.jpa.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -17,6 +18,7 @@ public class ShimmerData {
     private Long id;
     private String documentId;
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     private String jsonData;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
