@@ -293,6 +293,7 @@ public class ShimmerService {
                 HttpEntity responseEntity = shimmerAuthResponse.getEntity();
                 //get the json from the response and get the auth URL to redirect the user
                 String responseStr = EntityUtils.toString(responseEntity);
+                logger.debug("Shimmer Auth Response: " + responseStr);
                 JSONObject responseJson = new JSONObject(responseStr);
                 authorizationUrl = responseJson.getString("authorizationUrl");
                 logger.debug("Authorization URL " + authorizationUrl);
