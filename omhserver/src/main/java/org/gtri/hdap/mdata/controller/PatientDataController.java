@@ -100,9 +100,15 @@ public class PatientDataController {
         // The username query parameter can be set to any unique identifier you'd like to use to identify the user.
 
         String userShimmerId = getShimmerId(ehrId, shimkey);
+
+        //see if the session attribute needs to be updated
+        if(shimmerId.isEmpty()){
+            model.addAttribute("shimmerId", userShimmerId);
+        }
+
         String fitbitAuthUrl = null;
         try {
-            fitbitAuthUrl = shimmerService.requestShimmerAuthUrl(shimmerId, shimkey);
+            fitbitAuthUrl = shimmerService.requestShimmerAuthUrl(userShimmerId, shimkey);
         }
         catch(Exception e){
             e.printStackTrace();
@@ -112,10 +118,6 @@ public class PatientDataController {
 
         logger.debug("Finished connection to " + shimkey + " API");
 
-        //see if the session attribute needs to be updated
-        if(shimmerId.isEmpty()){
-            model.addAttribute("shimmerId", userShimmerId);
-        }
         //tell spring we want the attribute to survive the redirect
         attributes.addFlashAttribute("shimmerId", userShimmerId);
 //        attributes.addAttribute("shimmerId", userShimmerId);
