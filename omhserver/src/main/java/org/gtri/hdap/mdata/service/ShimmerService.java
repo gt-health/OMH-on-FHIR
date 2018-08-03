@@ -122,7 +122,7 @@ public class ShimmerService {
         shimmerAuthUrl = shimmerAuthUrl.replace("{shim-key}", shimkey);
         shimmerAuthUrl = shimmerAuthUrl.replace("{username}", shimmerId);
         shimmerAuthUrl = shimmerAuthUrl.replace("{redirect-url}", shimmerRedirectUrl);
-
+        logger.debug("Sending authorization request to " + shimmerAuthUrl);
         HttpGet httpGet = new HttpGet(shimmerAuthUrl);
         String authUrl = processShimmerAuthRequest(httpGet);
         if( authUrl == null ){

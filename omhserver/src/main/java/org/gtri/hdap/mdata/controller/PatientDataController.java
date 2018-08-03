@@ -170,11 +170,13 @@ public class PatientDataController {
     //GET https://apps.hdap.gatech.edu/hapiR4/baseR4/Binary?_id=EXexample
     @GetMapping("/Binary/{documentId}")
     public Bundle retrieveBinary(@PathVariable String documentId){
+        logger.debug("Retrieving Binary with URL");
         return makeBundleForDocument(documentId);
     }
 
     @GetMapping("/Binary")
     public Bundle retrieveBinaryFile(@RequestParam(name="_id", required = true)String documentId){
+        logger.debug("Retriving Binary with URL param");
         return makeBundleForDocument(documentId);
     }
 
@@ -260,11 +262,14 @@ public class PatientDataController {
     /*========================================================================*/
 
     private Bundle makeBundleForDocument(String documentId){
+        logger.debug("Making Bundle for Document" + documentId);
         //get fitbit data for binary resource
         ShimmerData shimmerData = shimmerDataRepository.findByDocumentId(documentId);
 
         //get shimmer data
         String jsonData = shimmerData.getJsonData();
+
+        logger.debug("Got JSON data " + jsonData);
 
         //convert to base64
         byte[] base64EncodedData = Base64.getEncoder().encode(jsonData.getBytes());
