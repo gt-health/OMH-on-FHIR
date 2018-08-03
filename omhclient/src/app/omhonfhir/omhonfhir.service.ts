@@ -133,8 +133,7 @@ export class OmhonfhirService {
 
   //requestBinaryAsJson(binaryUrl): Observable<Binary>{
   requestBinaryAsJson(binaryUrl): Observable<OmhActivity>{
-    //var shimmerBinaryUrl = environment.omhOnFhirAPIBase + "/" + binaryUrl;
-    var shimmerBinaryUrl = "https://apps.hdap.gatech.edu/mdata/Binary/b365e896-86a8-4fa8-96b7-11ee9160b372";
+    var shimmerBinaryUrl = environment.omhOnFhirAPIBase + "/" + binaryUrl;
     console.log("Requesting Binary " + shimmerBinaryUrl);
      return this.http.get<OmhActivity>(shimmerBinaryUrl, requestOptions );
   }
