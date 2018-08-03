@@ -29,12 +29,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.time.LocalDate;
@@ -170,14 +172,19 @@ public class PatientDataController {
 
     //handles requests of the format
     //GET https://apps.hdap.gatech.edu/hapiR4/baseR4/Binary?_id=EXexample
-    @GetMapping("/Binary/{documentId}")
-    public Bundle retrieveBinary(@PathVariable String documentId){
+    @GetMapping(value = "/Binary/{documentId}",
+                produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody byte[] retrieveBinary(
+                                 @RequestHeader("Accept") String acceptHeader,
+                                 @PathVariable String documentId){
         logger.debug("Retrieving Binary with URL");
-        return makeBundleForDocument(documentId);
+        byte[] docBytes = makeByteArrayForDocument(documentId);
+        return docBytes;
     }
 
     @GetMapping("/Binary")
-    public Bundle retrieveBinaryFile(@RequestParam(name="_id", required = true)String documentId){
+    public Bundle searchBinaryBundle(@RequestHeader("Accept") String acceptHeader,
+                                     @RequestParam(name="_id", required = true)String documentId){
         logger.debug("Retriving Binary with URL param");
         return makeBundleForDocument(documentId);
     }
@@ -263,7 +270,7 @@ public class PatientDataController {
     /* Private Methods */
     /*========================================================================*/
 
-    private Bundle makeBundleForDocument(String documentId){
+    private byte[] makeByteArrayForDocument(String documentId){
         logger.debug("Making Bundle for Document" + documentId);
         //get fitbit data for binary resource
         ShimmerData shimmerData = shimmerDataRepository.findByDocumentId(documentId);
@@ -273,8 +280,15 @@ public class PatientDataController {
 
         logger.debug("Got JSON data " + jsonData);
 
+        return jsonData.getBytes();
+    }
+
+    private Bundle makeBundleForDocument(String documentId){
+
+        byte[] jsonData = makeByteArrayForDocument(documentId);
+
         //convert to base64
-        byte[] base64EncodedData = Base64.getEncoder().encode(jsonData.getBytes());
+        byte[] base64EncodedData = Base64.getEncoder().encode(jsonData);
 
         //make the Binary object
         Binary binary = makeBinary(base64EncodedData);
