@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { OmhonfhirService } from '../omhonfhir/omhonfhir.service';
 import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -30,6 +31,15 @@ export class ActivityComponent implements OnInit {
       this.shimmerId = params.get("shimmerId");
       console.log("ShimmerId: " + this.shimmerId);
     });
+
+    //initialize the start date
+    var date = new Date();
+    var datePipe = new DatePipe('en-US');
+    var formattedDate = datePipe.transform(date, 'yyyy-MM-dd');
+    this.startDate = formattedDate;
+    this.endDate = formattedDate;
+    console.log("Set start date: " + this.startDate);
+    console.log("Set end date: " + this.endDate);
   }
 
   queryActivity(): void{
