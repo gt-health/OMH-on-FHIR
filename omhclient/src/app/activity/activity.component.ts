@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { OmhonfhirService } from '../omhonfhir/omhonfhir.service';
 import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import {DocumentReference, Binary, OmhActivity} from "../omhonfhir/omhonfhir.service";
+import {DocumentReference, Binary, OmhActivity, DocRefBundle} from "../omhonfhir/omhonfhir.service";
 
 @Component({
   selector: 'app-activity',
@@ -37,9 +37,11 @@ export class ActivityComponent implements OnInit {
     console.log("Querying patient " + this.shimmerId+ "activity from " + this.startDate + " to " + this.endDate);
     this.waitingForSearch = true;
     this.omhonfhirService.requestDocumentReference(this.shimmerId, this.startDate, this.endDate)
-      .subscribe((documentReference: DocumentReference) => {
+      .subscribe((documentReference: DocRefBundle) => {
         console.log("Processing response");
-        this.activityDocumentRef = documentReference;
+        //at the moment we are returning a single entry in the response
+        var currDocRef = documentReference.entry[0].resource;
+        this.activityDocumentRef = currDocRef;
         //sample response
         //{
         // "resourceType":"DocumentReference",
@@ -61,11 +63,11 @@ export class ActivityComponent implements OnInit {
         //}
         //
         //make title
-        this.activityResourceType = documentReference.resourceType;//documentReference['resourceType'];
+        this.activityResourceType = currDocRef.resourceType;//documentReference['resourceType'];
         //make type
-        this.activityDataType = documentReference.type.text;//documentReference['type']['text'];
+        this.activityDataType = currDocRef.type.text;//documentReference['type']['text'];
         //make url
-        this.activityBinaryUrl = documentReference.content[0].attachment.url;//documentReference['type']['content'][0]['url'];
+        this.activityBinaryUrl = currDocRef.content[0].attachment.url;//documentReference['type']['content'][0]['url'];
         this.waitingForSearch = false;
       });
   }

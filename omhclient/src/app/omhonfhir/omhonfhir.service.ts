@@ -12,6 +12,16 @@ const requestOptions = {
   headers: new HttpHeaders(headerDict)
 };
 
+export interface DocRefBundle{
+  type: string;
+  total: number;
+  entry: DocRefBundleEntry[];
+}
+
+export interface DocRefBundleEntry{
+  resource: DocumentReference;
+}
+
 export interface DocumentReference{
   resourceType: string;
   status: string;
@@ -95,7 +105,7 @@ export class OmhonfhirService {
     return "3f6625db-8cc7-4d25-9bf4-9febdc7028cd";
   }
 
-  requestDocumentReference(shimmerId, startDate, endDate): Observable<DocumentReference>{
+  requestDocumentReference(shimmerId, startDate, endDate): Observable<DocRefBundle>{
     var shimmerDocRefUrl = environment.omhOnFhirAPIBase + "/DocumentReference?subject=" + shimmerId;
 
     if(startDate){
@@ -128,7 +138,7 @@ export class OmhonfhirService {
     //}
     //
 
-    return this.http.get<DocumentReference>(shimmerDocRefUrl);
+    return this.http.get<DocRefBundle>(shimmerDocRefUrl);
   }
 
   //requestBinaryAsJson(binaryUrl): Observable<Binary>{
