@@ -48,6 +48,7 @@ export interface Binary{
   content: string;
 }
 
+//Define Generic OMH Data Object
 export interface OmhDataObject{
   effective_time_frame: OmhEffectiveTimeFrame;
 }
@@ -59,7 +60,6 @@ export interface OmhStepCount extends OmhDataObject{
   descriptive_statistic_denominator: string;
   //inherits effective_time_frame from OmhDataObject
 }
-
 
 // Define OMHActivity Interface
 export interface OmhActivity{

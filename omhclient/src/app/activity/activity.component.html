@@ -40,7 +40,8 @@
     <table *ngIf="omhActivity" class="table table-striped">
       <thead>
         <tr>
-          <td>Name</td>
+          <!--<td>Name</td>-->
+          <td>Step Count</td>
           <td>Start Time</td>
           <td>End Time</td>
           <td>Source</td>
@@ -53,7 +54,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let activityBody of omhActivity.body">
-          <td>{{activityBody.body.activity_name}}</td>
+          <!--<td>{{activityBody.body.activity_name}}</td>-->
+          <td>{{activityBody.body.step_count}}</td>
           <td>{{activityBody.body.effective_time_frame.time_interval.start_date_time}}</td>
           <td>{{activityBody.body.effective_time_frame.time_interval.end_date_time}}</td>
           <td>{{activityBody.header.acquisition_provenance.source_name}}</td>
