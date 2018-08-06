@@ -48,28 +48,43 @@ export interface Binary{
   content: string;
 }
 
+export interface OmhDataObject{
+  effective_time_frame: OmhEffectiveTimeFrame;
+}
+
+//Define OMHStepCount Interface
+export interface OmhStepCount extends OmhDataObject{
+  step_count: number;
+  descriptive_statistic: string;
+  descriptive_statistic_denominator: string;
+  //inherits effective_time_frame from OmhDataObject
+}
+
+
+// Define OMHActivity Interface
 export interface OmhActivity{
   shim: string;
   timeStamp: string;
-  body: OmhActivityBody[];
+  body: OmhObjectBody[];
 }
-export interface OmhActivityBody{
-  body: OmhActivityBodyBody;
-  header: OmhActivityHeader;
+export interface OmhObjectBody{
+  //body: OmhObjectBodyBody;
+  body: OmhDataObject;
+  header: OmhObjectHeader;
 }
-export interface OmhActivityBodyBody{
+export interface OmhObjectBodyBody extends OmhDataObject{
   activity_name: string;
-  effective_time_frame: OmhActivityEffectiveTimeFrame;
+  //effective_time_frame: OmhEffectiveTimeFrame;
 }
 
-export interface OmhActivityHeader{
+export interface OmhObjectHeader{
   acquisition_provenance: OmhActivityAcquisitionProvenance;
   creation_date_time: string;
   id: string;
   schema_id: OmhActivitySchemaId;
 }
 
-export interface OmhActivityEffectiveTimeFrame{
+export interface OmhEffectiveTimeFrame{
   time_interval: OmhActivityTimeInterval;
 }
 
