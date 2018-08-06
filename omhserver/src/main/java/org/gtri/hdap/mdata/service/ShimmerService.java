@@ -188,6 +188,7 @@ public class ShimmerService {
             //return a 500 error
             logger.debug("Did not find data");
         }
+        logger.debug("Response " + jsonResponse );
 
         //store the data
         String binaryResourceId = storePatientJson(applicationUser, jsonResponse);
