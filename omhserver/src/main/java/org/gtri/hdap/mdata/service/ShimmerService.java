@@ -47,7 +47,8 @@ public class ShimmerService {
     public static String SHIMMER_AUTH_URL = "/authorize/{shim-key}?username={username}&redirect_url={redirect-url}";
     public static String SHIMMER_AUTH_CALLBACK = "/authorize/{shim-key}/callback?code={code}&state={state}";
 //    public static String SHIMMER_AUTH_CALLBACK = "/authorize/{shim-key}/callback?state={state}";
-    public static String SHIMMER_DATA_RANGE_URL = "/data/{shim-key}/physical_activity?username={username}&normalize={normalize}";
+//public static String SHIMMER_DATA_RANGE_URL = "/data/{shim-key}/physical_activity?username={username}&normalize={normalize}";
+    public static String SHIMMER_DATA_RANGE_URL = "/data/{shim-key}/step_count?username={username}&normalize={normalize}";
     public static String SHIMMER_START_DATE_URL_PARAM = "&dateStart={start-date}";
     public static String SHIMMER_END_DATE_URL_PARAM = "&dateEnd={end-date}";
     public static String START_DATE_KEY = "startDate";
