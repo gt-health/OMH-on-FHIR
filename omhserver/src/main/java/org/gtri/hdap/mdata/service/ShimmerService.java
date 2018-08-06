@@ -16,6 +16,7 @@ import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
+import org.gtri.hdap.mdata.util.ShimmerUtil;
 import org.hl7.fhir.dstu3.model.Attachment;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.DocumentReference;
@@ -128,6 +129,7 @@ public class ShimmerService {
         if( authUrl == null ){
             throw new Exception("Could not retrieve authorization URL for " + shimkey);
         }
+
         return authUrl;
     }
 
@@ -294,8 +296,18 @@ public class ShimmerService {
                 //get the json from the response and get the auth URL to redirect the user
                 String responseStr = EntityUtils.toString(responseEntity);
                 logger.debug("Shimmer Auth Response: " + responseStr);
+
+                //response JSON {"id":"5b6852e7345e53000bbf6894","stateKey":null,"username":"93c542ab-2705-4526-bf1b-1212d2185087","redirectUri":null,"requestParams":null,"authorizationUrl":null,"clientRedirectUrl":null,"isAuthorized":true,"serializedRequest":null}
+
                 JSONObject responseJson = new JSONObject(responseStr);
-                authorizationUrl = responseJson.getString("authorizationUrl");
+                //check if we are already authenticated
+                if( !responseJson.getBoolean("isAuthorized") ){
+                    authorizationUrl = responseJson.getString("authorizationUrl");
+                }
+                else{
+                    authorizationUrl = System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
+                }
+
                 logger.debug("Authorization URL " + authorizationUrl);
             }
         } finally {

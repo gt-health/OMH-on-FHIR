@@ -21,6 +21,7 @@ import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
 import org.gtri.hdap.mdata.service.ShimmerService;
+import org.gtri.hdap.mdata.util.ShimmerUtil;
 import org.hl7.fhir.dstu3.model.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -48,12 +49,6 @@ import java.util.stream.Collectors;
 @RestController
 @SessionAttributes("shimmerId")
 public class PatientDataController {
-
-    /*========================================================================*/
-    /* Constants */
-    /*========================================================================*/
-    public static String OMH_ON_FHIR_CALLBACK_ENV = "OMH_ON_FHIR_CALLBACK";
-    public static String OMH_ON_FHIR_LOGIN_ENV = "OMH_ON_FHIR_LOGIN";
 
     /*========================================================================*/
     /* Variables */
@@ -164,13 +159,10 @@ public class PatientDataController {
 
         logger.debug("finished processing document request");
 
-//        logger.debug("Encoding DocumentReference to JSON");
-//        IParser jsonParser = FhirContext.forDstu3().newJsonParser();
-//        String docJson = jsonParser.encodeResourceToString(documentReference);
-//        logger.debug("Encoded JSON");
-//        logger.debug(docJson);
-        return ResponseEntity.ok(documentReference);
-//        return ResponseEntity.ok(docJson);
+        Bundle responseBundle = makeBundle(documentReference);
+
+//        return ResponseEntity.ok(documentReference);
+        return ResponseEntity.ok(responseBundle);
     }
 
     //handles requests of the format
@@ -226,13 +218,13 @@ public class PatientDataController {
         }
         catch(Exception e){
             e.printStackTrace();
-            omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_LOGIN_ENV);
+            omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_LOGIN_ENV);
             model.addAttribute("loginSuccess", false);
             logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
             return new ModelAndView(omhOnFhirUi, model);
         }
 
-        omhOnFhirUi = "redirect:" + System.getenv(OMH_ON_FHIR_CALLBACK_ENV);
+        omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
         model.addAttribute("loginSuccess", true);
         model.addAttribute("shimmerId", shimmerId);
         logger.debug("Redirecting to: " + omhOnFhirUi);
@@ -317,6 +309,7 @@ public class PatientDataController {
         List<Bundle.BundleEntryComponent> bundleEntryComponentList = new ArrayList<Bundle.BundleEntryComponent>();
         bundleEntryComponentList.add(bundleEntryComponent);
         bundle.setType(Bundle.BundleType.SEARCHSET);
+        bundle.setTotal(bundleEntryComponentList.size());
         bundle.setEntry(bundleEntryComponentList);
         return bundle;
     }
