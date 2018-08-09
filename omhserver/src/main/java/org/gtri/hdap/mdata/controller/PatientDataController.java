@@ -127,6 +127,13 @@ public class PatientDataController {
         logger.debug("Model Keys: " + model.keySet());
         logger.debug("Model Values " + model.values());
 
+        //THIS IS A HACK, check and remove  org.springframework.validation.BindingResult.shimmerId from the model
+        model.remove("org.springframework.validation.BindingResult.shimmerId");
+
+        logger.debug("Searched model for BindingResult to remove");
+        logger.debug("Model Keys: " + model.keySet());
+        logger.debug("Model Values " + model.values());
+
         ModelAndView mvToReturn = new ModelAndView(redirectUrl, model);
         if(bindingResult.hasErrors()){
             logger.debug("Found Errors");
