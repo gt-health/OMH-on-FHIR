@@ -106,9 +106,6 @@ public class PatientDataController {
             model.addAttribute("shimmerId", userShimmerId);
         }
 
-
-        //TODO: I bet if you are already authenticated then no redirect URL is returned. Update code to handle this case
-
         String fitbitAuthUrl = null;
         try {
             fitbitAuthUrl = shimmerService.requestShimmerAuthUrl(userShimmerId, shimkey);
@@ -127,7 +124,9 @@ public class PatientDataController {
 
         String redirectUrl = "redirect:" + fitbitAuthUrl;
         logger.debug("Redirecting to " + redirectUrl);
-        logger.debug("Model Values" + model.values());
+        logger.debug("Model Keys: " + model.keySet());
+        logger.debug("Model Values " + model.values());
+
         ModelAndView mvToReturn = new ModelAndView(redirectUrl, model);
         if(bindingResult.hasErrors()){
             logger.debug("Found Errors");
