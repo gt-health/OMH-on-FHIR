@@ -33,6 +33,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -89,7 +91,8 @@ public class PatientDataController {
                                                 @ModelAttribute("shimmerId") String shimmerId,
                                                 RedirectAttributes attributes,
                                                 @RequestParam(name="ehrId", required=true) String ehrId,
-                                                @RequestParam(name="shimkey", required=true) String shimkey){
+                                                @RequestParam(name="shimkey", required=true) String shimkey,
+                                                BindingResult bindingResult){
         logger.debug("Trying to connect to " + shimkey + " API");
         // Make a request to http://<shimmer-host>:8083/authorize/{shimKey}?username={userId}
         // The shimKey path parameter should be one of the keys listed below, e.g. fitbit
@@ -123,7 +126,18 @@ public class PatientDataController {
 //        attributes.addAttribute("shimmerId", userShimmerId);
 
         String redirectUrl = "redirect:" + fitbitAuthUrl;
-        return new ModelAndView(redirectUrl, model);
+        logger.debug("Redirecting to " + redirectUrl);
+        logger.debug("Model Values" + model.values());
+        ModelAndView mvToReturn = new ModelAndView(redirectUrl, model);
+        if(bindingResult.hasErrors()){
+            logger.debug("Found Errors");
+            bindingResult.getFieldErrors().forEach((FieldError fe) -> {
+                logger.debug("Field: " + fe.getField() );
+                logger.debug("Message: " + fe.getDefaultMessage());
+                logger.debug("Bad Value: " + fe.getObjectName() + " " + fe.getRejectedValue());
+            });
+        }
+        return mvToReturn;
     }
 
     /**
