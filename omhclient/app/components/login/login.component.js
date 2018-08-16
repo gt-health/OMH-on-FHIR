@@ -5,7 +5,7 @@ module('login').
 component('login', {
 
     templateUrl: 'components/login/login.template.html',
-    controller: ['$http', '$routeParams', 'OmhOnFhirApi', '__env', function LoginController($http, $routeParams, OmhOnFhirApi, env){
+    controller: ['$scope', '$http', '$routeParams', 'OmhOnFhirApi', '__env', function LoginController($scope, $http, $routeParams, OmhOnFhirApi, env){
         var self = this;
         self.env = env;
         self.omhOnFhirApi = OmhOnFhirApi;
@@ -24,7 +24,9 @@ component('login', {
             console.log(smart);
             smart.patient.read().then(function (pt) {
                 self.omhOnFhirApi.setPatientResourceObj(pt);
-                self.pageMsg = "Login to desired application to retrieve step count data for " + self.omhOnFhirApi.getPatientName();
+                self.pageMsg = "Link patient " + self.omhOnFhirApi.getPatientName() + " to an existing account.";
+                //update the scope so the variables are updated in the view
+                $scope.$apply();
             });
         },
         function(error){
