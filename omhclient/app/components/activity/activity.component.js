@@ -39,16 +39,16 @@ component('activity', {
         self.endDate = date;
 
         //watch the service
-        $scope.$watch(
-            function(){
-                return OmhOnFhirApi.patientResourceObj;
-            },
-            function(newVal, oldVal, scope){
-                if(newVal) {
-                    self.omhOnFhirApi.setPatientResourceObj(newVal);
-                }
-            }
-        );
+        //$scope.$watch(
+        //    function(){
+        //        return OmhOnFhirApi.patientResourceObj;
+        //    },
+        //    function(newVal, oldVal, scope){
+        //        if(newVal) {
+        //            self.omhOnFhirApi.setPatientResourceObj(newVal);
+        //        }
+        //    }
+        //);
 
         //===================================================================================
         // Functions

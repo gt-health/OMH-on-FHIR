@@ -23,10 +23,10 @@ angular.module('omhOnFhirService', [])
         console.log(patientResourceObj);
         this.patientResourceObj = patientResourceObj;
 
-        this.setPatientId(this.patientResourceObj.id);
+        this.patientId = this.patientResourceObj.id;
         console.log("PatientId: " + this.getPatientId());
 
-        this.setPatientName( this.getPatientNameFromObject(this.patientResourceObj));
+        this.patientName = this.getPatientNameFromObject(this.patientResourceObj);
         console.log("PatientName: " + this.patientName);
     };
 
