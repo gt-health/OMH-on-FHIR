@@ -26,6 +26,10 @@ component('login', {
                 self.omhOnFhirApi.setPatientResourceObj(pt);
                 self.pageMsg = "Login to desired application to retrieve step count data for " + self.omhOnFhirApi.getPatientName();
             });
+        },
+        function(error){
+            console.log("Error");
+            console.log(error);
         });
 
         //===================================================================================
