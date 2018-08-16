@@ -1,5 +1,5 @@
 #Option 1: build project and run with Node
-FROM node:10 as builder
+FROM node:8 as builder
 
 # make a working directory
 RUN mkdir -p /usr/local/app
@@ -13,11 +13,13 @@ COPY . /usr/local/app
 
 # install dependencies
 #RUN npm install
+# install bower and then install the project
+#RUN ls -la /usr/local/app
 RUN npm install
 
 # copy over project
 #COPY . /usr/local/app
-RUN ls -la /usr/local/app
+#RUN ls -la /usr/local/app/app
 #build code
 #RUN ng build --prod --base-href=/omhonfhir/
 
