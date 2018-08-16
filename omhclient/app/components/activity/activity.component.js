@@ -83,7 +83,7 @@ component('activity', {
                     //make type
                     self.activityDataType = currDocRef.type.text;
                     //make url
-                    self.activityBinaryUrl = currDocRef.content[0].attachment.url;
+                    self.activityBinaryUrl = currDocRef.entry[0].resource.content[0].attachment.url;
                     self.waitingForSearch = false;
                 });
         };
