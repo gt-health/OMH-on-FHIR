@@ -5,7 +5,7 @@ module('activity').
 component('activity', {
 
     templateUrl: 'components/activity/activity.template.html',
-    controller: ['$http', '$routeParams', 'OmhOnFhirApi', function ActivityController($http, $routeParams, OmhOnFhirApi){
+    controller: ['$scope', '$http', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $http, $routeParams, OmhOnFhirApi){
         var self = this;
         self.omhOnFhirApi = OmhOnFhirApi;
 
@@ -29,7 +29,7 @@ component('activity', {
         if($routeParams.shimmerId){
             self.shimmerId = $routeParams.shimmerId;
         }
-        var date = new Date();
+         var date = new Date();
         var formattedDate = date.toISOString().substring(0,10);//to make format 'yyyy-MM-dd'
         //self.startDate = formattedDate;
         //self.endDate = formattedDate;
@@ -37,10 +37,24 @@ component('activity', {
         //console.log("Set end date: " + self.endDate);
         self.startDate = date;
         self.endDate = date;
+
+        //watch the service
+        $scope.$watch(
+            function(){
+                return OmhOnFhirApi.patientResourceObj;
+            },
+            function(newVal, oldVal, scope){
+                if(newVal) {
+                    self.omhOnFhirApi.setPatientResourceObj(newVal);
+                }
+            }
+        );
+
         //===================================================================================
         // Functions
         //===================================================================================
         self.getPatientName = function getPatientName(){
+            //self.omhOnFhirApi.getPatientName();
             self.omhOnFhirApi.getPatientName();
         };
 
