@@ -6,7 +6,7 @@
     window.__env.googleFitShim = 'googlefit';
     window.__env.omhOnFhirClientId = 'test_client';
     window.__env.omhOnFhirScope = 'patient/*.read launch'; //to force provider login use the following scopes 'openid profile'
-    window.__env.omhOnFhirRedirectUri = 'http://localhost:8000/#!/login';
+    window.__env.omhOnFhirRedirectUri = 'https://apps.hdap.gatech.edu/omhonfhir/login';
     window.__env.omhOnFhirAPIBase = 'https://apps.hdap.gatech.edu/mdata';
     window.__env.omhOnFhirAPIShimmerAuth = '/shimmerAuthentication';
 }(this));
