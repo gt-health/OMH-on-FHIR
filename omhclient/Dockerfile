@@ -8,14 +8,15 @@ RUN mkdir -p /usr/local/app
 WORKDIR /usr/local/app
 
 # copy dependency definitions
-COPY package.json /usr/local/app
+#COPY package.json /usr/local/app
+COPY . /usr/local/app
 
 # install dependencies
 #RUN npm install
 RUN npm install
 
 # copy over project
-COPY . /usr/local/app
+#COPY . /usr/local/app
 RUN ls -la /usr/local/app
 #build code
 #RUN ng build --prod --base-href=/omhonfhir/
