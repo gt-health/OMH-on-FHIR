@@ -1,0 +1,12 @@
+(function (window) {
+    //following environment variable pattern described here: https://www.jvandemo.com/how-to-configure-your-angularjs-application-using-environment-variables/
+    window.__env = window.__env || {};
+    window.__env.baseUrl = '/omhonfhir/';
+    window.__env.fitbitShim = 'fitbit';
+    window.__env.googleFitShim = 'googlefit';
+    window.__env.omhOnFhirClientId = 'test_client';
+    window.__env.omhOnFhirScope = 'patient/*.read launch'; //to force provider login use the following scopes 'openid profile'
+    window.__env.omhOnFhirRedirectUri = 'http://localhost:8000/#!/login';
+    window.__env.omhOnFhirAPIBase = 'https://apps.hdap.gatech.edu/mdata';
+    window.__env.omhOnFhirAPIShimmerAuth = '/shimmerAuthentication';
+}(this));
