@@ -40,13 +40,11 @@ component('activity', {
         //===================================================================================
         // Functions
         //===================================================================================
+        self.getPatientName = function getPatientName(){
+            self.omhOnFhirApi.getPatientName();
+        };
 
         self.queryActivity = function queryActivity(){
-
-            //TODO: REMOVE THISSSSSS
-            //self.shimmerId = "96275915-6262-463c-8d26";
-
-
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;
             self.omhOnFhirApi.requestDocumentReference(self.shimmerId, self.startDate, self.endDate)
@@ -89,14 +87,9 @@ component('activity', {
         };
 
         self.queryBinary = function queryBinary(){
-
-
-            //TODO: REMOVE THISSSSSSS
-            //self.activityBinaryUrl = "Binary/313e4273-1772-4a46-8a88-82a3b3b761b2";
-
             console.log("Querying binary " + self.activityBinaryUrl);
             self.waitingForData = true;
-            self.omhonfhirService.requestBinaryAsJson(self.activityBinaryUrl)
+            self.omhOnFhirApi.requestBinaryAsJson(self.activityBinaryUrl)
                 .then(function(response){
                     //sample response
                     //{
