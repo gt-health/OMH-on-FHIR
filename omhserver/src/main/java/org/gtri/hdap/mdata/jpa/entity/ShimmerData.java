@@ -22,7 +22,10 @@ public class ShimmerData {
     private String jsonData;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "application_user_id", nullable = false)
+    @JoinColumns({
+        @JoinColumn(name = "ehr_id", referencedColumnName = "ehr_id", nullable = false),
+        @JoinColumn(name = "shim_key", referencedColumnName = "shim_key", nullable = false)
+    })
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ApplicationUser applicationUser;
 

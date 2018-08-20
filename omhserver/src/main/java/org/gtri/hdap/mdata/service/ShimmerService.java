@@ -130,7 +130,6 @@ public class ShimmerService {
         if( authUrl == null ){
             throw new Exception("Could not retrieve authorization URL for " + shimkey);
         }
-
         return authUrl;
     }
 
@@ -163,7 +162,7 @@ public class ShimmerService {
     public String retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries) throws Exception{
         logger.debug("Requesting patient data");
         String shimmerDataUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_DATA_RANGE_URL;
-        shimmerDataUrl = shimmerDataUrl.replace("{shim-key}", applicationUser.getShimKey());
+        shimmerDataUrl = shimmerDataUrl.replace("{shim-key}", applicationUser.getApplicationUserId().getShimKey());
         shimmerDataUrl = shimmerDataUrl.replace("{username}", applicationUser.getShimmerId());
         shimmerDataUrl = shimmerDataUrl.replace("{normalize}", "true");
 

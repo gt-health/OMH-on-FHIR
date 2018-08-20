@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
+import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.service.ShimmerService;
 import org.hl7.fhir.dstu3.model.Attachment;
@@ -76,7 +77,7 @@ public class PatientDataControllerTest {
         String validDate2 = "2018-07-01";
         String inValidDate1 = "le2018-06-01";
         String inValidDate2 = "ge2018-07-01";
-        ApplicationUser applicationUser = new ApplicationUser(ehrId, shimmerId, shimkey);
+        ApplicationUser applicationUser = new ApplicationUser(new ApplicationUserId(ehrId, shimkey), shimmerId);
         List<String> validQueryDates = createDateList(validDate1, validDate2);
         List<String> inValidQueryDates = createDateList(inValidDate1, inValidDate2);
 
@@ -100,7 +101,7 @@ public class PatientDataControllerTest {
     public void testGenerateDocumentReference() throws Exception{
         logger.debug("========== Entering testGenerateDocumentReference ==========");
         PatientDataController patientDataController = new PatientDataController();
-        ApplicationUser applicationUser = new ApplicationUser("123", "456", "fitbit");
+        ApplicationUser applicationUser = new ApplicationUser(new ApplicationUserId("123", "fitbit"), "456");
         DocumentReference documentReference = patientDataController.generateDocumentReference("doc123", "fitbit");
 
         assertTrue(documentReference != null);

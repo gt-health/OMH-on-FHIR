@@ -17,6 +17,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
+import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
@@ -84,8 +85,6 @@ public class PatientDataController {
      * @param shimkey the ID for the patient in Shimmer
      * @return
      */
-//    @RequestMapping(value="/shimmerAuthentication", method= RequestMethod.GET)
-    //TODO: Do we really need to pass in the ModelMap
     @GetMapping("/shimmerAuthentication")
     public ModelAndView authenticateWithShimmer(ModelMap model,
                                                 @ModelAttribute("shimmerId") String shimmerId,
@@ -120,7 +119,6 @@ public class PatientDataController {
 
         //tell spring we want the attribute to survive the redirect
         attributes.addFlashAttribute("shimmerId", userShimmerId);
-//        attributes.addAttribute("shimmerId", userShimmerId);
 
         String redirectUrl = "redirect:" + fitbitAuthUrl;
         logger.debug("Redirecting to " + redirectUrl);
@@ -160,7 +158,7 @@ public class PatientDataController {
         logger.debug("processing document request");
         //look up the user
         ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
-        String shimKey = applicationUser.getShimKey();
+        String shimKey = applicationUser.getApplicationUserId().getShimKey();
 
         String binaryRefId = "";
         //parse start and end dates
@@ -181,7 +179,6 @@ public class PatientDataController {
 
         Bundle responseBundle = makeBundle(documentReference);
 
-//        return ResponseEntity.ok(documentReference);
         return ResponseEntity.ok(responseBundle);
     }
 
@@ -223,16 +220,9 @@ public class PatientDataController {
         logger.debug("Code " + code);
         logger.debug("State " + state);
 
-        //TODO: YOU ARE HERE DO YOU NEED TO MAKE IT HANDLE A CALL BACK LIKE WHAT IS USED WITH POSTMAN?
-        //"authorizationUrl": "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=22D3DR&
-        // redirect_uri=https://apps.hdap.gatech.edu/mdata/authorize/fitbit/callback&scope=activity%20heartrate%20sleep%20weight&state=qdm1q7&prompt=login%20consent",
-
-        //call made by fitbit to auth server
-        //https://shimmer.apps.hdap.gatech.edu/authorize/fitbit/callback?code=bab6a0ebfaa5ff046bfc4e61e6461822be6d7f17&state=NVEcXD#_=_
-
         String omhOnFhirUi;
 
-        //TODO: Why is this call to the shimmer API not working
+        //TODO: Why is this call to the shimmer API not working for Fitbit?
         try {
             shimmerService.completeShimmerAuth(shimkey, code, state);
         }
@@ -336,21 +326,19 @@ public class PatientDataController {
 
     private String getShimmerId(String ehrId, String shimkey){
         logger.debug("Checking User");
-        ApplicationUser user = applicationUserRepository.findByEhrId(ehrId);
-        String shimmerId;
-        if(user == null){
-            //create a mapping
-            logger.debug("User does not exist, creating");
-            shimmerId = UUID.randomUUID().toString();
-            ApplicationUser newUser = new ApplicationUser(ehrId, shimmerId, shimkey);
-            applicationUserRepository.save(newUser);
-            logger.debug("finished creating user");
-        }
-        else{
-            logger.debug("Using existing user");
-            shimmerId = user.getShimmerId();
-        }
+        ApplicationUserId applicationUserId = new ApplicationUserId(ehrId, shimkey);
+        ApplicationUser user = applicationUserRepository.findById(applicationUserId).orElse(createNewApplicationUser(applicationUserId));
+        String shimmerId = user.getShimmerId();
+        logger.debug("Returning shimmer id: " + shimmerId);
         return shimmerId;
     }
 
+    private ApplicationUser createNewApplicationUser(ApplicationUserId applicationUserId){
+        logger.debug("User does not exist, creating");
+        String shimmerId = UUID.randomUUID().toString();
+        ApplicationUser newUser = new ApplicationUser(applicationUserId, shimmerId);
+        applicationUserRepository.save(newUser);
+        logger.debug("finished creating user");
+        return newUser;
+    }
 }
