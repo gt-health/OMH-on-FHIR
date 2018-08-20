@@ -22,6 +22,7 @@ public class ApplicationUserId implements Serializable{
     /*========================================================================*/
     /* Constructors */
     /*========================================================================*/
+    protected ApplicationUserId(){}
     public ApplicationUserId(String ehrId, String shimKey) {
         this.ehrId = ehrId;
         this.shimKey = shimKey;
