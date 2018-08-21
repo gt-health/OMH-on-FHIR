@@ -2,6 +2,7 @@ package org.gtri.hdap.mdata.service;
 
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.ParamPrefixEnum;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -14,7 +15,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
-import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
 import org.gtri.hdap.mdata.util.ShimmerUtil;
 import org.hl7.fhir.dstu3.model.Attachment;
@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,65 +59,19 @@ public class ShimmerService {
     /* Constructors */
     /*========================================================================*/
     public ShimmerService(){
-
     }
 
     /*========================================================================*/
     /* Variables */
     /*========================================================================*/
     private final Logger logger = LoggerFactory.getLogger(ShimmerService.class);
-    private CloseableHttpClient httpClient = null;
-    private HttpClientContext httpClientContext = null;
 
-    @Autowired
-    private ApplicationUserRepository applicationUserRepository;
     @Autowired
     private ShimmerDataRepository shimmerDataRepository;
 
     /*========================================================================*/
-    /* Getters */
-    /*========================================================================*/
-
-    public CloseableHttpClient getHttpClient(){
-        if( httpClient == null ){
-            httpClient = createHttpClient();
-        }
-        return httpClient;
-    }
-
-    public HttpClientContext getHttpClientContext() {
-        if( httpClientContext == null ){
-            httpClientContext = HttpClientContext.create();
-        }
-        return httpClientContext;
-    }
-
-    /*========================================================================*/
-    /* Setters */
-    /*========================================================================*/
-
-    public void setHttpClient(CloseableHttpClient httpClient) {
-        this.httpClient = httpClient;
-    }
-
-    public void setHttpClientContext(HttpClientContext httpClientContext) {
-        this.httpClientContext = httpClientContext;
-    }
-
-    /*========================================================================*/
     /* Public Methods */
     /*========================================================================*/
-    public String processShimmerAuthRequest(HttpUriRequest request){
-        String authorizationUrl = null;
-        try {
-            CloseableHttpResponse shimmerAuthResponse = getHttpClient().execute(request, getHttpClientContext());
-            authorizationUrl = checkShimmerAuthResponse(shimmerAuthResponse);
-        }
-        catch(IOException ioe){
-            ioe.printStackTrace();
-        }
-        return authorizationUrl;
-    }
 
     public String requestShimmerAuthUrl(String shimmerId, String shimkey) throws Exception{
         String shimmerAuthUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_AUTH_URL;
@@ -142,9 +97,17 @@ public class ShimmerService {
         logger.debug("Completing Shimmer Auth: " + shimmerAuthCallbackUrl);
 
         HttpGet httpGet = new HttpGet(shimmerAuthCallbackUrl);
-        CloseableHttpResponse shimmerAuthResponse = getHttpClient().execute(httpGet, getHttpClientContext());
-        int statusCode = shimmerAuthResponse.getStatusLine().getStatusCode();
-        if(statusCode != 200) {
+        CloseableHttpClient httpClient = createHttpClient();
+        HttpClientContext httpClientContext = HttpClientContext.create();
+        CloseableHttpResponse shimmerAuthResponse = httpClient.execute(httpGet, httpClientContext);
+        int statusCode;
+        try {
+            statusCode = shimmerAuthResponse.getStatusLine().getStatusCode();
+        }
+        finally {
+            shimmerAuthResponse.close();
+        }
+        if (statusCode != 200) {
             logger.debug("Auth Callback Resulted in Response Code " + statusCode);
             throw new Exception("Authorization did not complete");
         }
@@ -158,7 +121,6 @@ public class ShimmerService {
      * @param dateQueries A list of Strings of the format yyyy-MM-dd with start and end date parameters
      * @return the JSON string with the data retrieved from Shimmer or null if nothing was returned
      */
-//    public String retrievePatientData(String shimmerId, String shimkey, LocalDate startDate, LocalDate endDate){
     public String retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries) throws Exception{
         logger.debug("Requesting patient data");
         String shimmerDataUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_DATA_RANGE_URL;
@@ -184,14 +146,12 @@ public class ShimmerService {
         logger.debug("Sending data request to " + shimmerDataUrl);
         HttpGet httpGet = new HttpGet(shimmerDataUrl);
         String jsonResponse = processShimmerDataRequest(httpGet);
-        if(jsonResponse == null){
-            //return a 500 error
-            logger.debug("Did not find data");
-        }
         logger.debug("Response " + jsonResponse );
-
-        //store the data
-        String binaryResourceId = storePatientJson(applicationUser, jsonResponse);
+        String binaryResourceId = "";
+        if(jsonResponse != null){
+            //store the data
+            binaryResourceId = storePatientJson(applicationUser, jsonResponse);
+        }
 
         return binaryResourceId;
     }
@@ -267,12 +227,23 @@ public class ShimmerService {
     /* Private Methods */
     /*========================================================================*/
 
+    private String processShimmerAuthRequest(HttpUriRequest request) throws Exception{
+        String authorizationUrl = null;
+        CloseableHttpClient httpClient = createHttpClient();
+        HttpClientContext httpClientContext = HttpClientContext.create();
+        CloseableHttpResponse shimmerAuthResponse = httpClient.execute(request, httpClientContext);
+        //checkShimmerAuthResponse handles closing shimmerAuthResponse
+        authorizationUrl = checkShimmerAuthResponse(shimmerAuthResponse);
+        return authorizationUrl;
+    }
+
     /**
      * Creates a {@link CloseableHttpClient} to use in the application
      * @return
      */
     private CloseableHttpClient createHttpClient(){
         //TODO: Fix to use non-deprecated code
+        logger.debug("Creating HTTP Client");
         RequestConfig globalConfig = RequestConfig.custom()
                 .setCookieSpec(CookieSpecs.STANDARD)
                 .build();
@@ -281,6 +252,7 @@ public class ShimmerService {
 //                .setSSLSocketFactory(getSslsf())
 //                .setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER)
                 .build();
+        logger.debug("Returning created HTTP Client");
         return httpClient;
     }
 
@@ -320,7 +292,12 @@ public class ShimmerService {
     private String processShimmerDataRequest(HttpUriRequest request){
         String jsonResp = null;
         try {
-            CloseableHttpResponse shimmerDataResponse = getHttpClient().execute(request, getHttpClientContext());
+            logger.debug("Sending Shimmer Data Request");
+            CloseableHttpClient httpClient = createHttpClient();
+            HttpClientContext httpClientContext = HttpClientContext.create();
+            CloseableHttpResponse shimmerDataResponse = httpClient.execute(request, httpClientContext);
+            logger.debug("Received shimmer data");
+            //checkShimmerDataResponse closes the shimmerDataResponse
             jsonResp = checkShimmerDataResponse(shimmerDataResponse);
         }
         catch(IOException ioe){
@@ -335,15 +312,21 @@ public class ShimmerService {
         try {
             int statusCode = shimmerAuthResponse.getStatusLine().getStatusCode();
             logger.debug("Response Code " + statusCode);
+            HttpEntity responseEntity = shimmerAuthResponse.getEntity();
             if(statusCode == 200) {
                 //All we need is the cookie, which is managed as part of the HTTPContext
                 //for now ignore the content of the response. At a later date process
                 //the JSON. It contains permission and user metadata.
-                HttpEntity responseEntity = shimmerAuthResponse.getEntity();
+
                 //get the json from the response and get the auth URL to redirect the user
                 jsonResp = EntityUtils.toString(responseEntity);
                 logger.debug("Data Response: " + jsonResp);
             }
+            else{
+                logger.debug("Different Response Code " + statusCode);
+                logger.debug(EntityUtils.toString(responseEntity));
+            }
+
         } finally {
             shimmerAuthResponse.close();
         }
