@@ -109,7 +109,7 @@ public class ShimmerService {
         }
         if (statusCode != 200) {
             logger.debug("Auth Callback Resulted in Response Code " + statusCode);
-            throw new Exception("Authorization did not complete");
+            throw new Exception("Authorization did not complete: " +  EntityUtils.toString(shimmerAuthResponse.getEntity()));
         }
 
         logger.debug("Completed Shimmer Auth");
