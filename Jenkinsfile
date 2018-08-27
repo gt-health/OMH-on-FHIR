@@ -13,7 +13,7 @@ pipeline{
                 //element. The script below registers the HDAP Docker registry with the Docker instance used by
                 //the Jenkins Pipeline, builds a Docker image of the project, and pushes it to the registry.
                 script{
-                    docker.withRegistry('https://build.hdap.gatech.edu'){
+                    docker.withRegistry('https://gt-build.hdap.gatech.edu'){
                         //Build and push the database image
                         def webApiImage = docker.build("omhonfhirapp:1.0", "-f ./omhserver/Dockerfile ./omhserver")
                         webApiImage.push('latest')
@@ -30,12 +30,12 @@ pipeline{
         stage('Notify'){
             steps{
                 script{
-                    rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'openmhealth/shimmer-resource-server', ports: '', service: 'OMHonFHIR/resource-server', timeout: 50
-                    rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'mongo', ports: '', service: 'OMHonFHIR/mongo', timeout: 50
-                    rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'openmhealth/shimmer-console', ports: '', service: 'OMHonFHIR/console', timeout: 50
-                    rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'postgres:latest', ports: '', service: 'OMHonFHIR/mdata-db', timeout: 50
-                    rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'build.hdap.gatech.edu/omhonfhirapp:latest', ports: '', service: 'OMHonFHIR/mdata-app', timeout: 50
-                    rancher confirm: true, credentialId: 'rancher-server', endpoint: 'https://rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'build.hdap.gatech.edu/omhonfhirui:latest', ports: '', service: 'OMHonFHIR/omh-on-fhir-client', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: 'https://gt-rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'openmhealth/shimmer-resource-server', ports: '', service: 'OMHonFHIR/resource-server', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: 'https://gt-rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'mongo', ports: '', service: 'OMHonFHIR/mongo', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: 'https://gt-rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'openmhealth/shimmer-console', ports: '', service: 'OMHonFHIR/console', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: 'https://gt-rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'postgres:latest', ports: '', service: 'OMHonFHIR/mdata-db', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: 'https://gt-rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'gt-build.hdap.gatech.edu/omhonfhirapp:latest', ports: '', service: 'OMHonFHIR/mdata-app', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: 'https://gt-rancher.hdap.gatech.edu/v2-beta', environmentId: '1a7', environments: '', image: 'gt-build.hdap.gatech.edu/omhonfhirui:latest', ports: '', service: 'OMHonFHIR/omh-on-fhir-client', timeout: 50
                 }
             }
         }
