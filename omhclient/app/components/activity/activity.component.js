@@ -93,7 +93,7 @@ component('activity', {
                     //make title
                     self.activityResourceType = currDocRef.resourceType;
                     //make type
-                    self.activityDataType = currDocRef.type.text;
+                    self.activityDataType = currDocRef.type;
                     //make url
                     self.activityBinaryUrl = currDocRef.entry[0].resource.content[0].attachment.url;
                     self.waitingForSearch = false;
