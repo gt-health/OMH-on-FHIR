@@ -37,15 +37,13 @@
             Retrieving Activities...
         </div>
 
-
-        <div class="chart-container">
+        <div ng-if="$ctrl.waitingForData==false" class="chart-container">
             <div class="loading-message">
                 Loading data...
             </div>
             <svg class="chart">
             </svg>
         </div>
-
 
         <table ng-if="$ctrl.omhActivity" class="table table-striped">
             <thead>

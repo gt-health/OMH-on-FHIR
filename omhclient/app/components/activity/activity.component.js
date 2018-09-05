@@ -5,7 +5,7 @@ module('activity').
 component('activity', {
 
     templateUrl: 'components/activity/activity.template.html',
-    controller: ['$scope', '$http', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $http, $routeParams, OmhOnFhirApi){
+    controller: ['$scope', '$element', '$http', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $element, $http, $routeParams, OmhOnFhirApi){
         var self = this;
         self.omhOnFhirApi = OmhOnFhirApi;
 
@@ -192,9 +192,10 @@ component('activity', {
                     console.log("Processing Binary Response");
                     console.log(response);
                     self.omhActivity = response.data; //to convert OmhActivity to JSON string use JSON.stringify(omhActivity)
+                    self.waitingForData = false;
                     self.makeChart(self.omhActivity, d3.select('.chart-container'), "step_count", options);
                     console.log("processed response");
-                    self.waitingForData = false;
+
                 });
         };
 
@@ -203,17 +204,17 @@ component('activity', {
         //===================================================================================
 
         self.hideLoadingMessage = function hideLoadingMessage(){
-            loadingMessage.classed('hidden',true);
+            self.loadingMessage.classed('hidden',true);
         };
 
         self.updateLoadingMessage = function updateLoadingMessage ( amountLoaded ){
-            loadingMessage.classed('hidden',false);
-            loadingMessage.text('Loading data... ' + Math.round( amountLoaded * 100 ) + '%');
+            self.loadingMessage.classed('hidden',false);
+            self.loadingMessage.text('Loading data... ' + Math.round( amountLoaded * 100 ) + '%');
         };
 
         self.showLoadingError = function showLoadingError( error ){
-            loadingMessage.classed('hidden',false);
-            loadingMessage.html('There was an error while trying to load the data: <pre>' + JSON.stringify( error ) + '</pre>');
+            self.loadingMessage.classed('hidden',false);
+            self.loadingMessage.html('There was an error while trying to load the data: <pre>' + JSON.stringify( error ) + '</pre>');
         };
 
         self.hideChart = function hideChart(){
@@ -290,7 +291,7 @@ component('activity', {
             if ( self.chart.initialized ){
                 console.log("Chart initialized");
                 //customizes the chart's components
-                self.customizeChartComponents( chart.getComponents() );
+                self.customizeChartComponents( self.chart.getComponents() );
 
                 //renders the chart to an svg element
                 self.showChart();
@@ -306,63 +307,63 @@ component('activity', {
 
 
         //this is a test
-        console.log("Making Chart");
-        self.omhActivity = {
-            "shim": "googlefit",
-            "timeStamp": 1534251049,
-            "body": [
-                {
-                    "header": {
-                        "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee",
-                        "creation_date_time": "2018-08-14T12:50:49.383Z",
-                        "acquisition_provenance": {
-                            "source_name": "Google Fit API",
-                            "source_origin_id": "raw:com.google.step_count.cumulative:Google:Pixel 2 XL:5f9e1b9964be5834:LSM6DSM Step Counter"
-                        },
-                        "schema_id": {
-                            "namespace": "omh",
-                            "name": "step-count",
-                            "version": "2.0"
-                        }
-                    },
-                    "body": {
-                        "effective_time_frame": {
-                            "time_interval": {
-                                "start_date_time": "2018-08-14T00:00:17.805Z",
-                                "end_date_time": "2018-08-14T00:01:17.805Z"
-                            }
-                        },
-                        "step_count": 7
-                    }
-                },
-                {
-                    "header": {
-                        "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcff",
-                        "creation_date_time": "2018-08-14T12:50:49.383Z",
-                        "acquisition_provenance": {
-                            "source_name": "Google Fit API",
-                            "source_origin_id": "raw:com.google.step_count.cumulative:Google:Pixel 2 XL:5f9e1b9964be5834:LSM6DSM Step Counter"
-                        },
-                        "schema_id": {
-                            "namespace": "omh",
-                            "name": "step-count",
-                            "version": "2.0"
-                        }
-                    },
-                    "body": {
-                        "effective_time_frame": {
-                            "time_interval": {
-                                "start_date_time": "2018-08-14T00:03:17.805Z",
-                                "end_date_time": "2018-08-14T00:04:17.805Z"
-                            }
-                        },
-                        "step_count": 27
-                    }
-                }
-            ]
-        };
-        self.makeChart(self.omhActivity, d3.select('.chart-container'), "step_count", self.options);
-        console.log("Finished Making Chart");
+        //console.log("Making Chart");
+        //self.omhActivity = {
+        //    "shim": "googlefit",
+        //    "timeStamp": 1534251049,
+        //    "body": [
+        //        {
+        //            "header": {
+        //                "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee",
+        //                "creation_date_time": "2018-08-14T12:50:49.383Z",
+        //                "acquisition_provenance": {
+        //                    "source_name": "Google Fit API",
+        //                    "source_origin_id": "raw:com.google.step_count.cumulative:Google:Pixel 2 XL:5f9e1b9964be5834:LSM6DSM Step Counter"
+        //                },
+        //                "schema_id": {
+        //                    "namespace": "omh",
+        //                    "name": "step-count",
+        //                    "version": "2.0"
+        //                }
+        //            },
+        //            "body": {
+        //                "effective_time_frame": {
+        //                    "time_interval": {
+        //                        "start_date_time": "2018-08-14T00:00:17.805Z",
+        //                        "end_date_time": "2018-08-14T00:01:17.805Z"
+        //                    }
+        //                },
+        //                "step_count": 7
+        //            }
+        //        },
+        //        {
+        //            "header": {
+        //                "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcff",
+        //                "creation_date_time": "2018-08-14T12:50:49.383Z",
+        //                "acquisition_provenance": {
+        //                    "source_name": "Google Fit API",
+        //                    "source_origin_id": "raw:com.google.step_count.cumulative:Google:Pixel 2 XL:5f9e1b9964be5834:LSM6DSM Step Counter"
+        //                },
+        //                "schema_id": {
+        //                    "namespace": "omh",
+        //                    "name": "step-count",
+        //                    "version": "2.0"
+        //                }
+        //            },
+        //            "body": {
+        //                "effective_time_frame": {
+        //                    "time_interval": {
+        //                        "start_date_time": "2018-08-14T00:03:17.805Z",
+        //                        "end_date_time": "2018-08-14T00:04:17.805Z"
+        //                    }
+        //                },
+        //                "step_count": 27
+        //            }
+        //        }
+        //    ]
+        //};
+        //self.makeChart(self.omhActivity.body, d3.select('.chart-container'), "step_count", self.options);
+        //console.log("Finished Making Chart");
 
         //TODO: call a method on OmhOnFhirApi, figure out how to do serialization in
     }]
