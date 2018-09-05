@@ -27,8 +27,6 @@ component('activity', {
         // Variables for chart
         //===================================================================================
         self.chart = null;
-        self.loadingMessage = d3.select('.loading-message');
-        //self.datapointDetails = d3.select('.datapoint-details');
         self.clickInteraction = null;
         self.clickInteractionComponent = null;
         self.options = {
@@ -202,21 +200,6 @@ component('activity', {
         //===================================================================================
         // D3 Config
         //===================================================================================
-
-        self.hideLoadingMessage = function hideLoadingMessage(){
-            self.loadingMessage.classed('hidden',true);
-        };
-
-        self.updateLoadingMessage = function updateLoadingMessage ( amountLoaded ){
-            self.loadingMessage.classed('hidden',false);
-            self.loadingMessage.text('Loading data... ' + Math.round( amountLoaded * 100 ) + '%');
-        };
-
-        self.showLoadingError = function showLoadingError( error ){
-            self.loadingMessage.classed('hidden',false);
-            self.loadingMessage.html('There was an error while trying to load the data: <pre>' + JSON.stringify( error ) + '</pre>');
-        };
-
         self.hideChart = function hideChart(){
             d3.select('.chart').classed('hidden', true);
         };
@@ -224,18 +207,12 @@ component('activity', {
         self.showChart = function showChart(){
             d3.select('.chart').classed('hidden', false);
         };
-        //
-        //var showDatapointDetailsMessage = function( message ){
-        //    datapointDetails.html('<h3>Data Point Details</h3> '+message);
-        //};
 
         self.customizeChartComponents = function customizeChartComponents( components ){
             console.log("Setting Chart components");
             //move any label overlayed on the bottom right
             //of the chart up to the top left
             var plots = components.plots;
-
-            //showDatapointDetailsMessage('Choose a measure that displays as a scatter plot to see details here.');
 
             plots.forEach(function( component ){
 
@@ -257,7 +234,6 @@ component('activity', {
                                 var nearestEntity;
                                 try {
                                     nearestEntity = scatterPlot.entityNearest(point);
-                                    //updateDatapointDetails( nearestEntity.datum.omhDatum );
                                 } catch (e) {
                                     return;
                                 }
@@ -266,7 +242,6 @@ component('activity', {
 
                     self.clickInteraction.attachTo( scatterPlot );
                     self.clickInteractionComponent = scatterPlot;
-                    //showDatapointDetailsMessage('Click on a point to see details here...');
                 }
 
             });
@@ -295,12 +270,10 @@ component('activity', {
 
                 //renders the chart to an svg element
                 self.showChart();
-                self.hideLoadingMessage();
                 self.chart.renderTo( element.select("svg").node() );
             } else {
                 console.log("Could not initialize chart");
                 self.hideChart();
-                self.showLoadingError( 'Chart could not be initialized with the arguments supplied.' );
             }
             console.log("Finished making chart");
         };
