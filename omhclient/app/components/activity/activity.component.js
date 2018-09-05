@@ -193,7 +193,7 @@ component('activity', {
                     console.log(response);
                     self.omhActivity = response.data; //to convert OmhActivity to JSON string use JSON.stringify(omhActivity)
                     self.waitingForData = false;
-                    self.makeChart(self.omhActivity, d3.select('.chart-container'), "step_count", options);
+                    self.makeChart(self.omhActivity, d3.select('.chart-container'), "step_count", self.options);
                     console.log("processed response");
 
                 });
