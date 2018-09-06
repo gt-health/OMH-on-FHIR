@@ -68,7 +68,7 @@ Do the following to run the application:
 1) Create a `./shimmer-resource-server.env` file with environment variable to configure the Shimmer server, https://github.com/openmhealth/shimmer/blob/e3fef06d4d7d5f93d2a45e7656a823889f247499/resource-server.env, Place the file in the root directory of the project.
 2) Create a `./omhserver/postgres.env` file with environment variables to configure the Postgress database.
 3) Create a `./omhserver/omh-server.env` file with environment variables to configure the OMH on Fhir web service.
-3) From the root directory of the project run `docker-compose up -d`
+4) From the root directory of the project run `docker-compose up -d`
 
 ## User Interface Constraints
 
