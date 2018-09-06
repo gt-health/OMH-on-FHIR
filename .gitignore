@@ -2,9 +2,13 @@
 /omhclient-angular5/
 /omhserver/target
 omhclient/app/bower_components
+omhclient/node_modules
+omhclient/.travis.yml
+omhclient/yarn.lock
 omhserver/*.env
 !.mvn/wrapper/maven-wrapper.jar
 shimmer-resource-server.env
+package-lock.json
 
 ### STS ###
 .apt_generated
