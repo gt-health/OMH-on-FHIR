@@ -313,7 +313,7 @@ component('activity', {
                     //}
                     console.log("Processing response");
                     //at the moment we are returning a single entry in the response
-                    self.observationResponse = response.data;
+                    self.observationResponse = JSON.stringify(response.data);
                     self.waitingForObservationSearch = false;
                 });
         };
