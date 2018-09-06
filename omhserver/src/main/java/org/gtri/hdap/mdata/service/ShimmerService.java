@@ -2,6 +2,7 @@ package org.gtri.hdap.mdata.service;
 
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.ParamPrefixEnum;
+import javafx.application.Application;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.CookieSpecs;
@@ -119,10 +120,29 @@ public class ShimmerService {
      * Calls the Shimmer API to retrieve data for a user
      * @param applicationUser the application user for the query
      * @param dateQueries A list of Strings of the format yyyy-MM-dd with start and end date parameters
-     * @return the JSON string with the data retrieved from Shimmer or null if nothing was returned
+     * @return The database ID for the patient data stored in the database.
      */
     public String retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries) throws Exception{
         logger.debug("Requesting patient data");
+        String jsonResponse = retrieveShimmerData(applicationUser, dateQueries);
+        logger.debug("Response " + jsonResponse );
+        String binaryResourceId = "";
+        if(jsonResponse != null){
+            //store the data
+            binaryResourceId = storePatientJson(applicationUser, jsonResponse);
+        }
+        return binaryResourceId;
+    }
+
+
+    /**
+     * Calls the Shimmer API to retrieve data for a user
+     * @param applicationUser the application user for the query
+     * @param dateQueries A list of Strings of the format yyyy-MM-dd with start and end date parameters
+     * @return The JSON response for the query to the shimmer API.
+     */
+    public String retrieveShimmerData(ApplicationUser applicationUser, List<String> dateQueries) throws Exception{
+        logger.debug("Querying Shimmer");
         String shimmerDataUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_DATA_RANGE_URL;
         shimmerDataUrl = shimmerDataUrl.replace("{shim-key}", applicationUser.getApplicationUserId().getShimKey());
         shimmerDataUrl = shimmerDataUrl.replace("{username}", applicationUser.getShimmerId());
@@ -130,10 +150,11 @@ public class ShimmerService {
 
         LocalDate startDate = null;
         LocalDate endDate = null;
-        Map<String, LocalDate> dates = parseDateQueries(dateQueries);
-        startDate = dates.get(START_DATE_KEY);
-        endDate = dates.get(END_DATE_KEY);
-
+        if( dateQueries != null ) {
+            Map<String, LocalDate> dates = parseDateQueries(dateQueries);
+            startDate = dates.get(START_DATE_KEY);
+            endDate = dates.get(END_DATE_KEY);
+        }
         if(startDate != null) {
             shimmerDataUrl += SHIMMER_START_DATE_URL_PARAM;
             shimmerDataUrl = shimmerDataUrl.replace("{start-date}", startDate.toString());
@@ -146,16 +167,9 @@ public class ShimmerService {
         logger.debug("Sending data request to " + shimmerDataUrl);
         HttpGet httpGet = new HttpGet(shimmerDataUrl);
         String jsonResponse = processShimmerDataRequest(httpGet);
-        logger.debug("Response " + jsonResponse );
-        String binaryResourceId = "";
-        if(jsonResponse != null){
-            //store the data
-            binaryResourceId = storePatientJson(applicationUser, jsonResponse);
-        }
-
-        return binaryResourceId;
+        logger.debug("Completed query to Shimmer");
+        return jsonResponse;
     }
-
 
     public Map<String, LocalDate> parseDateQueries(List<String> dateQueries) throws Exception{
         LocalDate startDate = null;

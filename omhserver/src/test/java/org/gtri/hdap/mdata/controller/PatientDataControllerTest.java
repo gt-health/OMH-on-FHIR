@@ -8,10 +8,7 @@ import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.service.ShimmerService;
-import org.hl7.fhir.dstu3.model.Attachment;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.DocumentReference;
-import org.hl7.fhir.dstu3.model.Enumerations;
+import org.hl7.fhir.dstu3.model.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +114,137 @@ public class PatientDataControllerTest {
         assertTrue(documentReference.getContent().get(0).getAttachment().getCreation() != null);
 
         logger.debug("========== Exiting testGenerateDocumentReference ==========");
+    }
+
+    @Test
+    public void testGenerateObservation() throws Exception{
+        logger.debug("========== Entering testGenerateObservation ==========");
+        PatientDataController patientDataController = new PatientDataController();
+        ApplicationUser applicationUser = new ApplicationUser(new ApplicationUserId("123", "fitbit"), "456");
+        StringBuilder sb = new StringBuilder();
+        //{
+        //    "shim": "googlefit",
+        //    "timeStamp": 1534251049,
+        //    "body": [
+        //    {
+        //        "header": {
+        //            "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee",
+        //            "creation_date_time": "2018-08-14T12:50:49.383Z",
+        //            "acquisition_provenance": {
+        //                "source_name": "Google Fit API",
+        //                "source_origin_id": "raw:com.google.step_count.cumulative:Google:Pixel 2 XL:5f9e1b9964be5834:LSM6DSM Step Counter"
+        //            },
+        //            "schema_id": {
+        //                "namespace": "omh",
+        //                "name": "step-count",
+        //                "version": "2.0"
+        //            }
+        //        },
+        //        "body": {
+        //            "effective_time_frame": {
+        //                "time_interval": {
+        //                    "start_date_time": "2018-08-14T00:00:17.805Z",
+        //                    "end_date_time": "2018-08-14T00:01:17.805Z"
+        //                }
+        //            },
+        //            "step_count": 7
+        //        }
+        //    },
+        // ...
+        //    ]
+        //}
+        sb.append("{")
+            .append("\"shim\": \"googlefit\",")
+            .append("\"timeStamp\": 1534251049,")
+            .append("\"body\": [")
+            .append("{")
+            .append(    "\"header\": {")
+            .append(        "\"id\": \"3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee\",")
+            .append(        "\"creation_date_time\": \"2018-08-14T12:50:49.383Z\",")
+            .append(        "\"acquisition_provenance\": {")
+            .append(            "\"source_name\": \"some source\",")
+            .append(            "\"source_origin_id\": \"some step counter\"")
+            .append(        "},")
+            .append(        "\"schema_id\": {")
+            .append(            "\"namespace\": \"omh\",")
+            .append(            "\"name\": \"step-count\",")
+            .append(            "\"version\": \"2.0\"")
+            .append(        "}")
+            .append(    "},")
+            .append(    "\"body\": {")
+            .append(        "\"effective_time_frame\": {")
+            .append(            "\"time_interval\": {")
+            .append(                "\"start_date_time\": \"2018-08-14T00:00:17.805Z\",")
+            .append(                "\"end_date_time\": \"2018-08-14T00:01:17.805Z\"")
+            .append(            "}")
+            .append(        "},")
+            .append(        "\"step_count\": 7")
+            .append(    "}")
+            .append("},")
+            .append("{")
+            .append(    "\"header\": {")
+            .append(        "\"id\": \"3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcff\",")
+            .append(        "\"creation_date_time\": \"2018-08-14T12:50:49.383Z\",")
+            .append(        "\"acquisition_provenance\": {")
+            .append(            "\"source_name\": \"some source\",")
+            .append(            "\"source_origin_id\": \"some step counter\"")
+            .append(        "},")
+            .append(        "\"schema_id\": {")
+            .append(            "\"namespace\": \"omh\",")
+            .append(            "\"name\": \"step-count\",")
+            .append(            "\"version\": \"2.0\"")
+            .append(        "}")
+            .append(    "},")
+            .append(    "\"body\": {")
+            .append(        "\"effective_time_frame\": {")
+            .append(            "\"time_interval\": {")
+            .append(                "\"start_date_time\": \"2018-08-14T00:02:17.805Z\",")
+            .append(                "\"end_date_time\": \"2018-08-14T00:03:17.805Z\"")
+            .append(            "}")
+            .append(        "},")
+            .append(        "\"step_count\": 27")
+            .append(    "}")
+            .append("}")
+            .append("]")
+        .append("}");
+        List<Resource> observationList = patientDataController.generateObservationList("123456", sb.toString());
+        assertTrue(observationList.size() == 2);
+
+        assertTrue(((Observation)observationList.get(0)).getComponent().get(0).getValueQuantity().getValue().intValue() == 7 );
+        assertTrue(((Observation)observationList.get(0)).getId() != null );
+        assertTrue(((Observation)observationList.get(0)).getContained().get(0).getId().equals(PatientDataController.PATIENT_RESOURCE_ID) );
+        assertTrue(((Observation)observationList.get(0)).getIdentifier().get(0).getSystem().equals(PatientDataController.PATIENT_IDENTIFIER_SYSTEM) );
+        assertTrue(((Observation)observationList.get(0)).getIdentifier().get(0).getValue().equals("3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee") );
+        assertTrue(((Observation)observationList.get(0)).getStatus().equals(Observation.ObservationStatus.UNKNOWN) );
+        assertTrue(((Observation)observationList.get(0)).getCategory().get(0).getCoding().get(0).getCode().equals(PatientDataController.OBSERVATION_CATEGORY_CODE) );
+        assertTrue(((Observation)observationList.get(0)).getCategory().get(0).getCoding().get(0).getSystem().equals(PatientDataController.OBSERVATION_CATEGORY_SYSTEM) );
+        assertTrue(((Observation)observationList.get(0)).getCategory().get(0).getCoding().get(0).getDisplay().equals(PatientDataController.OBSERVATION_CATEGORY_DISPLAY) );
+        assertTrue(((Observation)observationList.get(0)).getCode().getCoding().get(0).getCode().equals(PatientDataController.OBSERVATION_CODE_CODE) );
+        assertTrue(((Observation)observationList.get(0)).getCode().getCoding().get(0).getSystem().equals(PatientDataController.OBSERVATION_CODE_SYSTEM) );
+        assertTrue(((Observation)observationList.get(0)).getCode().getCoding().get(0).getDisplay().equals(PatientDataController.OBSERVATION_CODE_DISPLAY) );
+        assertTrue(((Observation)observationList.get(0)).getSubject().getReference() != null );
+        assertTrue(((Observation)observationList.get(0)).getEffectivePeriod().getStart() != null );
+        assertTrue(((Observation)observationList.get(0)).getEffectivePeriod().getEnd() != null );
+        assertTrue(((Observation)observationList.get(0)).getIssued() != null );
+        assertTrue(((Observation)observationList.get(0)).getDevice().getDisplay().equals("some source,some step counter,1534251049") );
+
+        assertTrue(((Observation)observationList.get(1)).getComponent().get(0).getValueQuantity().getValue().intValue() == 27);
+        assertTrue(((Observation)observationList.get(1)).getId() != null );
+        assertTrue(((Observation)observationList.get(1)).getContained().get(0).getId().equals(PatientDataController.PATIENT_RESOURCE_ID) );
+        assertTrue(((Observation)observationList.get(1)).getIdentifier().get(0).getSystem().equals(PatientDataController.PATIENT_IDENTIFIER_SYSTEM) );
+        assertTrue(((Observation)observationList.get(1)).getIdentifier().get(0).getValue().equals("3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcff") );
+        assertTrue(((Observation)observationList.get(1)).getStatus().equals(Observation.ObservationStatus.UNKNOWN) );
+        assertTrue(((Observation)observationList.get(1)).getCategory().get(0).getCoding().get(0).getCode().equals(PatientDataController.OBSERVATION_CATEGORY_CODE) );
+        assertTrue(((Observation)observationList.get(1)).getCategory().get(0).getCoding().get(0).getSystem().equals(PatientDataController.OBSERVATION_CATEGORY_SYSTEM) );
+        assertTrue(((Observation)observationList.get(1)).getCategory().get(0).getCoding().get(0).getDisplay().equals(PatientDataController.OBSERVATION_CATEGORY_DISPLAY) );
+        assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getCode().equals(PatientDataController.OBSERVATION_CODE_CODE) );
+        assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getSystem().equals(PatientDataController.OBSERVATION_CODE_SYSTEM) );
+        assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getDisplay().equals(PatientDataController.OBSERVATION_CODE_DISPLAY) );
+        assertTrue(((Observation)observationList.get(1)).getSubject().getReference() != null );
+        assertTrue(((Observation)observationList.get(1)).getEffectivePeriod().getStart() != null );
+        assertTrue(((Observation)observationList.get(1)).getEffectivePeriod().getEnd() != null );
+        assertTrue(((Observation)observationList.get(1)).getIssued() != null );
+        logger.debug("========== Exiting testGenerateObservation ==========");
     }
 
     private List<String> createDateList(String startDate, String endDate){
