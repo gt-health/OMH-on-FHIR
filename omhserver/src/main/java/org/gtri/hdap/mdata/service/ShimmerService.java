@@ -2,7 +2,6 @@ package org.gtri.hdap.mdata.service;
 
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.ParamPrefixEnum;
-import javafx.application.Application;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.CookieSpecs;
