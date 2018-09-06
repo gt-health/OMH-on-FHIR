@@ -19,7 +19,6 @@ component('launch', {
                 "client_id": env.omhOnFhirClientId,
                 "scope":  env.omhOnFhirScope,
                 "redirect_url": env.omhOnFhirRedirectUri,
-                "redirect_uri": env.omhOnFhirRedirectUri,
                 "launch": $routeParams.launch
             },
             "server": $routeParams.iss

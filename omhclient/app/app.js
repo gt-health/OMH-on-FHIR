@@ -10,7 +10,6 @@ if(window){
 // Declare app level module which depends on views, and components
 var ngModule = angular.module('myApp', [
   'ngRoute',
-  'myApp.version',
   'launch',
   'activity',
   'login',
