@@ -1,7 +1,10 @@
 /target/
+/omhclient-angular5/
+/omhserver/target
+omhclient/app/bower_components
+omhserver/*.env
 !.mvn/wrapper/maven-wrapper.jar
 shimmer-resource-server.env
-postgres.env
 
 ### STS ###
 .apt_generated

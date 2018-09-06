@@ -8,7 +8,7 @@ services:
     depends_on:
       - mongo
     env_file:
-      - ./web-api/shimmer-resource-server.env
+      - ./shimmer-resource-server.env
     ports:
       - "8084:8083"
 
@@ -30,30 +30,27 @@ services:
     expose:
       - 5432
     env_file:
-      - ./web-api/postgres.env
+      - ./omhserver/postgres.env
 
   mdata-app:
     build:
-      context: ./web-api
+      context: ./omhserver
       dockerfile: Dockerfile
     restart: always
     ports:
       - "8888:8080"
-    environment:
-      - SHIMMER_SERVER_URL=http://console:8083
-      - SHIMMER_REDIRECT_URL=https://apps.hdap.gatech.edu/mdata/authorize/fitbit/callback
-      - OMH_ON_FHIR_CALLBACK=https://apps.hdap.gatech.edu/ohmonfhir/activity
-      - OMH_ON_FHIR_LOGIN=https://apps.hdap.gatech.edu/ohmonfhir/login
+    env_file:
+      - ./omhserver/omh-server.env
     depends_on:
       - mdata-db
 
-  omh_on_fhir_client:
+  omh-on-fhir-client:
       build:
         #specifiy the project build context
         context: ./omhclient
         #specifiy the Dockerfile to use
         dockerfile: Dockerfile
       restart: always
-      #bind host port 4200 to container port 4200
+      #bind host port 8989 to container port 8080
       ports:
-         - 8989:8080
+         - "8989:8080"

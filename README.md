@@ -1,27 +1,77 @@
-# Omhclient
+# OMH-on-FHIR
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.8.
+Implementation of the OMH-on-FHIR application described here: https://healthedata1.github.io/mFHIR/#smart-app-workflow
 
-## Development server
+## Top Level Project Directories
+```
+omhclient           --> AngularJS project for the OMH on FHIR user interface
+omhserver           --> Spring Boot project for the OMH on FHIR web service
+docker-compose.yml  --> Docker Compose file to create the service stack for the application
+Jenkinsfile         --> Jenkinsfile to tell Jenkins how to build the application
+README.md           --> This file
+```
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Project Containers
+The application uses Docker Compose to create a service stack for each component of the application.
+It creates the following containers:
 
-## Code scaffolding
+| Container | Name in Docker Compose | Description |
+| --------- |----------------------|-----------|
+| Shimmer Resource Server | resource-server | The container running the Shimmer resource server which makes Shimmer API calls availble to other containers running in the Docker Compose service stack |
+| Shimmer Database | mongo | The container running the Mongo database used by Shimmer |
+| Shimmer Console | console | The container running the Shimmer console |
+| OMH Server Database | mdata-db | The container running the Postgres database used by the OMH Web Service |
+| OMH Web Service | mdata-app | The container running the webservice endpoints for Shimmer Authentication, DocumentReference, Binary, and Observation queries |
+| OMH Client | omh-on-fhir-client | The container running the User Interface for the OMH on FHIR application |
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Environment Variables
+The following environment variables need to be set for the containers
 
-## Build
+### resource-server
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+| Variable | Description |
+| -------- | ----------- |
+| OPENMHEALTH_SHIMMER_DATA_PROVIDER_REDIRECT_BASE_URL | Base URL for Shimmer to use for OAuth redirects |
+| OPENMHEALTH_SHIM_FITBIT_CLIENT_ID | Client ID for Shimmer to use for FitBit Authentication |
+| OPENMHEALTH_SHIM_FITBIT_CLIENT_SECRET |  Client Secret for Shimmer to use for FitBit authentication |
+| OPENMHEALTH_SHIM_GOOGLEFIT_CLIENT_ID | Client ID for Shimmer to use for Google Fit authentication |
+| OPENMHEALTH_SHIM_GOOGLEFIT_CLIENT_SECRET | Client secret for Shimmer to use for Google Fit authentication |
 
-## Running unit tests
+### mongo
+none
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### console
+none
 
-## Running end-to-end tests
+### mdata-db
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+| Variable | Description |
+| -------- | ----------- |
+| POSTGRES_DB | The name of the database to create/use |
+| POSTGRES_USER | The name of the database user |
+| POSTGRES_PASSWORD | The password for the database user |
 
-## Further help
+### mdata-app
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+| Variable | Description |
+| -------- | ----------- |
+| SHIMMER_SERVER_URL | The URL to the Shimmer resource server |
+| SHIMMER_REDIRECT_URL | The redirect URL to pass to the Shimmer API. It contains the URL to the mdata-app /authorize/fitbit/callback endpoint that handles successful user authentication. Shimmer only redirects to this URL after successful authentication.  |
+| OMH_ON_FHIR_CALLBACK | The URL to the OMH on FHIR UI application to use after successful Shimmer authentication.  |
+| OMH_ON_FHIR_LOGIN | The URL to the user interface that handles login to Fitbit and Google fit. |
+
+### omh-on-fhir-client
+none
+
+## To Run
+Do the following to run the application:
+1) Create a `./shimmer-resource-server.env` file with environment variable to configure the Shimmer server, https://github.com/openmhealth/shimmer/blob/e3fef06d4d7d5f93d2a45e7656a823889f247499/resource-server.env, Place the file in the root directory of the project.
+2) Create a `./omhserver/postgres.env` file with environment variables to configure the Postgress database.
+3) Create a `./omhserver/omh-server.env` file with environment variables to configure the OMH on Fhir web service.
+3) From the root directory of the project run `docker-compose up -d`
+
+## User Interface Constraints
+
+- DocumentReference search can only support two date parameters, one for the start date and one for the end date.
+If the start date uses a prefix it must be `ge`. If the end date uses a prefix it must be `le`. The application only searches for documents between the specified date ranges.
+
