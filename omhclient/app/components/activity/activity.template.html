@@ -13,12 +13,25 @@
         <!-- input value is of the format yyyy-MM-dd by default -->
         <input ng-model="$ctrl.endDate" type="date" id="endDate" name="endDate">
     </div>
-    <button class="btn btn-default" ng-click="$ctrl.queryActivity()">Search</button>
+    <button class="btn btn-default" ng-click="$ctrl.queryActivity()">Find DocumentReference</button>
+    <button class="btn btn-default" ng-click="$ctrl.queryActivity()">Find Observation</button>
 </form>
 
 <div ng-if="$ctrl.waitingForSearch" class="alert alert-info">
     <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-    Searching for activities...
+    Searching for DocumentReferences...
+</div>
+
+
+<div ng-if="$ctrl.waitingForObservationSearch" class="alert alert-info">
+    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+    Searching for Observations...
+</div>
+
+<div ng-if="$ctrl.observationResponse.length > 0" class="container-fluid" id="observationResponse">
+    <div>
+        {{$ctrl.observationResponse}}
+    </div>
 </div>
 
 <div ng-if="$ctrl.activityDocumentRef" class="container-fluid" id="activityResponse">

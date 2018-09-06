@@ -13,6 +13,7 @@ component('activity', {
         console.log($routeParams);
 
         self.waitingForSearch = false;
+        self.waitingForObservationSearch = false;
         self.waitingForData = false;
         self.startDate;
         self.endDate;
@@ -22,6 +23,7 @@ component('activity', {
         self.activityDataType = "OMH JSON";
         self.activityBinaryUrl;
         self.omhActivity;
+        self.observationResponse = "";
 
         //===================================================================================
         // Variables for chart
@@ -111,6 +113,7 @@ component('activity', {
         self.queryActivity = function queryActivity(){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;
+            self.observationResponse = "";
             self.omhOnFhirApi.requestDocumentReference(self.shimmerId, self.startDate, self.endDate)
                 .then(function(response){
                     console.log("Activity Response");
@@ -165,8 +168,8 @@ component('activity', {
                     //            "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee",
                     //            "creation_date_time": "2018-08-14T12:50:49.383Z",
                     //            "acquisition_provenance": {
-                    //                "source_name": "Google Fit API",
-                    //                "source_origin_id": "raw:com.google.step_count.cumulative:Google:Pixel 2 XL:5f9e1b9964be5834:LSM6DSM Step Counter"
+                    //                "source_name": "some source",
+                    //                "source_origin_id": "somedevice"
                     //            },
                     //            "schema_id": {
                     //                "namespace": "omh",
@@ -197,6 +200,123 @@ component('activity', {
                 });
         };
 
+        self.queryObservation = function queryObservation(){
+            console.log("Querying Observation " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
+            self.waitingForObservationSearch = true;
+            self.omhOnFhirApi.requestObservation(self.shimmerId, self.startDate, self.endDate)
+                .then(function(response){
+                    console.log("Observation Response");
+                    console.log(response);
+
+                    //sample response data
+                    //{
+                    //    "resourceType": "Bundle",
+                    //    "id": "55f690f4-d5e5-4f26-8fa2-026be61019",
+                    //    "meta": {
+                    //    "lastUpdated": "2018-05-23T23:48:12Z"
+                    //},
+                    //    "type": "searchset",
+                    //    "total": 1,
+                    //    "link": [
+                    //    {
+                    //        "relation": "self",
+                    //        "url": "http://test.fhir.org/r3/Observation?_format=application/fhir+json&search-id=7db95351-c995-4cbc-b990-1760a91987&&patient.identifier=some%2Duser&_sort=_id"
+                    //    }
+                    //],
+                    //    "entry": [
+                    //    {
+                    //        "fullUrl": "http://test.fhir.org/r3/Observation/stepcount-example",
+                    //        "resource": {
+                    //            "resourceType": "Observation",
+                    //            "id": "stepcount-example",
+                    //            "meta": {
+                    //                "versionId": "5",
+                    //                "lastUpdated": "2018-05-23T21:56:09Z"
+                    //            },
+                    //            "contained": [
+                    //                {
+                    //                    "resourceType": "Patient",
+                    //                    "id": "p",
+                    //                    "identifier": [
+                    //                        {
+                    //                            "system": "https://omh.org/shimmer/patient_ids",
+                    //                            "value": "some-user"
+                    //                        }
+                    //                    ]
+                    //                }
+                    //            ],
+                    //            "identifier": [
+                    //                {
+                    //                    "system": "https://omh.org/shimmer/ids",
+                    //                    "value": "12341567"
+                    //                }
+                    //            ],
+                    //            "status": "unknown",
+                    //            "category": [
+                    //                {
+                    //                    "coding": [
+                    //                        {
+                    //                            "system": "http://snomed.info/sct",
+                    //                            "code": "68130003",
+                    //                            "display": "Physical activity (observable entity)"
+                    //                        }
+                    //                    ]
+                    //                }
+                    //            ],
+                    //            "code": {
+                    //                "coding": [
+                    //                    {
+                    //                        "system": "http://loinc.org",
+                    //                        "code": "55423-8",
+                    //                        "display": "Number of steps in unspecified time Pedometer"
+                    //                    }
+                    //                ],
+                    //                "text": "Step count"
+                    //            },
+                    //            "subject": {
+                    //                "reference": "#p"
+                    //            },
+                    //            "effectivePeriod": {
+                    //                "start": "2018-04-17T00:00:00Z",
+                    //                "end": "2018-04-24T00:00:00Z"
+                    //            },
+                    //            "issued": "2018-04-24T17:13:50Z",
+                    //            "device": {
+                    //                "display": "Jawbone UP API, modality =sensed, sourceCreationDateTime = 2018-04-17T17:13:50Z"
+                    //            },
+                    //            "component": [
+                    //                {
+                    //                    "code": {
+                    //                        "coding": [
+                    //                            {
+                    //                                "system": "http://hl7.org/fhir/observation-statistics",
+                    //                                "code": "maximum",
+                    //                                "display": "Maximum"
+                    //                            }
+                    //                        ],
+                    //                        "text": "Maximum"
+                    //                    },
+                    //                    "valueQuantity": {
+                    //                        "value": 7939,
+                    //                        "unit": "steps/day",
+                    //                        "system": "http://unitsofmeasure.org",
+                    //                        "code": "{steps}/d"
+                    //                    }
+                    //                }
+                    //            ]
+                    //        },
+                    //        "search": {
+                    //            "mode": "match"
+                    //        }
+                    //    }
+                    //]
+                    //}
+                    console.log("Processing response");
+                    //at the moment we are returning a single entry in the response
+                    self.observationResponse = response.data;
+                    self.waitingForObservationSearch = false;
+                });
+        };
         //===================================================================================
         // D3 Config
         //===================================================================================
@@ -290,8 +410,8 @@ component('activity', {
         //                "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee",
         //                "creation_date_time": "2018-08-14T12:50:49.383Z",
         //                "acquisition_provenance": {
-        //                    "source_name": "Google Fit API",
-        //                    "source_origin_id": "raw:com.google.step_count.cumulative:Google:Pixel 2 XL:5f9e1b9964be5834:LSM6DSM Step Counter"
+        //                    "source_name": "some source",
+        //                    "source_origin_id": "some device"
         //                },
         //                "schema_id": {
         //                    "namespace": "omh",
@@ -314,8 +434,8 @@ component('activity', {
         //                "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcff",
         //                "creation_date_time": "2018-08-14T12:50:49.383Z",
         //                "acquisition_provenance": {
-        //                    "source_name": "Google Fit API",
-        //                    "source_origin_id": "raw:com.google.step_count.cumulative:Google:Pixel 2 XL:5f9e1b9964be5834:LSM6DSM Step Counter"
+        //                    "source_name": "some source",
+        //                    "source_origin_id": "some device"
         //                },
         //                "schema_id": {
         //                    "namespace": "omh",
@@ -338,6 +458,5 @@ component('activity', {
         //self.makeChart(self.omhActivity.body, d3.select('.chart-container'), "step_count", self.options);
         //console.log("Finished Making Chart");
 
-        //TODO: call a method on OmhOnFhirApi, figure out how to do serialization in
     }]
 });

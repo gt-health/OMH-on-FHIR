@@ -85,6 +85,25 @@ angular.module('omhOnFhirService', [])
         return $http.get(shimmerDocRefUrl);
     };
 
+    factory.requestObservation = function requestObservation(shimmerId, startDate, endDate){
+        return this.requestOmhResource("Observation", shimmerId, startDate, endDate);
+    };
+
+    factory.requestOmhResource = function requestOmhResource(resource, shimmerId, startDate, endDate){
+        var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/" + resource + "?subject=" + shimmerId;
+
+        if(startDate){
+            shimmerDocRefUrl = shimmerDocRefUrl + "&date=" + startDate.toISOString().substring(0,10);//to make format 'yyyy-MM-dd'
+        }
+        if(endDate){
+            shimmerDocRefUrl = shimmerDocRefUrl + "&date=" + endDate.toISOString().substring(0,10);//to make format 'yyyy-MM-dd'
+        }
+        console.log("Requesting " + resource + " "  + shimmerDocRefUrl);
+
+        //returns a promise that contains headers, status, and data
+        return $http.get(shimmerDocRefUrl);
+    };
+
     factory.requestBinaryAsJson = function requestBinaryAsJson(binaryUrl){
         var shimmerBinaryUrl = env.omhOnFhirAPIBase + "/" + binaryUrl;
         console.log("Requesting Binary " + shimmerBinaryUrl);
