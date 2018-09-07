@@ -95,7 +95,7 @@ component('activity', {
         //===================================================================================
         $scope.$watch(function () { return OmhOnFhirApi.patientName}, function (newVal, oldVal) {
             if (typeof newVal !== 'undefined') {
-                this.patientName = newVal;
+                self.patientName = newVal;
             }
         });
 
