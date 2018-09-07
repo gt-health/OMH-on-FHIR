@@ -53,9 +53,9 @@ component('login', {
         //===================================================================================
         // Watch Config
         //===================================================================================
-        $scope.$watch(function () { return self.omhOnFhirApi.loginSuccessful}, function (newVal, oldVal) {
+        $scope.$watch(function () { return OmhOnFhirApi.loginSuccessful}, function (newVal, oldVal) {
             if (typeof newVal !== 'undefined') {
-                this.loginSuccessful = self.omhOnFhirApi.loginSuccessful;
+                this.loginSuccessful = newVal;
             }
         });
 
