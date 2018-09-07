@@ -1,5 +1,5 @@
 angular.module('omhOnFhirService', [])
-.factory('OmhOnFhirApi', [ '$http', '__env', function($http, env){
+.factory('OmhOnFhirApi', [ '$http', '$window', '__env', function($http, $window, env){
     var factory = {};
 
     console.log("Looking at environments");
@@ -11,6 +11,8 @@ angular.module('omhOnFhirService', [])
     factory.patientResourceObj;
     factory.patientId;
     factory.patientName;
+    factory.shimmerId;
+    factory.loginSuccessful;
 
     //===================================================================================
     // Getters and setters for the objects in the factory
@@ -44,6 +46,22 @@ angular.module('omhOnFhirService', [])
         this.patientName = patientName;
     };
 
+    factory.getShimmerId = function getShimmerId(){
+        return this.shimmerId;
+    };
+    factory.setShimmerId = function setShimmerId(shimmerId){
+        console.log("Setting shimmer ID " + shimmerId);
+        this.shimmerId = shimmerId;
+    };
+
+    factory.getLoginSuccessful = function getLoginSuccessful(){
+        return this.loginSuccessful;
+    };
+    factory.setLoginSuccessful = function setLoginSuccessful(loginSuccessful){
+        console.log("Was login successful " + loginSuccessful);
+        this.loginSuccessful = loginSuccessful;
+    };
+
     //===================================================================================
     // Additional functions for objects in the factory
     //===================================================================================
@@ -61,13 +79,15 @@ angular.module('omhOnFhirService', [])
 
     factory.login = function login( shimKey ){
         console.log("Logging in to Shimmer");
+        this.loginSuccessful = false;
         var shimmerAuthUrl =
             env.omhOnFhirAPIBase +
             env.omhOnFhirAPIShimmerAuth +
             "?ehrId=" + this.getPatientId() +
             "&shimkey=" + shimKey;
         console.log("Authorizing with Shimmer " + shimmerAuthUrl);
-        window.location.href = shimmerAuthUrl;
+        $window.open(shimmerAuthUrl, 'Shimmer Sign in', 'width=500,height=400');
+        //window.location.href = shimmerAuthUrl;
     };
 
     factory.requestDocumentReference = function requestDocumentReference(shimmerId, startDate, endDate){
