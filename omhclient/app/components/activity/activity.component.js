@@ -5,7 +5,7 @@ module('activity').
 component('activity', {
 
     templateUrl: 'components/activity/activity.template.html',
-    controller: ['$scope', '$http', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $http, $routeParams, OmhOnFhirApi){
+    controller: ['$scope', '$rootScope', '$http', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $rootScope, $http, $routeParams, OmhOnFhirApi){
         var self = this;
         self.omhOnFhirApi = OmhOnFhirApi;
 
@@ -299,6 +299,11 @@ component('activity', {
                     self.waitingForObservationSearch = false;
                 });
         };
+
+        self.getPatientName = function getPatientName(){
+            return $rootScope.patientName;
+        };
+
         //===================================================================================
         // D3 Config
         //===================================================================================

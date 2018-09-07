@@ -5,11 +5,10 @@ module('login').
 component('login', {
 
     templateUrl: 'components/login/login.template.html',
-    controller: ['$scope', '$http', '$window', '$location', '$routeParams', 'OmhOnFhirApi', '__env', function LoginController($scope, $http, $window, $location, $routeParams, OmhOnFhirApi, env){
+    controller: ['$scope', '$rootScope', '$http', '$window', '$location', '$routeParams', 'OmhOnFhirApi', '__env', function LoginController($scope, $rootScope, $http, $window, $location, $routeParams, OmhOnFhirApi, env){
         var self = this;
         self.env = env;
         self.omhOnFhirApi = OmhOnFhirApi;
-        self.loginSuccessful;
 
         self.pageMsg = 'TODO make login page';
         self.googleOauthUrl;
@@ -40,7 +39,7 @@ component('login', {
         //If so, forward to activity page, otherwise remain on login page.
         $window.onfocus = function (){
             console.log("Login window has focus");
-            if( self.omhOnFhirApi.getLoginSuccessful() == true ){
+            if( $rootScope.loginSuccess == true ){
                 //forward to the activity page
                 console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity");
                 $location.path(self.env.baseUrl + "activity");
