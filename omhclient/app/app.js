@@ -13,6 +13,7 @@ var ngModule = angular.module('myApp', [
   'launch',
   'activity',
   'login',
+  'callback',
   'omhOnFhirService'
 ]).
 config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
@@ -28,6 +29,9 @@ config(['$locationProvider', '$routeProvider', function($locationProvider, $rout
       }).
       when('/login', {
         template: '<login></login>'
+      }).
+      when('/callback', {
+        template: '<callback></callback>'
       }).
       otherwise({redirectTo: '/login'});
 }])
