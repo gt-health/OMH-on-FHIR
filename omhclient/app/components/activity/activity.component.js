@@ -11,7 +11,7 @@ component('activity', {
 
         console.log("Params passed to login");
         console.log($routeParams);
-        self.patientName = self.omhOnFhirApi.getPatientName();
+        self.patientName;
         self.waitingForSearch = false;
         self.waitingForObservationSearch = false;
         self.waitingForData = false;
@@ -93,9 +93,9 @@ component('activity', {
         //===================================================================================
         // Watch Config
         //===================================================================================
-        $scope.$watch(function () { return self.omhOnFhirApi.patientName}, function (newVal, oldVal) {
+        $scope.$watch(function () { return OmhOnFhirApi.patientName}, function (newVal, oldVal) {
             if (typeof newVal !== 'undefined') {
-                this.patientName = self.omhOnFhirApi.patientName;
+                this.patientName = newVal;
             }
         });
 
