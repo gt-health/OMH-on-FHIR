@@ -90,18 +90,6 @@ component('activity', {
         self.startDate = date;
         self.endDate = date;
 
-        //watch the service
-        //$scope.$watch(
-        //    function(){
-        //        return OmhOnFhirApi.patientResourceObj;
-        //    },
-        //    function(newVal, oldVal, scope){
-        //        if(newVal) {
-        //            self.omhOnFhirApi.setPatientResourceObj(newVal);
-        //        }
-        //    }
-        //);
-
         //===================================================================================
         // Watch Config
         //===================================================================================
