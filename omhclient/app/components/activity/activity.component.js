@@ -11,7 +11,7 @@ component('activity', {
 
         console.log("Params passed to login");
         console.log($routeParams);
-
+        self.patientName = self.omhOnFhirApi.getPatientName();
         self.waitingForSearch = false;
         self.waitingForObservationSearch = false;
         self.waitingForData = false;
@@ -103,13 +103,17 @@ component('activity', {
         //);
 
         //===================================================================================
+        // Watch Config
+        //===================================================================================
+        $scope.$watch(function () { return self.omhOnFhirApi.patientName}, function (newVal, oldVal) {
+            if (typeof newVal !== 'undefined') {
+                this.patientName = self.omhOnFhirApi.patientName;
+            }
+        });
+
+        //===================================================================================
         // Functions
         //===================================================================================
-        self.getPatientName = function getPatientName(){
-            //self.omhOnFhirApi.getPatientName();
-            self.omhOnFhirApi.getPatientName();
-        };
-
         self.queryActivity = function queryActivity(){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;
