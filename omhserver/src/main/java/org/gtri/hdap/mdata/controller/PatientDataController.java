@@ -106,9 +106,9 @@ public class PatientDataController {
             model.addAttribute("shimmerId", userShimmerId);
         }
 
-        String fitbitAuthUrl = null;
+        String oauthAuthUrl = null;
         try {
-            fitbitAuthUrl = shimmerService.requestShimmerAuthUrl(userShimmerId, shimkey);
+            oauthAuthUrl = shimmerService.requestShimmerAuthUrl(userShimmerId, shimkey);
         }
         catch(Exception e){
             e.printStackTrace();
@@ -121,7 +121,7 @@ public class PatientDataController {
         //tell spring we want the attribute to survive the redirect
         attributes.addFlashAttribute("shimmerId", userShimmerId);
 
-        String redirectUrl = "redirect:" + fitbitAuthUrl;
+        String redirectUrl = "redirect:" + oauthAuthUrl;
         logger.debug("Redirecting to " + redirectUrl);
         logger.debug("Model Keys: " + model.keySet());
         logger.debug("Model Values " + model.values());
@@ -237,12 +237,12 @@ public class PatientDataController {
     }
 
     @RequestMapping("/authorize/{shimkey}/callback")
-    public ModelAndView handleFitbitRedirect(ModelMap model,
+    public ModelAndView handleShimmerOauthCallback(ModelMap model,
                                        @ModelAttribute("shimmerId") String shimmerId,
                                        @PathVariable String shimkey,
                                        @RequestParam(name="code") String code,
                                        @RequestParam(name="state") String state){
-        logger.debug("Handling successful Fitbit auth redirect");
+        logger.debug("Handling successful " + shimkey + " auth redirect");
         logger.debug("MODEL shimmer id " + model.get("shimmerId"));
         logger.debug("Passed in shimmer id " + shimmerId);
         logger.debug("Code " + code);
