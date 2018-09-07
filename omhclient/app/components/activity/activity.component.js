@@ -5,7 +5,7 @@ module('activity').
 component('activity', {
 
     templateUrl: 'components/activity/activity.template.html',
-    controller: ['$scope', '$element', '$http', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $element, $http, $routeParams, OmhOnFhirApi){
+    controller: ['$scope', '$http', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $http, $routeParams, OmhOnFhirApi){
         var self = this;
         self.omhOnFhirApi = OmhOnFhirApi;
 
