@@ -11,7 +11,6 @@ component('activity', {
 
         console.log("Params passed to login");
         console.log($routeParams);
-        self.patientName;
         self.waitingForSearch = false;
         self.waitingForObservationSearch = false;
         self.waitingForData = false;
@@ -89,15 +88,6 @@ component('activity', {
         //console.log("Set end date: " + self.endDate);
         self.startDate = date;
         self.endDate = date;
-
-        //===================================================================================
-        // Watch Config
-        //===================================================================================
-        $scope.$watch(function () { return OmhOnFhirApi.patientName}, function (newVal, oldVal) {
-            if (typeof newVal !== 'undefined') {
-                self.patientName = newVal;
-            }
-        });
 
         //===================================================================================
         // Functions

@@ -40,7 +40,7 @@ component('login', {
         //If so, forward to activity page, otherwise remain on login page.
         $window.onfocus = function (){
             console.log("Login window has focus");
-            if( self.loginSuccessful ){
+            if( self.omhOnFhirApi.getLoginSuccessful() == true ){
                 //forward to the activity page
                 console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity");
                 $location.path(self.env.baseUrl + "activity");
@@ -49,15 +49,6 @@ component('login', {
                 console.log("Login not successful");
             }
         };
-
-        //===================================================================================
-        // Watch Config
-        //===================================================================================
-        $scope.$watch(function () { return OmhOnFhirApi.loginSuccessful}, function (newVal, oldVal) {
-            if (typeof newVal !== 'undefined') {
-                self.loginSuccessful = newVal;
-            }
-        });
 
         //===================================================================================
         // Functions

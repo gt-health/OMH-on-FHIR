@@ -5,7 +5,7 @@ module('callback').
 component('callback', {
 
     templateUrl: 'components/callback/callback.template.html',
-    controller: ['$scope', '$http', '$routeParams', 'OmhOnFhirApi', '__env', function LoginController($scope, $http, $routeParams, OmhOnFhirApi, env){
+    controller: ['$scope', '$rootScope', '$http', '$routeParams', 'OmhOnFhirApi', '__env', function LoginController($scope, $rootScope, $http, $routeParams, OmhOnFhirApi, env){
         var self = this;
         self.omhOnFhirApi = OmhOnFhirApi;
 
@@ -14,11 +14,11 @@ component('callback', {
         //===================================================================================
         if($routeParams.loginSuccess){
             console.log("Setting login success to: " + $routeParams.loginSuccess);
-            self.omhOnFhirApi.setLoginSuccessful(($routeParams.loginSuccess == 'true'));
+            $rootScope.loginSuccess = ($routeParams.loginSuccess == 'true');
         }
         if($routeParams.shimmerId){
             console.log("Setting shimmer id to: " + $routeParams.shimmerId);
-            self.omhOnFhirApi.setShimmerId($routeParams.shimmerId);
+            $rootScope.shimmerId = $routeParams.shimmerId;
         }
 
     }]

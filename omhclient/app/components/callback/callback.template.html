@@ -1,6 +1,6 @@
-<div ng-if="$ctrl.omhOnFhirApi.loginSuccessful == true">
+<div ng-if="$ctrl.omhOnFhirApi.getLoginSuccessful() == true">
     Authentication was successful. Please close window.
 </div>
-<div ng-if="$ctrl.omhOnFhirApi.loginSuccessful == false">
+<div ng-if="$ctrl.omhOnFhirApi.getLoginSuccessful() == false">
     Authentication was not successful. Please close window.
 </div>

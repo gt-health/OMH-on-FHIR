@@ -1,5 +1,5 @@
 angular.module('omhOnFhirService', [])
-.factory('OmhOnFhirApi', [ '$http', '$window', '__env', function($http, $window, env){
+.factory('OmhOnFhirApi', [ '$rootScope', '$http', '$window', '__env', function($rootScope, $http, $window, env){
     var factory = {};
 
     console.log("Looking at environments");
@@ -10,9 +10,6 @@ angular.module('omhOnFhirService', [])
     //===================================================================================\
     factory.patientResourceObj;
     factory.patientId;
-    factory.patientName;
-    factory.shimmerId;
-    factory.loginSuccessful;
 
     //===================================================================================
     // Getters and setters for the objects in the factory
@@ -28,7 +25,7 @@ angular.module('omhOnFhirService', [])
         this.patientId = this.patientResourceObj.id;
         console.log("PatientId: " + this.getPatientId());
 
-        this.patientName = this.getPatientNameFromObject(this.patientResourceObj);
+        $rootScope.patientName = this.getPatientNameFromObject(this.patientResourceObj);
         console.log("PatientName: " + this.patientName);
     };
 
@@ -40,26 +37,26 @@ angular.module('omhOnFhirService', [])
     };
 
     factory.getPatientName = function getPatientName(){
-        return this.patientName;
+        return $rootScope.patientName;
     };
     factory.setPatientName = function setPatientName(patientName){
-        this.patientName = patientName;
+        $rootScope.patientName = patientName;
     };
 
     factory.getShimmerId = function getShimmerId(){
-        return this.shimmerId;
+        return $rootScope.shimmerId;
     };
     factory.setShimmerId = function setShimmerId(shimmerId){
         console.log("Setting shimmer ID " + shimmerId);
-        this.shimmerId = shimmerId;
+        $rootScope.shimmerId = shimmerId;
     };
 
     factory.getLoginSuccessful = function getLoginSuccessful(){
-        return this.loginSuccessful;
+        return $rootScope.loginSuccess;
     };
     factory.setLoginSuccessful = function setLoginSuccessful(loginSuccessful){
         console.log("Was login successful " + loginSuccessful);
-        this.loginSuccessful = loginSuccessful;
+        $rootScope.loginSuccess = loginSuccessful;
     };
 
     //===================================================================================
