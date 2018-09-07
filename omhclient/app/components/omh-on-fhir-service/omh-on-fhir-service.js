@@ -86,7 +86,7 @@ angular.module('omhOnFhirService', [])
             "?ehrId=" + this.getPatientId() +
             "&shimkey=" + shimKey;
         console.log("Authorizing with Shimmer " + shimmerAuthUrl);
-        $window.open(shimmerAuthUrl, 'Shimmer Sign in', 'width=500,height=400');
+        $window.open(shimmerAuthUrl, 'Shimmer Sign in', 'left=100,top=100,width=500,height=600');
         //window.location.href = shimmerAuthUrl;
     };
 
