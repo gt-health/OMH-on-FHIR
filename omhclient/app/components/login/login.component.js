@@ -9,6 +9,7 @@ component('login', {
         var self = this;
         self.env = env;
         self.omhOnFhirApi = OmhOnFhirApi;
+        self.loginSuccessful;
 
         self.pageMsg = 'TODO make login page';
         self.googleOauthUrl;
@@ -39,7 +40,7 @@ component('login', {
         //If so, forward to activity page, otherwise remain on login page.
         $window.onfocus = function (){
             console.log("Login window has focus");
-            if( self.omhOnFhirApi.loginSuccessful ){
+            if( self.loginSuccessful ){
                 //forward to the activity page
                 console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity");
                 $location.path(self.env.baseUrl + "activity");
@@ -48,6 +49,15 @@ component('login', {
                 console.log("Login not successful");
             }
         };
+
+        //===================================================================================
+        // Watch Config
+        //===================================================================================
+        $scope.$watch(function () { return self.omhOnFhirApi.loginSuccessful}, function (newVal, oldVal) {
+            if (typeof newVal !== 'undefined') {
+                this.loginSuccessful = self.omhOnFhirApi.loginSuccessful;
+            }
+        });
 
         //===================================================================================
         // Functions
