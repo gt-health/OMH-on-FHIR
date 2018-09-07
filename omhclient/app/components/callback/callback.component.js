@@ -13,10 +13,14 @@ component('callback', {
         // Initialization
         //===================================================================================
         if($routeParams.loginSuccess){
+            console.log("Setting login success to: " + $routeParams.loginSuccess);
             self.omhOnFhirApi.setLoginSuccessful(($routeParams.loginSuccess == 'true'));
+            $scope.$apply();
         }
         if($routeParams.shimmerId){
+            console.log("Setting shimmer id to: " + $routeParams.shimmerId);
             self.omhOnFhirApi.setShimmerId($routeParams.shimmerId);
+            $scope.$apply();
         }
 
     }]
