@@ -24,8 +24,8 @@ component('callback', {
         //$window.opener.setShimmerId($routeParams.shimmerId);
         //$window.opener.setLoginSuccess(($routeParams.loginSuccess == 'true'));
         //
-        $window.opener.shimmerId = $routeParams.shimmerId;
-        $window.opener.loginSuccess = ($routeParams.loginSuccess == 'true');
+        $window.opener.self.shimmerId = $routeParams.shimmerId;
+        $window.opener.self.loginSuccess = ($routeParams.loginSuccess == 'true');
 
         console.log("WINDOW OPENER");
         console.log($window.opener);
