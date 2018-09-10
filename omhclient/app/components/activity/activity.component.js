@@ -5,7 +5,7 @@ module('activity').
 component('activity', {
 
     templateUrl: 'components/activity/activity.template.html',
-    controller: ['$scope', '$rootScope', '$http', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $rootScope, $http, $routeParams, OmhOnFhirApi){
+    controller: ['$scope', '$rootScope', '$http', '$window', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $rootScope, $http, $window, $routeParams, OmhOnFhirApi){
         var self = this;
         self.omhOnFhirApi = OmhOnFhirApi;
 
@@ -74,6 +74,9 @@ component('activity', {
             }
         };
 
+        //register listener to log user out on exit
+        $window.onbeforeunload = self.onExit();
+
         //===================================================================================
         // Initialization
         //===================================================================================
@@ -92,6 +95,12 @@ component('activity', {
         //===================================================================================
         // Functions
         //===================================================================================
+
+        self.onExit = function onExit(){
+            console.log("Logging out user " + self.shimmerId);
+            self.omhOnFhirApi.logoutShimmerUser(self.shimmerId);
+        }
+
         self.queryActivity = function queryActivity(){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;

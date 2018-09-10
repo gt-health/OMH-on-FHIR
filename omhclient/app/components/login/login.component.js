@@ -39,14 +39,26 @@ component('login', {
         //If so, forward to activity page, otherwise remain on login page.
         $window.onfocus = function (){
             console.log("Login window has focus");
-            if( $rootScope.loginSuccess == true ){
-                //forward to the activity page
-                console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity");
-                $location.path(self.env.baseUrl + "activity");
-            }
-            else{
-                console.log("Login not successful");
-            }
+            self.omhOnFhirApi.checkShimmerUserLoginStatus(self.shimmerId)
+                .then(function(response){
+                    if( response.data == "true" ){
+                        console.log("User is logged in");
+                        $location.path(self.env.baseUrl + "activity");
+                    }
+                    else{
+                        console.log("User is not logged in");
+                    }
+                });
+            //console.log("Login Pop UP Window");
+            //console.log(self.omhOnFhirApi.getSignInWindow());
+            //if( $rootScope.loginSuccess == true ){
+            //    //forward to the activity page
+            //    console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity");
+            //    $location.path(self.env.baseUrl + "activity");
+            //}
+            //else{
+            //    console.log("Login not successful");
+            //}
         };
 
         //===================================================================================

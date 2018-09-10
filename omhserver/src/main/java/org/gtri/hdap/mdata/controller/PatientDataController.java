@@ -262,11 +262,29 @@ public class PatientDataController {
             return new ModelAndView(omhOnFhirUi, model);
         }
 
+        ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
+        applicationUser.setLoggedIn(true);
+        applicationUserRepository.save(applicationUser);
+
         omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
         model.addAttribute("loginSuccess", true);
         model.addAttribute("shimmerId", shimmerId);
         logger.debug("Redirecting to: " + omhOnFhirUi);
         return new ModelAndView(omhOnFhirUi, model);
+    }
+
+    @GetMapping("/loginStatus/{shimmerId}")
+    public ResponseEntity loginStatus(@PathVariable String shimmerId){
+        ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
+        return ResponseEntity.ok(applicationUser.getLoggedIn());
+    }
+
+    @GetMapping("/logout/{shimmerId}")
+    public ResponseEntity logoutUser(@PathVariable String shimmerId){
+        ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
+        applicationUser.setLoggedIn(false);
+        applicationUserRepository.save(applicationUser);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     /*========================================================================*/
