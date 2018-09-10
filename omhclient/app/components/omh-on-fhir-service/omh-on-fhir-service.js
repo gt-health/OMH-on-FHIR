@@ -10,6 +10,7 @@ angular.module('omhOnFhirService', [])
     //===================================================================================\
     factory.patientResourceObj;
     factory.patientId;
+    factory.loginWindow;
 
     //===================================================================================
     // Getters and setters for the objects in the factory
@@ -84,8 +85,8 @@ angular.module('omhOnFhirService', [])
             "?ehrId=" + this.getPatientId() +
             "&shimkey=" + shimKey;
         console.log("Authorizing with Shimmer " + shimmerAuthUrl);
-        var loginWindow = window.open(shimmerAuthUrl, 'Sign In', 'left=100,top=100,width=500,height=600');
-        loginWindow.loginStatus = false;
+        this.loginWindow = window.open(shimmerAuthUrl, 'Sign In', 'left=100,top=100,width=500,height=600');
+        this.loginWindow.loginStatus = false;
     };
 
     factory.requestDocumentReference = function requestDocumentReference(shimmerId, startDate, endDate){

@@ -9,6 +9,8 @@ component('login', {
         var self = this;
         self.env = env;
         self.omhOnFhirApi = OmhOnFhirApi;
+        self.shimmerId;
+        self.loginSuccess;
 
         self.pageMsg = 'TODO make login page';
         self.googleOauthUrl;
@@ -64,6 +66,14 @@ component('login', {
         //===================================================================================
         // Functions
         //===================================================================================
+        self.setShimmerId = function setShimmerId(shimmerId){
+            console.log("LOGIN SETTING SHIMMER ID " + shimmerId);
+            self.shimmerId = shimmerId;
+        };
+        self.setLoginSuccess = function setLoginSuccess(loginSuccess){
+            console.log("LOGIN SETTING SUCCESS " + loginSuccess);
+            self.loginSuccess = loginSuccess;
+        };
         self.loginWithFitbit = function loginWithFitbit() {
             console.log("Logging in with Fitbit");
             self.omhOnFhirApi.login(self.env.fitbitShim);

@@ -20,6 +20,10 @@ component('callback', {
             console.log("Setting shimmer id to: " + $routeParams.shimmerId);
             $rootScope.shimmerId = $routeParams.shimmerId;
         }
+
+        $window.opener.setShimmerId($routeParams.shimmerId);
+        $window.opener.setLoginSuccess(($routeParams.loginSuccess == 'true'));
+
         console.log("WINDOW OPENER");
         console.log($window.opener);
 
