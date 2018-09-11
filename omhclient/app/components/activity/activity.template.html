@@ -1,6 +1,7 @@
 <h1>Activity</h1>
 <h2>Search Patient Activity for : {{$ctrl.getPatientName()}}</h2>
 <form>
+    <h4>Search for activity between date range</h4>
     <div class="form-group">
         <label for="startDate">Start Date:</label>
         <!-- Using date input type for details see: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date -->
@@ -13,19 +14,19 @@
         <!-- input value is of the format yyyy-MM-dd by default -->
         <input ng-model="$ctrl.endDate" type="date" id="endDate" name="endDate">
     </div>
-    <button class="btn btn-default" ng-click="$ctrl.queryActivity()">Find DocumentReference</button>
-    <button class="btn btn-default" ng-click="$ctrl.queryObservation()">Find Observation</button>
+    <button class="btn btn-default" ng-click="$ctrl.queryActivity()">Find step-count in OMH format</button>
+    <button class="btn btn-default" ng-click="$ctrl.queryObservation()">Find step-count as FHIR STU3 Observation</button>
 </form>
 
 <div ng-if="$ctrl.waitingForSearch" class="alert alert-info">
     <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-    Searching for DocumentReferences...
+    Searching for OMH data...
 </div>
 
 
 <div ng-if="$ctrl.waitingForObservationSearch" class="alert alert-info">
     <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-    Searching for Observations...
+    Searching for STU3 Observations...
 </div>
 
 <div ng-if="$ctrl.observationResponse.length > 0" class="container-fluid" id="observationResponse">
@@ -43,7 +44,7 @@
     </div>
 
     <div class="row">
-        <button class="btn btn-default" ng-click="$ctrl.queryBinary()">Retrieve Activity Data</button>
+        <button class="btn btn-default" ng-click="$ctrl.queryBinary()">Retrieve in step-count in OMH format</button>
 
         <div ng-if="$ctrl.waitingForData" class="alert alert-info">
             <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>

@@ -2,7 +2,6 @@ package org.gtri.hdap.mdata.service;
 
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.ParamPrefixEnum;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -17,10 +16,6 @@ import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
 import org.gtri.hdap.mdata.util.ShimmerUtil;
-import org.hl7.fhir.dstu3.model.Attachment;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.DocumentReference;
-import org.hl7.fhir.dstu3.model.Enumerations;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,8 +42,9 @@ public class ShimmerService {
     public static String SHIMMER_AUTH_URL = "/authorize/{shim-key}?username={username}&redirect_url={redirect-url}";
     public static String SHIMMER_AUTH_CALLBACK = "/authorize/{shim-key}/callback?code={code}&state={state}";
 //    public static String SHIMMER_AUTH_CALLBACK = "/authorize/{shim-key}/callback?state={state}";
-//public static String SHIMMER_DATA_RANGE_URL = "/data/{shim-key}/physical_activity?username={username}&normalize={normalize}";
-    public static String SHIMMER_DATA_RANGE_URL = "/data/{shim-key}/step_count?username={username}&normalize={normalize}";
+//public static String SHIMMER_STEP_COUNT_RANGE_URL = "/data/{shim-key}/physical_activity?username={username}&normalize={normalize}";
+    public static String SHIMMER_STEP_COUNT_RANGE_URL = "/data/{shim-key}/step_count?username={username}&normalize={normalize}";
+    public static String SHIMMER_ACTIVITY_RANGE_URL = "/data/{shim-key}/step_count?username={username}&normalize={normalize}";
     public static String SHIMMER_START_DATE_URL_PARAM = "&dateStart={start-date}";
     public static String SHIMMER_END_DATE_URL_PARAM = "&dateEnd={end-date}";
     public static String START_DATE_KEY = "startDate";
@@ -123,7 +118,8 @@ public class ShimmerService {
      */
     public String retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries) throws Exception{
         logger.debug("Requesting patient data");
-        String jsonResponse = retrieveShimmerData(applicationUser, dateQueries);
+        String jsonResponse = retrieveShimmerData(SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
+//        String jsonResponse = retrieveShimmerData(SHIMMER_ACTIVITY_RANGE_URL, applicationUser, dateQueries);
         logger.debug("Response " + jsonResponse );
         String binaryResourceId = "";
         if(jsonResponse != null){
@@ -140,9 +136,9 @@ public class ShimmerService {
      * @param dateQueries A list of Strings of the format yyyy-MM-dd with start and end date parameters
      * @return The JSON response for the query to the shimmer API.
      */
-    public String retrieveShimmerData(ApplicationUser applicationUser, List<String> dateQueries) throws Exception{
+    public String retrieveShimmerData(String shimmerDataUrlFragment, ApplicationUser applicationUser, List<String> dateQueries) throws Exception{
         logger.debug("Querying Shimmer");
-        String shimmerDataUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_DATA_RANGE_URL;
+        String shimmerDataUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + shimmerDataUrlFragment;
         shimmerDataUrl = shimmerDataUrl.replace("{shim-key}", applicationUser.getApplicationUserId().getShimKey());
         shimmerDataUrl = shimmerDataUrl.replace("{username}", applicationUser.getShimmerId());
         shimmerDataUrl = shimmerDataUrl.replace("{normalize}", "true");

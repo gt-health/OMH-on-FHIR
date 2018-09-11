@@ -217,7 +217,7 @@ public class PatientDataController {
         //parse start and end dates
         try {
             //Query patient data
-            jsonResponse = shimmerService.retrieveShimmerData(applicationUser, dateQueries);
+            jsonResponse = shimmerService.retrieveShimmerData(ShimmerService.SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
         }
         catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
