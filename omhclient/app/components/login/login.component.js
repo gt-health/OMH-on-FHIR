@@ -58,8 +58,9 @@ component('login', {
             if( this.loginSuccess == true ){
                 //forward to the activity page
                 console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity?shimmerId=" + this.shimmerId);
-                $location.path(self.env.baseUrl + "activity?shimmerId=" + this.shimmerId );
-                $scope.$apply()
+                //$location.path(self.env.baseUrl + "activity?shimmerId=" + this.shimmerId );
+                $window.location.href(self.env.baseUrl + "activity?shimmerId=" + this.shimmerId );
+                //$scope.$apply();
             }
             else{
                 console.log("Login not successful");
