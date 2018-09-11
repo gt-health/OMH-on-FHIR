@@ -74,8 +74,8 @@ component('activity', {
             }
         };
 
-        //register listener to log user out on exit
-        $window.onbeforeunload = self.onExit();
+        ////register listener to log user out on exit
+        //$window.onbeforeunload = self.onExit();
 
         //===================================================================================
         // Initialization

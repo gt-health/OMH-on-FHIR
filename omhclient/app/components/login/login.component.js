@@ -56,8 +56,8 @@ component('login', {
             console.log("Shimmer Id: " + this.shimmerId);
             if( this.loginSuccess == true ){
                 //forward to the activity page
-                console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity");
-                $location.path(self.env.baseUrl + "activity?shimmerId=" + this.shimmerId );
+                console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity?shimmerId=" + this.shimmerId);
+                $location.path( "activity?shimmerId=" + this.shimmerId );
             }
             else{
                 console.log("Login not successful");
