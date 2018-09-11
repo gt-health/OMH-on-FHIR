@@ -85,8 +85,7 @@ angular.module('omhOnFhirService', [])
             "?ehrId=" + this.getPatientId() +
             "&shimkey=" + shimKey;
         console.log("Authorizing with Shimmer " + shimmerAuthUrl);
-        this.loginWindow = window.open(shimmerAuthUrl, 'Sign In', 'left=100,top=100,width=500,height=600');
-        this.loginWindow.loginStatus = false;
+        this.loginWindow = $window.open(shimmerAuthUrl, 'Sign In', 'left=100,top=100,width=500,height=600');
     };
 
     factory.requestDocumentReference = function requestDocumentReference(shimmerId, startDate, endDate){
@@ -142,18 +141,6 @@ angular.module('omhOnFhirService', [])
         //returns a promise that contains headers, status, and data
         return $http.get(shimmerBinaryUrl);
     };
-
-    factory.checkShimmerUserLoginStatus = function checkShimmerUserLoginStatus(shimmerId){
-        var shimmerLoginStatusUrl = env.omhOnFhirAPIBase + "/loginStatus/" + shimmerId;
-        console.log("Checking login status " + shimmerLoginStatusUrl);
-        return $http.get(shimmerLoginStatusUrl);
-    };
-
-    factory.logoutShimmerUser = function logoutShimmerUser(shimmerId){
-        var shimmerLogoutUrl = env.omhOnFhirAPIBase + "/logout/" + shimmerId;
-        console.log("Logging out " + shimmerLogoutUrl);
-        return $http.get(shimmerLogoutUrl);
-    }
 
     //Return the factory object
     return factory;

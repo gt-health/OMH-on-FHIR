@@ -14,30 +14,17 @@ component('callback', {
         //===================================================================================
         if($routeParams.loginSuccess){
             console.log("Setting login success to: " + $routeParams.loginSuccess);
+            //set the variable in the scope for this window
             $rootScope.loginSuccess = ($routeParams.loginSuccess == 'true');
+            //set the variable in the scope of the parent window
+            $window.opener.self.loginSuccess = ($routeParams.loginSuccess == 'true');
         }
         if($routeParams.shimmerId){
             console.log("Setting shimmer id to: " + $routeParams.shimmerId);
+            //set the variable in the scope for this window
             $rootScope.shimmerId = $routeParams.shimmerId;
+            //set the variable in the scope of the parent window
+            $window.opener.self.shimmerId = $routeParams.shimmerId;
         }
-
-        //$window.opener.setShimmerId($routeParams.shimmerId);
-        //$window.opener.setLoginSuccess(($routeParams.loginSuccess == 'true'));
-        //
-        $window.opener.self.shimmerId = $routeParams.shimmerId;
-        $window.opener.self.loginSuccess = ($routeParams.loginSuccess == 'true');
-
-        console.log("WINDOW OPENER");
-        console.log($window.opener);
-
-        console.log("WINDOW PARENT");
-        console.log($window.parent);
-
-        console.log("Window SCOPE");
-        console.log($scope);
-
-        console.log("WINDOW THIS");
-        console.log(this);
-
     }]
 });

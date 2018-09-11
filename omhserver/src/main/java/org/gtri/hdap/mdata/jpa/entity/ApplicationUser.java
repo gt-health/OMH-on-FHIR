@@ -11,7 +11,6 @@ public class ApplicationUser {
     @EmbeddedId
     private ApplicationUserId applicationUserId;
     private String shimmerId;
-    private Boolean loggedIn;
 
     /*========================================================================*/
     /* Constructors */
@@ -19,14 +18,10 @@ public class ApplicationUser {
     protected ApplicationUser(){}
 
     public ApplicationUser(ApplicationUserId applicationUserId, String shimmerId){
-        this(applicationUserId, shimmerId, false);
-    }
-
-    public ApplicationUser(ApplicationUserId applicationUserId, String shimmerId, Boolean loggedIn){
         this.applicationUserId = applicationUserId;
         this.shimmerId = shimmerId;
-        this.loggedIn = loggedIn;
     }
+
     /*========================================================================*/
     /* Getters */
     /*========================================================================*/
@@ -39,9 +34,6 @@ public class ApplicationUser {
         return shimmerId;
     }
 
-    public Boolean getLoggedIn() {
-        return loggedIn;
-    }
     /*========================================================================*/
     /* Setters */
     /*========================================================================*/
@@ -54,15 +46,12 @@ public class ApplicationUser {
         this.shimmerId = shimmerId;
     }
 
-    public void setLoggedIn(Boolean loggedIn) {
-        this.loggedIn = loggedIn;
-    }
     /*========================================================================*/
     /* Methods */
     /*========================================================================*/
 
     @Override
     public String toString(){
-        return String.format("ApplicationUser ehrId: '%s', shimmerId: '%s', shimKey: '%s', is logged in: '%s'", applicationUserId.getEhrId(), shimmerId, getApplicationUserId().getShimKey(), loggedIn);
+        return String.format("ApplicationUser ehrId: '%s', shimmerId: '%s', shimKey: '%s', is logged in: '%s'", applicationUserId.getEhrId(), shimmerId, getApplicationUserId().getShimKey());
     }
 }

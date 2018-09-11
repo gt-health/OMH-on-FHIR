@@ -27,8 +27,8 @@ component('login', {
             console.log(smart);
             smart.patient.read().then(function (pt) {
                 self.omhOnFhirApi.setPatientResourceObj(pt);
-                self.pageMsg = "Link patient " + self.omhOnFhirApi.getPatientName() + " to an existing account.";
                 $rootScope.patientName = self.omhOnFhirApi.getPatientName();
+                self.pageMsg = "Link patient " + $rootScope.patientName + " to an existing account.";
                 //update the scope so the variables are updated in the view
                 $scope.$apply();
             });
@@ -42,25 +42,12 @@ component('login', {
         //If so, forward to activity page, otherwise remain on login page.
         $window.onfocus = function (){
             console.log("Login window has focus");
-            //self.omhOnFhirApi.checkShimmerUserLoginStatus(self.shimmerId)
-            //    .then(function(response){
-            //        if( response.data == "true" ){
-            //            console.log("User is logged in");
-            //            $location.path(self.env.baseUrl + "activity");
-            //        }
-            //        else{
-            //            console.log("User is not logged in");
-            //        }
-            //    });
-            console.log("Looking login info");
             console.log("Login in successful " + this.loginSuccess);
             console.log("Shimmer Id: " + this.shimmerId);
             if( this.loginSuccess == true ){
                 //forward to the activity page
                 console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity?shimmerId=" + this.shimmerId);
-                //$location.path(self.env.baseUrl + "activity?shimmerId=" + this.shimmerId );
                 $window.location.href = self.env.baseUrl + "activity?shimmerId=" + this.shimmerId;
-                //$scope.$apply();
             }
             else{
                 console.log("Login not successful");
@@ -85,12 +72,6 @@ component('login', {
 
         self.loginWithGoogleFit = function loginWithGoogleFit(){
             console.log("Logging in with Google fit");
-            //self.googleOauthUrl =
-            //    self.env.omhOnFhirAPIBase +
-            //    self.env.omhOnFhirAPIShimmerAuth +
-            //    "?ehrId=" + self.omhOnFhirApi.getPatientId() +
-            //    "&shimkey=" + self.env.googleFitShim;
-            //console.log("Opening Google OAuth URL: " + self.googleOauthUrl);
             self.omhOnFhirApi.login(self.env.googleFitShim);
         };
 
