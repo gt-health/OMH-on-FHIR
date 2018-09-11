@@ -28,6 +28,7 @@ component('login', {
             smart.patient.read().then(function (pt) {
                 self.omhOnFhirApi.setPatientResourceObj(pt);
                 self.pageMsg = "Link patient " + self.omhOnFhirApi.getPatientName() + " to an existing account.";
+                $rootScope.patientName = self.omhOnFhirApi.getPatientName();
                 //update the scope so the variables are updated in the view
                 $scope.$apply();
             });
@@ -57,7 +58,8 @@ component('login', {
             if( this.loginSuccess == true ){
                 //forward to the activity page
                 console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity?shimmerId=" + this.shimmerId);
-                $location.path( "activity?shimmerId=" + this.shimmerId );
+                $location.path(self.env.baseUrl + "activity?shimmerId=" + this.shimmerId );
+                $scope.$apply()
             }
             else{
                 console.log("Login not successful");
