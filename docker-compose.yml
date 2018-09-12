@@ -53,4 +53,4 @@ services:
       restart: always
       #bind host port 8989 to container port 8080
       ports:
-         - "8989:8080"
+         - "8989:80"
