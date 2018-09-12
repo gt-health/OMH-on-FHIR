@@ -245,7 +245,6 @@ public class PatientDataController {
         }
 
         ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
-        applicationUserRepository.save(applicationUser);
         if(applicationUser != null){
             applicationUserRepository.save(applicationUser);
         }
@@ -590,7 +589,7 @@ public class PatientDataController {
     }
 
     private String getShimmerId(String ehrId, String shimkey){
-        logger.debug("Checking User");
+        logger.debug("Checking User EHR ID: " + ehrId + " ShimKey: " + shimkey);
         ApplicationUserId applicationUserId = new ApplicationUserId(ehrId, shimkey);
         ApplicationUser user = applicationUserRepository.findById(applicationUserId).orElse(createNewApplicationUser(applicationUserId));
         String shimmerId = user.getShimmerId();
