@@ -3,6 +3,7 @@ package org.gtri.hdap.mdata.service;
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.ParamPrefixEnum;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -68,7 +69,7 @@ public class ShimmerService {
     /* Public Methods */
     /*========================================================================*/
 
-    public String requestShimmerAuthUrl(String shimmerId, String shimkey) throws Exception{
+    public ShimmerResponse requestShimmerAuthUrl(String shimmerId, String shimkey){
         String shimmerAuthUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + SHIMMER_AUTH_URL;
         String shimmerRedirectUrl = System.getenv(SHIMMER_SERVER_REDIRECT_URL_ENV);
         shimmerAuthUrl = shimmerAuthUrl.replace("{shim-key}", shimkey);
@@ -76,11 +77,8 @@ public class ShimmerService {
         shimmerAuthUrl = shimmerAuthUrl.replace("{redirect-url}", shimmerRedirectUrl);
         logger.debug("Sending authorization request to " + shimmerAuthUrl);
         HttpGet httpGet = new HttpGet(shimmerAuthUrl);
-        String authUrl = processShimmerAuthRequest(httpGet);
-        if( authUrl == null ){
-            throw new Exception("Could not retrieve authorization URL for " + shimkey);
-        }
-        return authUrl;
+        ShimmerResponse shimmerResponse = processShimmerAuthRequest(httpGet);
+        return shimmerResponse;
     }
 
     public void completeShimmerAuth(String shimkey, String code, String state) throws Exception{
@@ -114,19 +112,30 @@ public class ShimmerService {
      * Calls the Shimmer API to retrieve data for a user
      * @param applicationUser the application user for the query
      * @param dateQueries A list of Strings of the format yyyy-MM-dd with start and end date parameters
-     * @return The database ID for the patient data stored in the database.
+     * @return ShimmerResponse with details of the search.
      */
-    public String retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries) throws Exception{
+    public ShimmerResponse retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries){
         logger.debug("Requesting patient data");
-        String jsonResponse = retrieveShimmerData(SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
-//        String jsonResponse = retrieveShimmerData(SHIMMER_ACTIVITY_RANGE_URL, applicationUser, dateQueries);
-        logger.debug("Response " + jsonResponse );
-        String binaryResourceId = "";
-        if(jsonResponse != null){
+        ShimmerResponse shimmerResponse = retrieveShimmerData(SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
+        //        ShimmerResponse shimmerResponse = retrieveShimmerData(SHIMMER_ACTIVITY_RANGE_URL, applicationUser, dateQueries);
+        return shimmerResponse;
+    }
+
+    /**
+     * Persist data returned in a ShimmerResponse for a specific user
+     * @param applicationUser the application user for the query
+     * @param shimmerResponse the ShimmerResponse to process
+     * @return the id to use to retrieve the stored data
+     */
+    public String writePatientData(ApplicationUser applicationUser, ShimmerResponse shimmerResponse){
+        String binaryRefId = "";
+        logger.debug("Response " + shimmerResponse.getResponseData());
+        if(shimmerResponse.getResponseData() != null){
             //store the data
-            binaryResourceId = storePatientJson(applicationUser, jsonResponse);
+            binaryRefId = storePatientJson(applicationUser, shimmerResponse.getResponseData());
         }
-        return binaryResourceId;
+        logger.debug("Binary ID for patient data: " + binaryRefId);
+        return binaryRefId;
     }
 
 
@@ -134,9 +143,9 @@ public class ShimmerService {
      * Calls the Shimmer API to retrieve data for a user
      * @param applicationUser the application user for the query
      * @param dateQueries A list of Strings of the format yyyy-MM-dd with start and end date parameters
-     * @return The JSON response for the query to the shimmer API.
+     * @return ShimmerResponse object with response details.
      */
-    public String retrieveShimmerData(String shimmerDataUrlFragment, ApplicationUser applicationUser, List<String> dateQueries) throws Exception{
+    public ShimmerResponse retrieveShimmerData(String shimmerDataUrlFragment, ApplicationUser applicationUser, List<String> dateQueries){
         logger.debug("Querying Shimmer");
         String shimmerDataUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + shimmerDataUrlFragment;
         shimmerDataUrl = shimmerDataUrl.replace("{shim-key}", applicationUser.getApplicationUserId().getShimKey());
@@ -146,9 +155,15 @@ public class ShimmerService {
         LocalDate startDate = null;
         LocalDate endDate = null;
         if( dateQueries != null ) {
-            Map<String, LocalDate> dates = parseDateQueries(dateQueries);
-            startDate = dates.get(START_DATE_KEY);
-            endDate = dates.get(END_DATE_KEY);
+            try {
+                Map<String, LocalDate> dates = parseDateQueries(dateQueries);
+                startDate = dates.get(START_DATE_KEY);
+                endDate = dates.get(END_DATE_KEY);
+            }
+            catch(UnsupportedFhirDatePrefixException ufdpe){
+                String errorResponse = "{\"status\":" + HttpStatus.SC_BAD_REQUEST + ",\"exception\":\"" + ufdpe.getMessage() + "\"}";
+                return new ShimmerResponse(HttpStatus.SC_BAD_REQUEST, errorResponse);
+            }
         }
         if(startDate != null) {
             shimmerDataUrl += SHIMMER_START_DATE_URL_PARAM;
@@ -161,12 +176,12 @@ public class ShimmerService {
 
         logger.debug("Sending data request to " + shimmerDataUrl);
         HttpGet httpGet = new HttpGet(shimmerDataUrl);
-        String jsonResponse = processShimmerDataRequest(httpGet);
+        ShimmerResponse shimmerResponse = processShimmerDataRequest(httpGet);
         logger.debug("Completed query to Shimmer");
-        return jsonResponse;
+        return shimmerResponse;
     }
 
-    public Map<String, LocalDate> parseDateQueries(List<String> dateQueries) throws Exception{
+    public Map<String, LocalDate> parseDateQueries(List<String> dateQueries) throws UnsupportedFhirDatePrefixException{
         LocalDate startDate = null;
         LocalDate endDate = null;
         //if more than two dates throw an error
@@ -179,11 +194,11 @@ public class ShimmerService {
             if(dateParams.size() == 2){
                 startDate = LocalDate.parse(dateParams.get(0).getValueAsString());
                 if(dateParams.get(0).getPrefix() != null && dateParams.get(0).getPrefix() != ParamPrefixEnum.GREATERTHAN_OR_EQUALS){
-                    throw new Exception("Unsupported FHIR date prefix only GE is supported for start dates.");
+                    throw new UnsupportedFhirDatePrefixException("Unsupported FHIR date prefix only GE is supported for start dates.");
                 }
                 endDate = LocalDate.parse(dateParams.get(1).getValueAsString());
                 if(dateParams.get(1).getPrefix() != null && dateParams.get(1).getPrefix() != ParamPrefixEnum.LESSTHAN_OR_EQUALS){
-                    throw new Exception("Unsupported FHIR date prefix only LE is supported for end dates.");
+                    throw new UnsupportedFhirDatePrefixException("Unsupported FHIR date prefix only LE is supported for end dates.");
                 }
             }//end if(dateParams.size() == 2)
 
@@ -199,7 +214,7 @@ public class ShimmerService {
                     }
                     else{
                         //we don't support the operation
-                        throw new Exception("Unsupported FHIR date prefix only GE and LE are supported.");
+                        throw new UnsupportedFhirDatePrefixException("Unsupported FHIR date prefix only GE and LE are supported.");
                     }
                 }
                 else {
@@ -210,7 +225,7 @@ public class ShimmerService {
             }//end else if(dateParams.size() == 1)
         }
         else if(dateQueries != null && dateQueries.size() > 2){
-            throw new Exception("No more than two dates can be passed as parameters.");
+            throw new UnsupportedFhirDatePrefixException("No more than two dates can be passed as parameters.");
         }
 
         Map<String, LocalDate> dateMap = new HashMap<String, LocalDate>();
@@ -236,14 +251,27 @@ public class ShimmerService {
     /* Private Methods */
     /*========================================================================*/
 
-    private String processShimmerAuthRequest(HttpUriRequest request) throws Exception{
-        String authorizationUrl = null;
+    private ShimmerResponse processShimmerAuthRequest(HttpUriRequest request){
         CloseableHttpClient httpClient = createHttpClient();
         HttpClientContext httpClientContext = HttpClientContext.create();
-        CloseableHttpResponse shimmerAuthResponse = httpClient.execute(request, httpClientContext);
-        //checkShimmerAuthResponse handles closing shimmerAuthResponse
-        authorizationUrl = checkShimmerAuthResponse(shimmerAuthResponse);
-        return authorizationUrl;
+        ShimmerResponse shimmerResponse;
+        try {
+            CloseableHttpResponse shimmerAuthResponse = httpClient.execute(request, httpClientContext);
+            //checkShimmerAuthResponse handles closing shimmerAuthResponse
+            try {
+                shimmerResponse = checkShimmerAuthResponse(shimmerAuthResponse);
+            }
+            catch(IOException ioe){
+                logger.error("Error processing Shimmer response", ioe);
+                String errorResponse = "{\"status\":" + org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR.value() + ",\"exception\":\"Could not complete Shimmer request\"}";
+                shimmerResponse = new ShimmerResponse(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse);
+            }
+        }
+        catch(IOException ioe){
+            String errorResponse = "{\"status\":" + org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR.value() + ",\"exception\":\"Could not process Shimmer response\"}";
+            shimmerResponse = new ShimmerResponse(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse);
+        }
+        return shimmerResponse;
     }
 
     /**
@@ -265,18 +293,28 @@ public class ShimmerService {
         return httpClient;
     }
 
-    private String checkShimmerAuthResponse(CloseableHttpResponse shimmerAuthResponse) throws IOException {
+    private ShimmerResponse checkShimmerAuthResponse(CloseableHttpResponse shimmerAuthResponse) throws IOException {
         String authorizationUrl = null;
+        ShimmerResponse shimmerResponse;
         try {
             int statusCode = shimmerAuthResponse.getStatusLine().getStatusCode();
+            //All we need is the cookie, which is managed as part of the HTTPContext
+            //for now ignore the content of the response. At a later date process
+            //the JSON. It contains permission and user metadata.
+            HttpEntity responseEntity = shimmerAuthResponse.getEntity();
+            //get the json from the response and get the auth URL to redirect the user
+            String responseStr = EntityUtils.toString(responseEntity);
+
+            shimmerResponse = new ShimmerResponse(statusCode, responseStr);
+
             logger.debug("Response Code " + statusCode);
             if(statusCode == 200) {
                 //All we need is the cookie, which is managed as part of the HTTPContext
                 //for now ignore the content of the response. At a later date process
                 //the JSON. It contains permission and user metadata.
-                HttpEntity responseEntity = shimmerAuthResponse.getEntity();
+//                HttpEntity responseEntity = shimmerAuthResponse.getEntity();
                 //get the json from the response and get the auth URL to redirect the user
-                String responseStr = EntityUtils.toString(responseEntity);
+//                String responseStr = EntityUtils.toString(responseEntity);
                 logger.debug("Shimmer Auth Response: " + responseStr);
 
                 //response JSON {"id":"5b6852e7345e53000bbf6894","stateKey":null,"username":"93c542ab-2705-4526-bf1b-1212d2185087","redirectUri":null,"requestParams":null,"authorizationUrl":null,"clientRedirectUrl":null,"isAuthorized":true,"serializedRequest":null}
@@ -290,16 +328,19 @@ public class ShimmerService {
                     authorizationUrl = System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
                 }
 
+                //set the URL as
+                shimmerResponse.setResponseData(authorizationUrl);
+
                 logger.debug("Authorization URL " + authorizationUrl);
             }
         } finally {
             shimmerAuthResponse.close();
         }
-        return authorizationUrl;
+        return shimmerResponse;
     }
 
-    private String processShimmerDataRequest(HttpUriRequest request){
-        String jsonResp = null;
+    private ShimmerResponse processShimmerDataRequest(HttpUriRequest request){
+        ShimmerResponse shimmerResponse;
         try {
             logger.debug("Sending Shimmer Data Request");
             CloseableHttpClient httpClient = createHttpClient();
@@ -307,38 +348,53 @@ public class ShimmerService {
             CloseableHttpResponse shimmerDataResponse = httpClient.execute(request, httpClientContext);
             logger.debug("Received shimmer data");
             //checkShimmerDataResponse closes the shimmerDataResponse
-            jsonResp = checkShimmerDataResponse(shimmerDataResponse);
+            shimmerResponse = checkShimmerDataResponse(shimmerDataResponse);
         }
         catch(IOException ioe){
-            ioe.printStackTrace();
+            logger.error("Error processing Shimmer response", ioe);
+            String errorResponse = "{\"status\":" + org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR.value() + ",\"exception\":\"Could not process Shimmer response\"}";
+            shimmerResponse = new ShimmerResponse(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR.value(), errorResponse);
         }
-        return jsonResp;
+        return shimmerResponse;
     }
 
-    private String checkShimmerDataResponse(CloseableHttpResponse shimmerAuthResponse) throws IOException {
+    private ShimmerResponse checkShimmerDataResponse(CloseableHttpResponse shimmerAuthResponse) throws IOException {
         logger.debug("Looking for Data");
-        String jsonResp = null;
+        String jsonResp = "";
+        ShimmerResponse shimmerResponse;
         try {
             int statusCode = shimmerAuthResponse.getStatusLine().getStatusCode();
-            logger.debug("Response Code " + statusCode);
             HttpEntity responseEntity = shimmerAuthResponse.getEntity();
-            if(statusCode == 200) {
-                //All we need is the cookie, which is managed as part of the HTTPContext
-                //for now ignore the content of the response. At a later date process
-                //the JSON. It contains permission and user metadata.
+            jsonResp = EntityUtils.toString(responseEntity);
 
-                //get the json from the response and get the auth URL to redirect the user
-                jsonResp = EntityUtils.toString(responseEntity);
-                logger.debug("Data Response: " + jsonResp);
-            }
-            else{
-                logger.debug("Different Response Code " + statusCode);
-                logger.debug(EntityUtils.toString(responseEntity));
-            }
+            logger.debug("Response Code " + statusCode);
+            logger.debug("Data Response: " + jsonResp);
+            shimmerResponse = new ShimmerResponse(statusCode, jsonResp);
+//            if(statusCode == 200) {
+//                //All we need is the cookie, which is managed as part of the HTTPContext
+//                //for now ignore the content of the response. At a later date process
+//                //the JSON. It contains permission and user metadata.
+//
+//                //get the json from the response and get the auth URL to redirect the user
+//                jsonResp = EntityUtils.toString(responseEntity);
+//                logger.debug("Data Response: " + jsonResp);
+//            }
+//            else{
+//                logger.debug("Different Response Code " + statusCode);
+//                jsonResp = EntityUtils.toString(responseEntity);
+//                logger.debug(EntityUtils.toString(responseEntity));
+//            }
 
-        } finally {
+        }
+        catch(Exception ioe){
+            logger.error("Error parsing response Entity", ioe);
+            String errorResponse = "{\"status\":500,\"exception\":\"Could not parse response entity of Shimmer response\"}";
+            shimmerResponse = new ShimmerResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR, errorResponse);
+        }
+        finally {
             shimmerAuthResponse.close();
         }
-        return jsonResp;
+
+        return shimmerResponse;
     }
 }

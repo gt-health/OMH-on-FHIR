@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
+import org.gtri.hdap.mdata.service.ShimmerResponse;
 import org.gtri.hdap.mdata.service.ShimmerService;
 import org.hl7.fhir.dstu3.model.*;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -77,15 +79,18 @@ public class PatientDataControllerTest {
         ApplicationUser applicationUser = new ApplicationUser(new ApplicationUserId(ehrId, shimkey), shimmerId);
         List<String> validQueryDates = createDateList(validDate1, validDate2);
         List<String> inValidQueryDates = createDateList(inValidDate1, inValidDate2);
+        ShimmerResponse shimmerResponse = new ShimmerResponse(HttpStatus.OK.value(), "{\"status\":" + HttpStatus.OK.value() + "}");
+        ShimmerResponse failureResponse = new ShimmerResponse(HttpStatus.BAD_REQUEST.value(), "{\"status\":" + HttpStatus.BAD_REQUEST.value() + ", \"error\":\"Unsupported FHIR date prefix only GE is supported for start dates.\"}");
 
         given(applicationUserRepository.findByShimmerId(shimmerId)).willReturn(applicationUser);
-        given(shimmerService.retrievePatientData(applicationUser, validQueryDates)).willReturn(docId);
+        given(shimmerService.retrievePatientData(applicationUser, validQueryDates)).willReturn(shimmerResponse);
+        given(shimmerService.writePatientData(applicationUser, shimmerResponse)).willReturn(docId);
 
         mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + validDate1 + "&date=" + validDate2))
         .andExpect(status().isOk());
 //            .andExpect(content().json("{\"data\": \"activity data here\"}"));
 
-        given(shimmerService.retrievePatientData(applicationUser, inValidQueryDates)).willThrow(new Exception("Unsupported FHIR date prefix only GE is supported for start dates."));
+        given(shimmerService.retrievePatientData(applicationUser, inValidQueryDates)).willReturn(failureResponse);// willThrow(new Exception("Unsupported FHIR date prefix only GE is supported for start dates."));
 
         mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + inValidDate1 + "&date=" + inValidDate2))
                 .andExpect(status().is4xxClientError());

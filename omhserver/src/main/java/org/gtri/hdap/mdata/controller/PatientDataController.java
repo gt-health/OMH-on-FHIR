@@ -7,10 +7,11 @@ import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
+import org.gtri.hdap.mdata.service.ShimmerAuthenticationException;
+import org.gtri.hdap.mdata.service.ShimmerResponse;
 import org.gtri.hdap.mdata.service.ShimmerService;
 import org.gtri.hdap.mdata.util.ShimmerUtil;
 import org.hl7.fhir.dstu3.model.*;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,14 +107,14 @@ public class PatientDataController {
             model.addAttribute("shimmerId", userShimmerId);
         }
 
+        ShimmerResponse shimmerResponse = shimmerService.requestShimmerAuthUrl(userShimmerId, shimkey);
         String oauthAuthUrl = null;
-        try {
-            oauthAuthUrl = shimmerService.requestShimmerAuthUrl(userShimmerId, shimkey);
+        if( shimmerResponse.getResponseCode() == HttpStatus.OK.value()){
+            oauthAuthUrl = shimmerResponse.getResponseData();
         }
-        catch(Exception e){
-            e.printStackTrace();
-            //TODO redirect to no auth URL page
-            //read this link http://www.baeldung.com/spring-boot-custom-error-page
+        else{
+            //did not get a response URL
+            throw new ShimmerAuthenticationException("Could not authorize shimmer user " + shimmerResponse.getResponseData());
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
@@ -122,26 +123,11 @@ public class PatientDataController {
         attributes.addFlashAttribute("shimmerId", userShimmerId);
 
         String redirectUrl = "redirect:" + oauthAuthUrl;
-        logger.debug("Redirecting to " + redirectUrl);
-        logger.debug("Model Keys: " + model.keySet());
-        logger.debug("Model Values " + model.values());
-
         //THIS IS A HACK, check and remove  org.springframework.validation.BindingResult.shimmerId from the model
         model.remove("org.springframework.validation.BindingResult.shimmerId");
 
-        logger.debug("Searched model for BindingResult to remove");
-        logger.debug("Model Keys: " + model.keySet());
-        logger.debug("Model Values " + model.values());
-
         ModelAndView mvToReturn = new ModelAndView(redirectUrl, model);
-        if(bindingResult.hasErrors()){
-            logger.debug("Found Errors");
-            bindingResult.getFieldErrors().forEach((FieldError fe) -> {
-                logger.debug("Field: " + fe.getField() );
-                logger.debug("Message: " + fe.getDefaultMessage());
-                logger.debug("Bad Value: " + fe.getObjectName() + " " + fe.getRejectedValue());
-            });
-        }
+
         return mvToReturn;
     }
 
@@ -162,25 +148,24 @@ public class PatientDataController {
         String shimKey = applicationUser.getApplicationUserId().getShimKey();
 
         String binaryRefId = "";
-        //parse start and end dates
-        try {
-            //Query patient data
-            binaryRefId = shimmerService.retrievePatientData(applicationUser, dateQueries);
+        //retrieve patient data
+        ShimmerResponse shimmerResponse = shimmerService.retrievePatientData(applicationUser, dateQueries);
+
+        if(shimmerResponse.getResponseCode() == HttpStatus.OK.value()){
+            binaryRefId = shimmerService.writePatientData(applicationUser, shimmerResponse);
+
+            //generate the document reference
+            DocumentReference documentReference = generateDocumentReference(binaryRefId, shimKey);
+
+            logger.debug("finished processing document request");
+
+            Bundle responseBundle = makeBundleWithSingleEntry(documentReference);
+            return ResponseEntity.ok(responseBundle);
         }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        else{
+            //not successful
+            return ResponseEntity.status(shimmerResponse.getResponseCode()).body(shimmerResponse.getResponseData());
         }
-
-        logger.debug("Binary ID for patient data: " + binaryRefId);
-
-        //generate the document reference
-        DocumentReference documentReference = generateDocumentReference(binaryRefId, shimKey);
-
-        logger.debug("finished processing document request");
-
-        Bundle responseBundle = makeBundleWithSingleEntry(documentReference);
-
-        return ResponseEntity.ok(responseBundle);
     }
 
     //handles requests of the format
@@ -213,20 +198,17 @@ public class PatientDataController {
         ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
         String shimKey = applicationUser.getApplicationUserId().getShimKey();
 
-        String jsonResponse = "";
+        ShimmerResponse shimmerResponse;
         //parse start and end dates
-        try {
-            //Query patient data
-            jsonResponse = shimmerService.retrieveShimmerData(ShimmerService.SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
-        }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        shimmerResponse = shimmerService.retrieveShimmerData(ShimmerService.SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
+        if( shimmerResponse.getResponseCode() != HttpStatus.OK.value()){
+            return ResponseEntity.status(shimmerResponse.getResponseCode()).body(shimmerResponse.getResponseData());
         }
 
         //generateObservationList
         List<Resource> observations;
         try {
-            observations = generateObservationList(shimKey, jsonResponse);
+            observations = generateObservationList(shimKey, shimmerResponse.getResponseData());
         }
         catch(IOException ioe){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not generate observation.");
@@ -264,6 +246,15 @@ public class PatientDataController {
 
         ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
         applicationUserRepository.save(applicationUser);
+        if(applicationUser != null){
+            applicationUserRepository.save(applicationUser);
+        }
+        else{
+            omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_LOGIN_ENV);
+            model.addAttribute("loginSuccess", false);
+            logger.debug("Could not find Shimmer ID for user. Redirecting to: " + omhOnFhirUi);
+            return new ModelAndView(omhOnFhirUi, model);
+        }
 
         omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
         model.addAttribute("loginSuccess", true);
@@ -277,28 +268,31 @@ public class PatientDataController {
     /*========================================================================*/
 
     public DocumentReference generateDocumentReference(String documentId, String shimKey){
-        String title = "OMH " + shimKey + " data";
-        String binaryRef = "Binary/" + documentId;
-        Date creationDate = new Date();
-        //create a DocumentReference to return
-        DocumentReference documentReference = new DocumentReference();
-        documentReference.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
-        CodeableConcept codeableConcept = new CodeableConcept();
-        codeableConcept.setText(title);
-        documentReference.setType(codeableConcept);
-        documentReference.setIndexed(creationDate);
-        DocumentReference.DocumentReferenceContentComponent documentReferenceContentComponent = new DocumentReference.DocumentReferenceContentComponent();
-        //create an Attachment that has a URL for the data
-        Attachment attachment = new Attachment();
-        attachment.setContentType("application/json");
-        attachment.setUrl(binaryRef);
-        attachment.setTitle(title);
-        attachment.setCreation(creationDate);
-        documentReferenceContentComponent.setAttachment(attachment);
-        //add attachment to DocumentReference
-        List<DocumentReference.DocumentReferenceContentComponent> documentContent = new ArrayList<DocumentReference.DocumentReferenceContentComponent>();
-        documentContent.add(documentReferenceContentComponent);
-        documentReference.setContent(documentContent);
+        DocumentReference documentReference = null;
+        if(!documentId.isEmpty()) {
+            String title = "OMH " + shimKey + " data";
+            String binaryRef = "Binary/" + documentId;
+            Date creationDate = new Date();
+            //create a DocumentReference to return
+            documentReference = new DocumentReference();
+            documentReference.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
+            CodeableConcept codeableConcept = new CodeableConcept();
+            codeableConcept.setText(title);
+            documentReference.setType(codeableConcept);
+            documentReference.setIndexed(creationDate);
+            DocumentReference.DocumentReferenceContentComponent documentReferenceContentComponent = new DocumentReference.DocumentReferenceContentComponent();
+            //create an Attachment that has a URL for the data
+            Attachment attachment = new Attachment();
+            attachment.setContentType("application/json");
+            attachment.setUrl(binaryRef);
+            attachment.setTitle(title);
+            attachment.setCreation(creationDate);
+            documentReferenceContentComponent.setAttachment(attachment);
+            //add attachment to DocumentReference
+            List<DocumentReference.DocumentReferenceContentComponent> documentContent = new ArrayList<DocumentReference.DocumentReferenceContentComponent>();
+            documentContent.add(documentReferenceContentComponent);
+            documentReference.setContent(documentContent);
+        }
         return documentReference;
     }
 
@@ -576,7 +570,9 @@ public class PatientDataController {
 
     private Bundle makeBundleWithSingleEntry(Resource fhirResource){
         List<Resource> fhirResources = new ArrayList<Resource>();
-        fhirResources.add(fhirResource);
+        if( fhirResource != null ) {
+            fhirResources.add(fhirResource);
+        }
         return makeBundle(fhirResources);
     }
     private Bundle makeBundle(List<Resource> fhirResources){
