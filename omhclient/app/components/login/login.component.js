@@ -11,7 +11,7 @@ component('login', {
         self.omhOnFhirApi = OmhOnFhirApi;
         self.shimmerId;
         self.loginSuccess;
-
+        self.alertMsg = "";
         self.pageMsg = 'TODO make login page';
         self.googleOauthUrl;
 
@@ -51,6 +51,7 @@ component('login', {
             }
             else{
                 console.log("Login not successful");
+                self.alertMsg = "Authentication not successful"
             }
         };
 

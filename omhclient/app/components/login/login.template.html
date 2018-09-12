@@ -1,8 +1,11 @@
 <div>
     <h3>{{$ctrl.pageMsg}}</h3>
+    <div class="alert-warning" ng-if="$ctrl.alertMsg">
+        {{$ctrl.alertMsg}}
+    </div>
     <p>Select one of the fitness tracking applications below, and complete its authorization process, to link this application to the account.</p>
     <div>
-        <button class="btn btn-default" ng-click="$ctrl.loginWithFitbit()"><img src="{{$ctrl.env.baseUrl}}img/fitbit-transparent.png" height="25" width="99"></button>
+        <button class="btn btn-default" ng-click="$ctrl.loginWithFitbit()" disabled><img src="{{$ctrl.env.baseUrl}}img/fitbit-transparent.png" height="25" width="99"></button>
     </div>
     <div>
         <!--<button class="btn btn-default" ng-click="$ctrl.loginWithGoogleFit()"><img src="{{$ctrl.env.baseUrl}}img/Google-Fit-Logo-transparent.png" height="25" width="99"></button>-->
