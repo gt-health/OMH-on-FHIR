@@ -103,9 +103,9 @@ public class PatientDataController {
         String userShimmerId = getShimmerId(ehrId, shimkey);
 
         //see if the session attribute needs to be updated
-        if(shimmerId.isEmpty()){
-            model.addAttribute("shimmerId", userShimmerId);
-        }
+//        if(shimmerId.isEmpty()){
+        model.addAttribute("shimmerId", userShimmerId);
+//        }
 
         ShimmerResponse shimmerResponse = shimmerService.requestShimmerAuthUrl(userShimmerId, shimkey);
         String oauthAuthUrl = null;
@@ -121,6 +121,14 @@ public class PatientDataController {
 
         //tell spring we want the attribute to survive the redirect
         attributes.addFlashAttribute("shimmerId", userShimmerId);
+
+        //If the returned oauthAuthUrl equals the final callback URL for UI then the user has already
+        //linked the EHR user to their device account via shimmer. Update the model to contain
+        //loginSuccess true. The shimmerID for the model was set above so no need to set it again.
+        if( oauthAuthUrl.equals(System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV))) {
+            logger.debug("User already approved. Forwarding to login callback UI page");
+            model.addAttribute("loginSuccess", true);
+        }
 
         String redirectUrl = "redirect:" + oauthAuthUrl;
         //THIS IS A HACK, check and remove  org.springframework.validation.BindingResult.shimmerId from the model
@@ -593,7 +601,6 @@ public class PatientDataController {
         ApplicationUserId applicationUserId = new ApplicationUserId(ehrId, shimkey);
         //debug info
         logger.debug("Find by ID " + applicationUserRepository.findById(applicationUserId).isPresent());
-        logger.debug("Find by EHR and SHIM " + (applicationUserRepository.findByApplicationUserIdEhrIdAndApplicationUserIdShimKey(ehrId, shimkey) != null));
         ApplicationUser user;
         Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(applicationUserId);
         if(applicationUserOptional.isPresent()){

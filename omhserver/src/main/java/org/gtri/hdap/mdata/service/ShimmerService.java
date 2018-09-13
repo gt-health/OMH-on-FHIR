@@ -294,7 +294,7 @@ public class ShimmerService {
     }
 
     private ShimmerResponse checkShimmerAuthResponse(CloseableHttpResponse shimmerAuthResponse) throws IOException {
-        String authorizationUrl = null;
+        String shimmerResponseData = null;
         ShimmerResponse shimmerResponse;
         try {
             int statusCode = shimmerAuthResponse.getStatusLine().getStatusCode();
@@ -322,16 +322,18 @@ public class ShimmerService {
                 JSONObject responseJson = new JSONObject(responseStr);
                 //check if we are already authenticated
                 if( !responseJson.getBoolean("isAuthorized") ){
-                    authorizationUrl = responseJson.getString("authorizationUrl");
+                    logger.debug("User is not authorized");
+                    shimmerResponseData = responseJson.getString("authorizationUrl");
                 }
                 else{
-                    authorizationUrl = System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
+                    logger.debug("User is authorized");
+                    shimmerResponseData = System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
                 }
 
                 //set the URL as
-                shimmerResponse.setResponseData(authorizationUrl);
+                shimmerResponse.setResponseData(shimmerResponseData);
 
-                logger.debug("Authorization URL " + authorizationUrl);
+                logger.debug("Authorization URL " + shimmerResponseData);
             }
         } finally {
             shimmerAuthResponse.close();
