@@ -238,7 +238,7 @@ public class PatientDataController {
         }
         catch(Exception e){
             e.printStackTrace();
-            omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_LOGIN_ENV);
+            omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
             model.addAttribute("loginSuccess", false);
             logger.debug("Error with Authentication. Redirecting to: " + omhOnFhirUi);
             return new ModelAndView(omhOnFhirUi, model);
@@ -249,7 +249,7 @@ public class PatientDataController {
             applicationUserRepository.save(applicationUser);
         }
         else{
-            omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_LOGIN_ENV);
+            omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
             model.addAttribute("loginSuccess", false);
             logger.debug("Could not find Shimmer ID for user. Redirecting to: " + omhOnFhirUi);
             return new ModelAndView(omhOnFhirUi, model);
@@ -589,8 +589,11 @@ public class PatientDataController {
     }
 
     private String getShimmerId(String ehrId, String shimkey){
-        logger.debug("Checking User EHR ID: " + ehrId + " ShimKey: " + shimkey);
+        logger.debug("Checking User EHR ID: [" + ehrId + "] ShimKey: [" + shimkey + "]");
         ApplicationUserId applicationUserId = new ApplicationUserId(ehrId, shimkey);
+        //debug info
+        logger.debug("Find by ID " + applicationUserRepository.findById(applicationUserId).isPresent());
+        logger.debug("Find by EHR and SHIM " + (applicationUserRepository.findByApplicationUserIdEhrIdAndApplicationUserIdShimKey(ehrId, shimkey) != null));
         ApplicationUser user = applicationUserRepository.findById(applicationUserId).orElse(createNewApplicationUser(applicationUserId));
         String shimmerId = user.getShimmerId();
         logger.debug("Returning shimmer id: " + shimmerId);
@@ -602,6 +605,8 @@ public class PatientDataController {
         String shimmerId = UUID.randomUUID().toString();
         ApplicationUser newUser = new ApplicationUser(applicationUserId, shimmerId);
         applicationUserRepository.save(newUser);
+        //force a flush
+        applicationUserRepository.flush();
         logger.debug("finished creating user");
         return newUser;
     }

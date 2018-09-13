@@ -13,6 +13,7 @@
     <logger name="org.gtri.hdap.mdata.conf" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.jackson" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.controller.PatientDataController" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.jpa" level="DEBUG"/>
 
     <root level="ERROR">
         <appender-ref ref="STDOUT" />

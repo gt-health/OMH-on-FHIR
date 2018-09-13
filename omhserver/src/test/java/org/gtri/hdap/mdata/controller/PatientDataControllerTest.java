@@ -95,7 +95,7 @@ public class PatientDataControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + inValidDate1 + "&date=" + inValidDate2))
                 .andExpect(status().is4xxClientError());
 
-        logger.debug("========== Entering getFindDocumentReference ==========");
+        logger.debug("========== Exiting getFindDocumentReference ==========");
     }
 
 
