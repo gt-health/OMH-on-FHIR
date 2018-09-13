@@ -12,4 +12,5 @@ import java.util.List;
 public interface ApplicationUserRepository extends JpaRepository<ApplicationUser, ApplicationUserId> {
 
     ApplicationUser findByShimmerId(String shimmerId);
+    ApplicationUser findByApplicationUserIdEhrIdAndApplicationUserIdShimKey(String ehrId, String shimKey);
 }
