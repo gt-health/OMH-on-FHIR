@@ -594,7 +594,16 @@ public class PatientDataController {
         //debug info
         logger.debug("Find by ID " + applicationUserRepository.findById(applicationUserId).isPresent());
         logger.debug("Find by EHR and SHIM " + (applicationUserRepository.findByApplicationUserIdEhrIdAndApplicationUserIdShimKey(ehrId, shimkey) != null));
-        ApplicationUser user = applicationUserRepository.findById(applicationUserId).orElse(createNewApplicationUser(applicationUserId));
+        ApplicationUser user;
+        Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(applicationUserId);
+        if(applicationUserOptional.isPresent()){
+            logger.debug("Found the user");
+            user = applicationUserOptional.get();
+        }
+        else{
+            logger.debug("Did not find user. Creating new one");
+            user = createNewApplicationUser(applicationUserId);
+        }
         String shimmerId = user.getShimmerId();
         logger.debug("Returning shimmer id: " + shimmerId);
         return shimmerId;
