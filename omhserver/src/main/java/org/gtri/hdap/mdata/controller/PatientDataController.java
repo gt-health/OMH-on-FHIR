@@ -7,6 +7,7 @@ import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
+import org.gtri.hdap.mdata.service.ResponseService;
 import org.gtri.hdap.mdata.service.ShimmerAuthenticationException;
 import org.gtri.hdap.mdata.service.ShimmerResponse;
 import org.gtri.hdap.mdata.service.ShimmerService;
@@ -37,22 +38,6 @@ import java.util.*;
 @SessionAttributes("shimmerId")
 public class PatientDataController {
 
-    public static String PATIENT_RESOURCE_ID = "p";
-    public static String PATIENT_IDENTIFIER_SYSTEM = "https://omh.org/shimmer/patient_ids";
-    public static String OBSERVATION_CATEGORY_SYSTEM = "https://snomed.info.sct";
-    public static String OBSERVATION_CATEGORY_CODE = "68130003";
-    public static String OBSERVATION_CATEGORY_DISPLAY = "Physical activity (observable entity)";
-    public static String OBSERVATION_CODE_SYSTEM = "http://loinc.org";
-    public static String OBSERVATION_CODE_CODE = "55423-8";
-    public static String OBSERVATION_CODE_DISPLAY = "Number of steps in unspecified time Pedometer";
-    public static String OBSERVATION_COMPONENT_CODE_SYSTEM = "http://hl7.org/fhir/observation-statistics";
-    public static String OBSERVATION_COMPONENT_CODE_CODE = "maximum";
-    public static String OBSERVATION_COMPONENT_CODE_DISPLAY = "Maximum";
-    public static String OBSERVATION_COMPONENT_CODE_TEXT = "Maximum";
-    public static String OBSERVATION_COMPONENT_VALUE_CODE_UNIT = "/{tot}";
-    public static String OBSERVATION_COMPONENT_VALUE_CODE_SYSTEM = "http://unitsofmeasure.org";
-    public static String OBSERVATION_COMPONENT_VALUE_CODE_CODE = "{steps}/{tot}";
-
     /*========================================================================*/
     /* Variables */
     /*========================================================================*/
@@ -61,11 +46,12 @@ public class PatientDataController {
     @Autowired
     private ShimmerService shimmerService;
     @Autowired
+    private ResponseService responseService;
+    @Autowired
     private ApplicationUserRepository applicationUserRepository;
     @Autowired
     private ShimmerDataRepository shimmerDataRepository;
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     @ModelAttribute("shimmerId")
     public String shimmerId(){
@@ -100,12 +86,9 @@ public class PatientDataController {
         // for example https://gt-apps.hdap.gatech.edu:8083/authorize/fitbit?username={userId}
         // The username query parameter can be set to any unique identifier you'd like to use to identify the user.
 
-        String userShimmerId = getShimmerId(ehrId, shimkey);
-
-        //see if the session attribute needs to be updated
-//        if(shimmerId.isEmpty()){
+        String userShimmerId = responseService.getShimmerId(ehrId, shimkey);
+        //add the shimmer id to the model
         model.addAttribute("shimmerId", userShimmerId);
-//        }
 
         ShimmerResponse shimmerResponse = shimmerService.requestShimmerAuthUrl(userShimmerId, shimkey);
         String oauthAuthUrl = null;
@@ -163,11 +146,11 @@ public class PatientDataController {
             binaryRefId = shimmerService.writePatientData(applicationUser, shimmerResponse);
 
             //generate the document reference
-            DocumentReference documentReference = generateDocumentReference(binaryRefId, shimKey);
+            DocumentReference documentReference = responseService.generateDocumentReference(binaryRefId, shimKey);
 
             logger.debug("finished processing document request");
 
-            Bundle responseBundle = makeBundleWithSingleEntry(documentReference);
+            Bundle responseBundle = responseService.makeBundleWithSingleEntry(documentReference);
             return ResponseEntity.ok(responseBundle);
         }
         else{
@@ -184,7 +167,7 @@ public class PatientDataController {
                                  @RequestHeader("Accept") String acceptHeader,
                                  @PathVariable String documentId){
         logger.debug("Retrieving Binary with URL");
-        byte[] docBytes = makeByteArrayForDocument(documentId);
+        byte[] docBytes = responseService.makeByteArrayForDocument(documentId);
         return docBytes;
     }
 
@@ -192,7 +175,7 @@ public class PatientDataController {
     public Bundle searchBinaryBundle(@RequestHeader("Accept") String acceptHeader,
                                      @RequestParam(name="_id", required = true)String documentId){
         logger.debug("Retriving Binary with URL param");
-        return makeBundleForDocument(documentId);
+        return responseService.makeBundleForDocument(documentId);
     }
 
     //handles requests of the format
@@ -216,13 +199,13 @@ public class PatientDataController {
         //generateObservationList
         List<Resource> observations;
         try {
-            observations = generateObservationList(shimKey, shimmerResponse.getResponseData());
+            observations = responseService.generateObservationList(shimKey, shimmerResponse.getResponseData());
         }
         catch(IOException ioe){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not generate observation.");
         }
 
-        Bundle responseBundle = makeBundle(observations);
+        Bundle responseBundle = responseService.makeBundle(observations);
         return ResponseEntity.ok(responseBundle);
     }
 
@@ -268,362 +251,5 @@ public class PatientDataController {
         model.addAttribute("shimmerId", shimmerId);
         logger.debug("Redirecting to: " + omhOnFhirUi);
         return new ModelAndView(omhOnFhirUi, model);
-    }
-
-    /*========================================================================*/
-    /* Public Methods */
-    /*========================================================================*/
-
-    public DocumentReference generateDocumentReference(String documentId, String shimKey){
-        DocumentReference documentReference = null;
-        if(!documentId.isEmpty()) {
-            String title = "OMH " + shimKey + " data";
-            String binaryRef = "Binary/" + documentId;
-            Date creationDate = new Date();
-            //create a DocumentReference to return
-            documentReference = new DocumentReference();
-            documentReference.setStatus(Enumerations.DocumentReferenceStatus.CURRENT);
-            CodeableConcept codeableConcept = new CodeableConcept();
-            codeableConcept.setText(title);
-            documentReference.setType(codeableConcept);
-            documentReference.setIndexed(creationDate);
-            DocumentReference.DocumentReferenceContentComponent documentReferenceContentComponent = new DocumentReference.DocumentReferenceContentComponent();
-            //create an Attachment that has a URL for the data
-            Attachment attachment = new Attachment();
-            attachment.setContentType("application/json");
-            attachment.setUrl(binaryRef);
-            attachment.setTitle(title);
-            attachment.setCreation(creationDate);
-            documentReferenceContentComponent.setAttachment(attachment);
-            //add attachment to DocumentReference
-            List<DocumentReference.DocumentReferenceContentComponent> documentContent = new ArrayList<DocumentReference.DocumentReferenceContentComponent>();
-            documentContent.add(documentReferenceContentComponent);
-            documentReference.setContent(documentContent);
-        }
-        return documentReference;
-    }
-
-    public List<Resource> generateObservationList(String shimKey, String jsonResponse) throws IOException{
-        //parse JSON response. It is of format
-        //sample response
-        //{
-        //    "shim": "googlefit",
-        //    "timeStamp": 1534251049,
-        //    "body": [
-        //    {
-        //        "header": {
-        //            "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee",
-        //            "creation_date_time": "2018-08-14T12:50:49.383Z",
-        //            "acquisition_provenance": {
-        //                "source_name": "some application",
-        //                "source_origin_id": "some device"
-        //            },
-        //            "schema_id": {
-        //                "namespace": "omh",
-        //                "name": "step-count",
-        //                "version": "2.0"
-        //            }
-        //        },
-        //        "body": {
-        //            "effective_time_frame": {
-        //                "time_interval": {
-        //                    "start_date_time": "2018-08-14T00:00:17.805Z",
-        //                    "end_date_time": "2018-08-14T00:01:17.805Z"
-        //                }
-        //            },
-        //            "step_count": 7
-        //        }
-        //    },
-        // ...
-        //    ]
-        //}
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-        List<Resource> observationList = new ArrayList<Resource>();
-        Observation observation;
-
-        logger.debug("Looking through JSON nodes");
-        long timestamp = jsonNode.get("timeStamp").asLong();
-        logger.debug("timestamp: " + timestamp);
-
-        for( JsonNode omhStepCount : jsonNode.get("body")){
-            logger.debug("Looking at json node");
-            logger.debug(omhStepCount.toString());
-            observation = generateObservation(shimKey, timestamp, omhStepCount);
-            observationList.add(observation);
-        }
-        return observationList;
-    }
-
-    public Observation generateObservation(String shimKey, long timestamp, JsonNode omhStepCount){
-        logger.debug("Generating Observation");
-        JsonNode omhStepCountBody = omhStepCount.get("body");
-        logger.debug("got body");
-
-        JsonNode omhStepCountHeader = omhStepCount.get("header");
-        logger.debug("got header");
-
-        String identifier = omhStepCountHeader.get("id").asText();
-        logger.debug("identifier: " + identifier);
-
-        String startDateStr = omhStepCountBody.get("effective_time_frame").get("time_interval").get("start_date_time").asText();
-        logger.debug("startDateStr: [" + startDateStr + "]");
-
-        String endDateStr = omhStepCountBody.get("effective_time_frame").get("time_interval").get("end_date_time").asText();
-        logger.debug("endDateStr: [" + endDateStr + "]");
-
-        int stepCount = omhStepCountBody.get("step_count").asInt();
-        logger.debug("stepCount: " + stepCount);
-
-        String deviceSource = omhStepCountHeader.get("acquisition_provenance").get("source_name").asText();
-        logger.debug("deviceSource: " + deviceSource);
-
-        String deviceOrigin = omhStepCountHeader.get("acquisition_provenance").get("source_origin_id").asText();
-        logger.debug("deviceOrigin: " + deviceOrigin);
-
-        List<String> deviceInfoList = new ArrayList<String>();
-        deviceInfoList.add(deviceSource);
-        deviceInfoList.add(deviceOrigin);
-        deviceInfoList.add(Long.toString(timestamp));
-        String deviceInfo = String.join(",", deviceInfoList);
-
-        Observation observation = new Observation();
-        //set Id
-        observation.setId(UUID.randomUUID().toString());
-
-        //set patient
-        Patient patient = generatePatient(shimKey);
-        List<Resource> containedResources = new ArrayList<Resource>();
-        containedResources.add(patient);
-        observation.setContained(containedResources);
-
-        //set identifier
-        List<Identifier> idList = createSingleIdentifier(identifier);
-        observation.setIdentifier(idList);
-
-        //set status
-        observation.setStatus(Observation.ObservationStatus.UNKNOWN);
-
-        //set category
-        List<CodeableConcept> categories = createCategory();
-        observation.setCategory(categories);
-
-        //set code
-        CodeableConcept code = createCodeableConcept(OBSERVATION_CODE_SYSTEM, OBSERVATION_CODE_CODE, OBSERVATION_CODE_DISPLAY);
-        observation.setCode(code);
-
-        //set subject
-        Reference subjectRef = createSubjectReference(patient.getId());
-        observation.setSubject(subjectRef);
-
-        //set effective period
-        try {
-            Period effectivePeriod = createEffectiveDateTime(startDateStr, endDateStr);
-            observation.setEffective(effectivePeriod);
-        }
-        catch(ParseException pe){
-            logger.warn("Could not parse Shimmer dates");
-            pe.printStackTrace();
-        }
-
-        //set Issued
-        observation.setIssued(new Date(timestamp));
-
-        //set device
-        Reference deviceRef = createDeviceReference(deviceInfo);
-        observation.setDevice(deviceRef);
-
-        //set steps
-        List<Observation.ObservationComponentComponent> componentList = new ArrayList<Observation.ObservationComponentComponent>();
-        Observation.ObservationComponentComponent occ = createObservationComponent(stepCount);
-        componentList.add(occ);
-        observation.setComponent(componentList);
-        return observation;
-    }
-
-    public Patient generatePatient(String shimKey){
-        Patient patient = new Patient();
-        //set id
-        patient.setId(PATIENT_RESOURCE_ID);
-        //set identifier
-        List<Identifier> idList = createSingleIdentifier(shimKey);
-        patient.setIdentifier(idList);
-        return patient;
-    }
-
-    public Reference createSubjectReference(String refId){
-        return createReference(refId, null);
-    }
-    public Reference createDeviceReference(String display){
-        return createReference(null, display);
-    }
-
-    public Reference createReference(String refId, String display){
-        Reference reference = new Reference();
-        if( refId != null ){
-            reference.setReference(refId);
-        }
-        if(display != null){
-            reference.setDisplay(display);
-        }
-        return reference;
-    }
-
-    public Identifier createIdentifier(String id){
-        Identifier identifier = new Identifier();
-        identifier.setSystem(PATIENT_IDENTIFIER_SYSTEM);
-        identifier.setValue(id);
-        return identifier;
-    }
-
-    public List<Identifier> createSingleIdentifier(String id){
-        Identifier identifier = createIdentifier(id);
-        List<Identifier> idList = new ArrayList<Identifier>();
-        idList.add(identifier);
-        return idList;
-    }
-
-    public List<CodeableConcept> createCategory(){
-        CodeableConcept codeableConcept = createCodeableConcept(OBSERVATION_CATEGORY_SYSTEM, OBSERVATION_CATEGORY_CODE, OBSERVATION_CATEGORY_DISPLAY);
-        List<CodeableConcept> codeableConceptList = new ArrayList<>();
-        codeableConceptList.add(codeableConcept);
-        return codeableConceptList;
-    }
-
-    public CodeableConcept createCodeableConcept(String system, String code, String display){
-        return createCodeableConcept(system, code, display, null);
-    }
-    public CodeableConcept createCodeableConcept(String system, String code, String display, String text){
-        CodeableConcept codeableConcept = new CodeableConcept();
-        List<Coding> codingList = new ArrayList<>();
-        Coding coding = new Coding();
-        coding.setSystem(system);
-        coding.setCode(code);
-        coding.setDisplay(display);
-        codingList.add(coding);
-        codeableConcept.setCoding(codingList);
-        if(text!= null){
-            codeableConcept.setText(text);
-        }
-        return  codeableConcept;
-    }
-
-    public Period createEffectiveDateTime(String startDateStr, String endDateStr) throws ParseException{
-        Period effectivePeriod = new Period();
-        Date startDate = sdf.parse(startDateStr);
-        Date endDate = sdf.parse(endDateStr);
-        effectivePeriod.setStart(startDate);
-        effectivePeriod.setEnd(endDate);
-        return effectivePeriod;
-    }
-
-    public Observation.ObservationComponentComponent createObservationComponent(int stepCount){
-        Observation.ObservationComponentComponent occ = new Observation.ObservationComponentComponent();
-        //set code
-        CodeableConcept codeableConcept = createCodeableConcept(OBSERVATION_COMPONENT_CODE_SYSTEM, OBSERVATION_COMPONENT_CODE_CODE, OBSERVATION_COMPONENT_CODE_DISPLAY, OBSERVATION_COMPONENT_CODE_TEXT);
-        occ.setCode(codeableConcept);
-
-        //set valueQuantity
-        Quantity quantity = new Quantity();
-        quantity.setValue(stepCount);
-        quantity.setUnit(OBSERVATION_COMPONENT_VALUE_CODE_UNIT);
-        quantity.setSystem(OBSERVATION_COMPONENT_VALUE_CODE_SYSTEM);
-        quantity.setCode(OBSERVATION_COMPONENT_VALUE_CODE_CODE);
-        occ.setValue(quantity);
-
-        return occ;
-    }
-
-    /*========================================================================*/
-    /* Private Methods */
-    /*========================================================================*/
-
-    private byte[] makeByteArrayForDocument(String documentId){
-        logger.debug("Making Bundle for Document" + documentId);
-        //get fitbit data for binary resource
-        ShimmerData shimmerData = shimmerDataRepository.findByDocumentId(documentId);
-
-        //get shimmer data
-        String jsonData = shimmerData.getJsonData();
-
-        logger.debug("Got JSON data " + jsonData);
-
-        return jsonData.getBytes();
-    }
-
-    private Bundle makeBundleForDocument(String documentId){
-
-        byte[] jsonData = makeByteArrayForDocument(documentId);
-
-        //convert to base64
-        byte[] base64EncodedData = Base64.getEncoder().encode(jsonData);
-
-        //make the Binary object
-        Binary binary = makeBinary(base64EncodedData);
-
-        //convert to a bundle
-        Bundle bundle = makeBundleWithSingleEntry(binary);
-
-        //return the bundle
-        return bundle;
-    }
-
-    private Binary makeBinary(byte[] base64EncodedData){
-        Binary binary = new Binary();
-        binary.setContentType("application/json");
-        binary.setContent(base64EncodedData);
-        return binary;
-    }
-
-    private Bundle makeBundleWithSingleEntry(Resource fhirResource){
-        List<Resource> fhirResources = new ArrayList<Resource>();
-        if( fhirResource != null ) {
-            fhirResources.add(fhirResource);
-        }
-        return makeBundle(fhirResources);
-    }
-    private Bundle makeBundle(List<Resource> fhirResources){
-        Bundle bundle = new Bundle();
-        bundle.setType(Bundle.BundleType.SEARCHSET);
-        bundle.setTotal(fhirResources.size());
-
-        for( Resource fhirResource : fhirResources){
-            Bundle.BundleEntryComponent bundleEntryComponent = new Bundle.BundleEntryComponent();
-            bundleEntryComponent.setResource(fhirResource);
-            bundle.addEntry(bundleEntryComponent);
-        }
-
-        return bundle;
-    }
-
-    private String getShimmerId(String ehrId, String shimkey){
-        logger.debug("Checking User EHR ID: [" + ehrId + "] ShimKey: [" + shimkey + "]");
-        ApplicationUserId applicationUserId = new ApplicationUserId(ehrId, shimkey);
-        //debug info
-        logger.debug("Find by ID " + applicationUserRepository.findById(applicationUserId).isPresent());
-        ApplicationUser user;
-        Optional<ApplicationUser> applicationUserOptional = applicationUserRepository.findById(applicationUserId);
-        if(applicationUserOptional.isPresent()){
-            logger.debug("Found the user");
-            user = applicationUserOptional.get();
-        }
-        else{
-            logger.debug("Did not find user. Creating new one");
-            user = createNewApplicationUser(applicationUserId);
-        }
-        String shimmerId = user.getShimmerId();
-        logger.debug("Returning shimmer id: " + shimmerId);
-        return shimmerId;
-    }
-
-    private ApplicationUser createNewApplicationUser(ApplicationUserId applicationUserId){
-        logger.debug("User does not exist, creating");
-        String shimmerId = UUID.randomUUID().toString();
-        ApplicationUser newUser = new ApplicationUser(applicationUserId, shimmerId);
-        applicationUserRepository.save(newUser);
-        //force a flush
-        applicationUserRepository.flush();
-        logger.debug("finished creating user");
-        return newUser;
     }
 }
