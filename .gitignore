@@ -8,7 +8,7 @@ omhclient/yarn.lock
 omhserver/*.env
 !.mvn/wrapper/maven-wrapper.jar
 shimmer-resource-server.env
-package-lock.json
+./omhclient/package-lock.json
 
 ### STS ###
 .apt_generated
