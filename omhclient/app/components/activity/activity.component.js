@@ -67,7 +67,7 @@ component('activity', {
                     'range': undefined,
                     'timeQuantizationLevel': OMHWebVisualizations.QUANTIZE_DAY,
                     'chart': {
-                        'type' : 'clustered_bar',
+                        'type' : 'line',
                         'daysShownOnTimeline': undefined
                     }
                 }
