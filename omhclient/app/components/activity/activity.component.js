@@ -65,9 +65,9 @@ component('activity', {
                 },
                 'step_count': {
                     'range': undefined,
-                    'timeQuantizationLevel': OMHWebVisualizations.QUANTIZE_NONE,
+                    'timeQuantizationLevel': OMHWebVisualizations.QUANTIZE_DAY,
                     'chart': {
-                        'type' : 'line',
+                        'type' : 'clustered_bar',
                         'daysShownOnTimeline': undefined
                     }
                 }
