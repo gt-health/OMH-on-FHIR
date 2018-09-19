@@ -313,17 +313,9 @@ public class ResponseService {
         logger.debug("Making Bundle for Document" + documentId);
         //get fitbit data for binary resource
         ShimmerData shimmerData = shimmerDataRepository.findByDocumentId(documentId);
-
         //get shimmer data
-        String jsonData = "";
-        if(shimmerData != null) {
-            jsonData = shimmerData.getJsonData();
-            logger.debug("Got JSON data " + jsonData);
-
-            //we've processed the binary so remove it from the database. We do not want to hold on to data
-            //any longer than necessary.
-            shimmerDataRepository.delete(shimmerData);
-        }
+        String jsonData = shimmerData.getJsonData();
+        logger.debug("Got JSON data " + jsonData);
         return jsonData.getBytes();
     }
 
