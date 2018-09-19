@@ -22,7 +22,7 @@ component('activity', {
         self.activityDataType = "OMH JSON";
         self.activityBinaryUrl;
         self.omhActivity;
-        self.enableBinaryQuery = "enabled";
+        self.disableBinaryQuery = false;
         self.observationResponse = "";
 
         //===================================================================================
@@ -108,7 +108,7 @@ component('activity', {
             self.observationResponse = "";
             self.activityDocumentRef = null;
             self.omhActivity = null;
-            self.enableBinaryQuery = "enabled";
+            self.disableBinaryQuery = false;
             self.omhOnFhirApi.requestDocumentReference(self.shimmerId, self.startDate, self.endDate)
                 .then(function(response){
                     console.log("Activity Response");
@@ -189,7 +189,7 @@ component('activity', {
                     console.log(response);
                     self.omhActivity = response.data; //to convert OmhActivity to JSON string use JSON.stringify(omhActivity)
                     self.waitingForData = false;
-                    self.enableBinaryQuery = "disabled";
+                    self.disableBinaryQuery = true;
                     self.makeChart(self.omhActivity.body, d3.select('.chart-container'), "step_count", self.options);
                     console.log("processed response");
                 });
