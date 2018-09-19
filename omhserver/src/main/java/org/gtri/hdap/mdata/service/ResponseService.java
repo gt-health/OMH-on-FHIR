@@ -315,10 +315,15 @@ public class ResponseService {
         ShimmerData shimmerData = shimmerDataRepository.findByDocumentId(documentId);
 
         //get shimmer data
-        String jsonData = shimmerData.getJsonData();
+        String jsonData = "";
+        if(shimmerData != null) {
+            jsonData = shimmerData.getJsonData();
+            logger.debug("Got JSON data " + jsonData);
 
-        logger.debug("Got JSON data " + jsonData);
-
+            //we've processed the binary so remove it from the database. We do not want to hold on to data
+            //any longer than necessary.
+            shimmerDataRepository.delete(shimmerData);
+        }
         return jsonData.getBytes();
     }
 
