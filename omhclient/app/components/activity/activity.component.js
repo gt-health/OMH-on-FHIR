@@ -106,6 +106,7 @@ component('activity', {
             self.waitingForSearch = true;
             self.observationResponse = "";
             self.activityDocumentRef = null;
+            self.omhActivity = null;
             self.omhOnFhirApi.requestDocumentReference(self.shimmerId, self.startDate, self.endDate)
                 .then(function(response){
                     console.log("Activity Response");
