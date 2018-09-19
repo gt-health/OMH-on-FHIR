@@ -97,11 +97,6 @@ component('activity', {
         // Functions
         //===================================================================================
 
-        self.onExit = function onExit(){
-            console.log("Logging out user " + self.shimmerId);
-            self.omhOnFhirApi.logoutShimmerUser(self.shimmerId);
-        }
-
         self.queryActivity = function queryActivity(){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;
