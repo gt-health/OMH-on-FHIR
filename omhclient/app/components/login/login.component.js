@@ -30,6 +30,7 @@ component('login', {
                 self.omhOnFhirApi.setPatientResourceObj(pt);
                 self.patientName = self.omhOnFhirApi.getPatientName();
                 self.pageMsg = "Link patient " + self.patientName + " to an existing account.";
+                $scope.patientName = self.omhOnFhirApi.getPatientName();
                 //update the scope so the variables are updated in the view
                 $scope.$apply();
             });
@@ -45,7 +46,8 @@ component('login', {
             console.log("Login window has focus");
             console.log("Login in successful " + this.loginSuccess);
             console.log("Shimmer Id: " + this.shimmerId);
-            console.log("Shimmer Id: " + this.patientName);
+            this.patientName = $scope.patientName;
+            console.log("Shimmer Name: " + this.patientName);
             if( this.loginSuccess == true ){
                 //forward to the activity page
                 console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity?shimmerId=" + this.shimmerId + "&patientName=" + this.patientName);
