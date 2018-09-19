@@ -242,7 +242,6 @@ public class ShimmerService {
      */
     public String storePatientJson(ApplicationUser applicationUser, String jsonResponse){
         logger.debug("Storing patient data");
-        logger.debug("Patient " + applicationUser.getShimmerId() + "Json: " + jsonResponse);
         ShimmerData shimmerData = new ShimmerData(applicationUser, jsonResponse);
         shimmerDataRepository.save(shimmerData);
         return shimmerData.getDocumentId();
