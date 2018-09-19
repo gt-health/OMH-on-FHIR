@@ -21,6 +21,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -48,6 +50,28 @@ public class ResponseServiceTest {
     private ShimmerDataRepository shimmerDataRepository;
 
     private Logger logger = LoggerFactory.getLogger(ResponseServiceTest.class);
+
+    @Test
+    public void testParseDate() throws Exception{
+        logger.debug("========== Entering testParseDate==========");
+        String expected = "2018-09-18T18:00:00.000Z";
+        String nomillis = "2018-09-18T18:00:00Z";
+        String notExpected = "2018-09-18";
+
+        Date date = responseService.parseDate(expected);
+        assertTrue(date != null);
+        date = responseService.parseDate(nomillis);
+        assertTrue(date != null);
+        boolean hadError = false;
+        try {
+            date = responseService.parseDate(notExpected);
+        }
+        catch(ParseException pe){
+            hadError = true;
+        }
+        assertTrue(hadError == true);
+        logger.debug("========== Exiting testParseDate==========");
+    }
 
     @Test
     public void testGenerateDocumentReference() throws Exception{

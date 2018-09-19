@@ -45,6 +45,7 @@ public class ResponseService {
     private ShimmerDataRepository shimmerDataRepository;
     private final Logger logger = LoggerFactory.getLogger(ResponseService.class);
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private SimpleDateFormat sdfNoMilli = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     /*========================================================================*/
     /* Public Methods */
@@ -285,11 +286,22 @@ public class ResponseService {
 
     public Period createEffectiveDateTime(String startDateStr, String endDateStr) throws ParseException{
         Period effectivePeriod = new Period();
-        Date startDate = sdf.parse(startDateStr);
-        Date endDate = sdf.parse(endDateStr);
+        Date startDate = parseDate(startDateStr);
+        Date endDate = parseDate(endDateStr);
         effectivePeriod.setStart(startDate);
         effectivePeriod.setEnd(endDate);
         return effectivePeriod;
+    }
+
+    public Date parseDate(String dateStr) throws ParseException{
+        Date date;
+        try{
+            date =sdf.parse(dateStr);
+        }
+        catch(ParseException pe){
+            date = sdfNoMilli.parse(dateStr);
+        }
+        return date;
     }
 
     public Observation.ObservationComponentComponent createObservationComponent(int stepCount){
