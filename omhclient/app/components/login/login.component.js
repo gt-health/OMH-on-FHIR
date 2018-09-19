@@ -47,7 +47,7 @@ component('login', {
             console.log("Login in successful " + this.loginSuccess);
             console.log("Shimmer Id: " + this.shimmerId);
             this.patientName = $scope.patientName;
-            console.log("Shimmer Name: " + this.patientName);
+            console.log("Patient Name: " + this.patientName);
             if( this.loginSuccess == true ){
                 //forward to the activity page
                 console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity?shimmerId=" + this.shimmerId + "&patientName=" + this.patientName);
