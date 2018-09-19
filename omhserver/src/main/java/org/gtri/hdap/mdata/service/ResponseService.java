@@ -314,8 +314,13 @@ public class ResponseService {
         //get fitbit data for binary resource
         ShimmerData shimmerData = shimmerDataRepository.findByDocumentId(documentId);
         //get shimmer data
-        String jsonData = shimmerData.getJsonData();
-        logger.debug("Got JSON data " + jsonData);
+        String jsonData = "";
+        if(shimmerData != null) {
+            jsonData = shimmerData.getJsonData();
+            logger.debug("Got JSON data " + jsonData);
+            //Delete the stored user data because it has been retrieved. We do not want to hold on to data longer than needed.
+            shimmerDataRepository.delete(shimmerData);
+        }
         return jsonData.getBytes();
     }
 
