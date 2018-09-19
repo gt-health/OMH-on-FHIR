@@ -45,9 +45,10 @@ component('login', {
             console.log("Login window has focus");
             console.log("Login in successful " + this.loginSuccess);
             console.log("Shimmer Id: " + this.shimmerId);
+            console.log("Shimmer Id: " + this.patientName);
             if( this.loginSuccess == true ){
                 //forward to the activity page
-                console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity?shimmerId=" + this.shimmerId);
+                console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity?shimmerId=" + this.shimmerId + "&patientName=" + this.patientName);
                 $window.location.href = self.env.baseUrl + "activity?shimmerId=" + this.shimmerId + "&patientName=" + this.patientName;
             }
             else{
