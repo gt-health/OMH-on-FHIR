@@ -9,6 +9,7 @@
     </appender>
 
     <logger name="org.gtri.hdap.mdata.service.ShimmerService" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.service.ResponseService" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.controller" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.conf" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.jackson" level="DEBUG"/>

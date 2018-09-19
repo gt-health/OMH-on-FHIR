@@ -197,7 +197,7 @@ public class ResponseService {
             observation.setEffective(effectivePeriod);
         }
         catch(ParseException pe){
-            logger.warn("Could not parse Shimmer dates");
+            logger.error("Could not parse Shimmer dates");
             pe.printStackTrace();
         }
 
