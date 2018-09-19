@@ -5,7 +5,7 @@ module('login').
 component('login', {
 
     templateUrl: 'components/login/login.template.html',
-    controller: ['$scope', '$rootScope', '$http', '$window', '$location', '$routeParams', 'OmhOnFhirApi', '__env', function LoginController($scope, $rootScope, $http, $window, $location, $routeParams, OmhOnFhirApi, env){
+    controller: ['$scope', '$http', '$window', '$location', '$routeParams', 'OmhOnFhirApi', '__env', function LoginController($scope, $http, $window, $location, $routeParams, OmhOnFhirApi, env){
         var self = this;
         self.env = env;
         self.omhOnFhirApi = OmhOnFhirApi;
@@ -14,6 +14,7 @@ component('login', {
         self.alertMsg = "";
         self.pageMsg = 'TODO make login page';
         self.googleOauthUrl;
+        self.patientName;
 
         console.log("Params passed to login");
         console.log($routeParams);
@@ -27,8 +28,8 @@ component('login', {
             console.log(smart);
             smart.patient.read().then(function (pt) {
                 self.omhOnFhirApi.setPatientResourceObj(pt);
-                $rootScope.patientName = self.omhOnFhirApi.getPatientName();
-                self.pageMsg = "Link patient " + $rootScope.patientName + " to an existing account.";
+                self.patientName = self.omhOnFhirApi.getPatientName();
+                self.pageMsg = "Link patient " + self.patientName + " to an existing account.";
                 //update the scope so the variables are updated in the view
                 $scope.$apply();
             });
@@ -47,7 +48,7 @@ component('login', {
             if( this.loginSuccess == true ){
                 //forward to the activity page
                 console.log("Authentication successful redirecting to " + self.env.baseUrl + "activity?shimmerId=" + this.shimmerId);
-                $window.location.href = self.env.baseUrl + "activity?shimmerId=" + this.shimmerId;
+                $window.location.href = self.env.baseUrl + "activity?shimmerId=" + this.shimmerId + "&patientName=" + this.patientName;
             }
             else{
                 console.log("Login not successful");

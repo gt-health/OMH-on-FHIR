@@ -5,7 +5,7 @@ module('activity').
 component('activity', {
 
     templateUrl: 'components/activity/activity.template.html',
-    controller: ['$scope', '$rootScope', '$http', '$window', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $rootScope, $http, $window, $routeParams, OmhOnFhirApi){
+    controller: ['$scope', '$http', '$window', '$routeParams', 'OmhOnFhirApi', function ActivityController($scope, $http, $window, $routeParams, OmhOnFhirApi){
         var self = this;
         self.omhOnFhirApi = OmhOnFhirApi;
 
@@ -24,6 +24,7 @@ component('activity', {
         self.omhActivity;
         self.disableBinaryQuery = false;
         self.observationResponse = "";
+        self.patientName;
 
         //===================================================================================
         // Variables for chart
@@ -75,14 +76,14 @@ component('activity', {
             }
         };
 
-        ////register listener to log user out on exit
-        //$window.onbeforeunload = self.onExit();
-
         //===================================================================================
         // Initialization
         //===================================================================================
         if($routeParams.shimmerId){
             self.shimmerId = $routeParams.shimmerId;
+        }
+        if($routeParams.patientName){
+            self.patientName = $routeParams.patientName;
         }
         var date = new Date();
         var formattedDate = date.toISOString().substring(0,10);//to make format 'yyyy-MM-dd'
@@ -306,10 +307,6 @@ component('activity', {
                     self.observationResponse = JSON.stringify(response.data, null, 2);
                     self.waitingForObservationSearch = false;
                 });
-        };
-
-        self.getPatientName = function getPatientName(){
-            return $rootScope.patientName;
         };
 
         //===================================================================================
