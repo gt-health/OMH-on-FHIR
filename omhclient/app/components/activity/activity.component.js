@@ -25,6 +25,7 @@ component('activity', {
         self.disableBinaryQuery = false;
         self.observationResponse = "";
         self.patientName;
+        self.observationVisible = false;
 
         //===================================================================================
         // Variables for chart
@@ -306,7 +307,13 @@ component('activity', {
                     //at the moment we are returning a single entry in the response
                     self.observationResponse = JSON.stringify(response.data, null, 2);
                     self.waitingForObservationSearch = false;
+                    self.observationVisible = true;
                 });
+        };
+
+        self.toggleObservationVisibility = function toggleObservationVisibility(){
+            self.observationVisible = !self.observationVisible;
+            console.log("Toggled Observation Visibility to: " + self.observationVisible);
         };
 
         //===================================================================================

@@ -23,3 +23,7 @@
   content: "|";
   padding-right: 0.3em;
 }
+
+.observation-header {
+  text-decoration: underline;
+}
