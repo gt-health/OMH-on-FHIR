@@ -51,12 +51,12 @@
         </div>
 
         <div class="chart-container">
-            <h3>Steps Per Day <small>(all step data points aggregated by day)</small></h3>
+            <h3 ng-if="$ctrl.omhActivity">Steps Per Day <small>(all step data points aggregated by day)</small></h3>
             <svg class="chart">
             </svg>
         </div>
 
-        <h3>All Step Data Points</h3>
+        <h3 ng-if="$ctrl.omhActivity">All Step Data Points</h3>
         <table ng-if="$ctrl.omhActivity" class="table table-striped">
             <thead>
             <tr>
