@@ -2,6 +2,8 @@ package org.gtri.hdap.mdata.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
@@ -36,6 +38,7 @@ import java.util.*;
  */
 @RestController
 @SessionAttributes("shimmerId")
+@Api(value="patientdatacontroller", description="OMH on FHIR web service operations." )
 public class PatientDataController {
 
     /*========================================================================*/
@@ -61,6 +64,7 @@ public class PatientDataController {
     /*========================================================================*/
     /* Service Endpoint Methods */
     /*========================================================================*/
+    @ApiOperation(value="View Spring Boot test.")
     @RequestMapping("/")
     public String index(){
         return "Greetings from Spring Boot!";
@@ -73,6 +77,7 @@ public class PatientDataController {
      * @param shimkey the ID for the patient in Shimmer
      * @return
      */
+    @ApiOperation(value="Authenticate an EHR user to use a specific shim with the Shimmer library.")
     @GetMapping("/shimmerAuthentication")
     public ModelAndView authenticateWithShimmer(ModelMap model,
                                                 @ModelAttribute("shimmerId") String shimmerId,
@@ -130,6 +135,7 @@ public class PatientDataController {
      * @return
      */
     //GET https://apps.hdap.gatech.edu/hapiR4/baseR4/DocumentReference?subject=EXxcda
+    @ApiOperation(value="Retrieve a DocumentReference for a subject with a specific Shimmer ID.")
     @GetMapping("/DocumentReference")
     public ResponseEntity findDocumentReference(@RequestParam(name="subject", required=true) String shimmerId,
                                                 @RequestParam(name="date") List<String> dateQueries){
@@ -161,6 +167,7 @@ public class PatientDataController {
 
     //handles requests of the format
     //GET https://apps.hdap.gatech.edu/hapiR4/baseR4/Binary?_id=EXexample
+    @ApiOperation(value="Retrieve a Binary with OMH data for a DocumentReference query.")
     @GetMapping(value = "/Binary/{documentId}",
                 produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody byte[] retrieveBinary(
@@ -171,6 +178,7 @@ public class PatientDataController {
         return docBytes;
     }
 
+    @ApiOperation(value="Retrieve a Binary with OMH data for a DocumentReference query.")
     @GetMapping("/Binary")
     public Bundle searchBinaryBundle(@RequestHeader("Accept") String acceptHeader,
                                      @RequestParam(name="_id", required = true)String documentId){
@@ -180,6 +188,7 @@ public class PatientDataController {
 
     //handles requests of the format
     //GET https://apps.hdap.gatech.edu/hapiR4/baseR4/Observation?subject=EXf201
+    @ApiOperation(value="Retrieve an Observation with OMH data.")
     @GetMapping("/Observation")
     public ResponseEntity findObservation(@RequestParam(name="subject", required=true) String shimmerId,
                                        @RequestParam(name="date") List<String> dateQueries){
@@ -209,7 +218,8 @@ public class PatientDataController {
         return ResponseEntity.ok(responseBundle);
     }
 
-    @RequestMapping("/authorize/{shimkey}/callback")
+    @ApiOperation(value="Callback method for Shimmer to use during user authentication.")
+    @GetMapping("/authorize/{shimkey}/callback")
     public ModelAndView handleShimmerOauthCallback(ModelMap model,
                                        @ModelAttribute("shimmerId") String shimmerId,
                                        @PathVariable String shimkey,
