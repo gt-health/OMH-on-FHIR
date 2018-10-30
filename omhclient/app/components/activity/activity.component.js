@@ -142,6 +142,7 @@ component('activity', {
                     //make url
                     self.activityBinaryUrl = currDocRef.entry[0].resource.content[0].attachment.url;
                     self.waitingForSearch = false;
+                    self.docReferenceVisible = true;
                 });
         };
 
