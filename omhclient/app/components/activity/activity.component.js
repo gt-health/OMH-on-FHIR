@@ -89,12 +89,8 @@ component('activity', {
             self.patientName = $routeParams.patientName;
         }
         var date = new Date();
-        var formattedDate = date.toISOString().substring(0,10);//to make format 'yyyy-MM-dd'
-        //self.startDate = formattedDate;
-        //self.endDate = formattedDate;
-        //console.log("Set start date: " + self.startDate);
-        //console.log("Set end date: " + self.endDate);
-        self.startDate = date.getDate() - self.startDateGap;
+        self.startDate = new Date();
+        self.startDate.setDate(date.getDate() - self.startDateGap);
         self.endDate = date;
         console.log("Start Date " + self.startDate);
         console.log("End Date " + self.endDate);

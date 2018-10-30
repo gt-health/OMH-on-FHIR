@@ -44,7 +44,7 @@
 
     <div class="row">
 
-        <div ng-if="$ctrl.activityDocumentRef" class="row">
+        <div class="panel panel-default" ng-if="$ctrl.activityDocumentRef" class="row">
             <div class="panel-heading observation-header" ng-click="$ctrl.toggleDocReferenceVisibility()">Steps as STU3 DocumentReference</div>
             <div class="panel-body" ng-if="$ctrl.docReferenceVisible == true">
                 <pre>{{$ctrl.activityDocumentRef}}</pre>
