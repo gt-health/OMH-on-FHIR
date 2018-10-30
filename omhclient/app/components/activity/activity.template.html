@@ -43,6 +43,14 @@
     </div>
 
     <div class="row">
+
+        <div ng-if="$ctrl.activityDocumentRef" class="row">
+            <div class="panel-heading observation-header" ng-click="$ctrl.toggleDocReferenceVisibility()">Steps as STU3 DocumentReference</div>
+            <div class="panel-body" ng-if="$ctrl.docReferenceVisible == true">
+                <pre>{{$ctrl.activityDocumentRef}}</pre>
+            </div>
+        </div>
+
         <button class="btn btn-default" ng-click="$ctrl.queryBinary()" ng-disabled="$ctrl.disableBinaryQuery == true">Retrieve step-count in OMH format</button>
 
         <div ng-if="$ctrl.waitingForData" class="alert alert-info">
@@ -74,11 +82,11 @@
             <tbody>
             <tr ng-repeat="stepActivity in $ctrl.omhActivity.body">
                 <td>{{stepActivity.body.step_count}}</td>
-                <td>{{stepActivity.body.effective_time_frame.time_interval.start_date_time}}</td>
-                <td>{{stepActivity.body.effective_time_frame.time_interval.end_date_time}}</td>
+                <td>{{stepActivity.body.effective_time_frame.time_interval.start_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td><!--<td>{{stepActivity.body.effective_time_frame.time_interval.start_date_time}}</td>-->
+                <td>{{stepActivity.body.effective_time_frame.time_interval.end_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td><!--<td>{{stepActivity.body.effective_time_frame.time_interval.end_date_time}}</td>-->
                 <td>{{stepActivity.header.acquisition_provenance.source_name}}</td>
                 <td>{{stepActivity.header.acquisition_provenance.source_origin_id}}</td>
-                <td>{{stepActivity.header.creation_date_time}}</td>
+                <td>{{stepActivity.header.creation_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td> <!--<td>{{stepActivity.header.creation_date_time}}</td>-->
                 <td>{{stepActivity.header.schema_id.name}}</td>
                 <td>{{stepActivity.header.schema_id.namespace}}</td>
                 <td>{{stepActivity.header.schema_id.version}}</td>
@@ -86,8 +94,5 @@
             </tbody>
         </table>
 
-        <div ng-if="$ctrl.activityBinaryJson" class="row">
-            {{activityBinaryJson}}
-        </div>
     </div>
 </div>

@@ -12,7 +12,7 @@ component('login', {
         self.shimmerId;
         self.loginSuccess;
         self.alertMsg = "";
-        self.pageMsg = 'TODO make login page';
+        self.pageMsg = 'Link patient to an existing account.';
         self.googleOauthUrl;
         self.patientName;
 

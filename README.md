@@ -75,3 +75,7 @@ Do the following to run the application:
 - DocumentReference search can only support two date parameters, one for the start date and one for the end date.
 If the start date uses a prefix it must be `ge`. If the end date uses a prefix it must be `le`. The application only searches for documents between the specified date ranges.
 
+## mdata-app web service API
+Swagger is used to document the endpoints made available by the mdata-app. Use the following URLs to view details on the web service endpoints.
+- *JSON* - <server_dns_name>/mdata/v2/api-docs
+- *UI* - <server_dns_name>/mdata/swagger-ui.html#/

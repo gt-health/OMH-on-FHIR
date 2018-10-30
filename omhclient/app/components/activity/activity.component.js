@@ -26,6 +26,8 @@ component('activity', {
         self.observationResponse = "";
         self.patientName;
         self.observationVisible = false;
+        self.docReferenceVisible = false;
+        self.startDateGap = 15;
 
         //===================================================================================
         // Variables for chart
@@ -92,8 +94,10 @@ component('activity', {
         //self.endDate = formattedDate;
         //console.log("Set start date: " + self.startDate);
         //console.log("Set end date: " + self.endDate);
-        self.startDate = date;
+        self.startDate = date.getDate() - self.startDateGap;
         self.endDate = date;
+        console.log("Start Date " + self.startDate);
+        console.log("End Date " + self.endDate);
 
         //===================================================================================
         // Functions
@@ -314,6 +318,11 @@ component('activity', {
         self.toggleObservationVisibility = function toggleObservationVisibility(){
             self.observationVisible = !self.observationVisible;
             console.log("Toggled Observation Visibility to: " + self.observationVisible);
+        };
+
+        self.toggleDocReferenceVisibility = function toggleDocReferenceVisibility(){
+            self.docReferenceVisible = !self.docReferenceVisible;
+            console.log("Toggled DocReference Visibility to: " + self.docReferenceVisible);
         };
 
         //===================================================================================

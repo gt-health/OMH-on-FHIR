@@ -83,3 +83,8 @@ The following environment variables need to be set for the `mdata-db` container
 2) Create a `./postgres.env` file with environment variables to configure the Postgress database.
 3) Create a `./omh-server.env` file with environment variables to configure the OMH on Fhir web service.
 3) From the root directory of the project run `docker-compose up -d`
+
+##API Details
+Swagger is used to document the endpoints made available by the mdata-app. Use the following URLs to view details on the web service endpoints.
+- *JSON* - <server_dns_name>/mdata/v2/api-docs
+- *UI* - <server_dns_name>/mdata/swagger-ui.html#/
