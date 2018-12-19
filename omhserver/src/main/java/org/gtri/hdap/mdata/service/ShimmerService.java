@@ -74,6 +74,7 @@ public class ShimmerService {
         String shimmerRedirectUrl = System.getenv(SHIMMER_SERVER_REDIRECT_URL_ENV);
         shimmerAuthUrl = shimmerAuthUrl.replace("{shim-key}", shimkey);
         shimmerAuthUrl = shimmerAuthUrl.replace("{username}", shimmerId);
+        shimmerRedirectUrl = shimmerRedirectUrl.replace("{shim-key}", shimkey);
         shimmerAuthUrl = shimmerAuthUrl.replace("{redirect-url}", shimmerRedirectUrl);
         logger.debug("Sending authorization request to " + shimmerAuthUrl);
         HttpGet httpGet = new HttpGet(shimmerAuthUrl);
