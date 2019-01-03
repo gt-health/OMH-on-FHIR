@@ -139,22 +139,22 @@ public class ResponseService {
         JsonNode omhStepCountHeader = omhStepCount.get("header");
         logger.debug("got header");
 
-        String identifier = omhStepCountHeader.get("id").asText();
+        String identifier = getJsonNodeText(omhStepCountHeader.get("id"));
         logger.debug("identifier: " + identifier);
 
-        String startDateStr = omhStepCountBody.get("effective_time_frame").get("time_interval").get("start_date_time").asText();
+        String startDateStr = getJsonNodeText(omhStepCountBody.get("effective_time_frame").get("time_interval").get("start_date_time"));
         logger.debug("startDateStr: [" + startDateStr + "]");
 
-        String endDateStr = omhStepCountBody.get("effective_time_frame").get("time_interval").get("end_date_time").asText();
+        String endDateStr = getJsonNodeText(omhStepCountBody.get("effective_time_frame").get("time_interval").get("end_date_time"));
         logger.debug("endDateStr: [" + endDateStr + "]");
 
         int stepCount = omhStepCountBody.get("step_count").asInt();
         logger.debug("stepCount: " + stepCount);
 
-        String deviceSource = omhStepCountHeader.get("acquisition_provenance").get("source_name").asText();
+        String deviceSource = getJsonNodeText(omhStepCountHeader.get("acquisition_provenance").get("source_name"));
         logger.debug("deviceSource: " + deviceSource);
 
-        String deviceOrigin = omhStepCountHeader.get("acquisition_provenance").get("source_origin_id").asText();
+        String deviceOrigin = getJsonNodeText(omhStepCountHeader.get("acquisition_provenance").get("source_origin_id"));
         logger.debug("deviceOrigin: " + deviceOrigin);
 
         List<String> deviceInfoList = new ArrayList<String>();
@@ -412,4 +412,17 @@ public class ResponseService {
         return newUser;
     }
 
+
+    /**
+     * Returns the text contained in a JsonNode object or an empty string if the Node is null
+     * @param jsonNode
+     * @return
+     */
+    private String getJsonNodeText(JsonNode jsonNode){
+        String nodeText = "";
+        if(jsonNode != null){
+            nodeText = jsonNode.asText();
+        }
+        return nodeText;
+    }
 }
