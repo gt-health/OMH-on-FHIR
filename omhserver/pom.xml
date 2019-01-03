@@ -96,6 +96,14 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!-- The following was added to get around surefire error introduced in latest maven docker image https://github.com/carlossg/docker-maven/issues/90 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<forkMode>never</forkMode>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
