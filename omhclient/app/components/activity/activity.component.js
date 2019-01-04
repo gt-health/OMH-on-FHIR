@@ -102,7 +102,6 @@ component('activity', {
         self.queryActivity = function queryActivity(){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;
-            self.observationResponse = "";
             self.activityDocumentRef = null;
             self.omhActivity = null;
             self.disableBinaryQuery = false;
