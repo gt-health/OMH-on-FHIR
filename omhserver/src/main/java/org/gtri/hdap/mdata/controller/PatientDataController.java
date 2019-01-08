@@ -102,7 +102,11 @@ public class PatientDataController {
         }
         else{
             //did not get a response URL
-            throw new ShimmerAuthenticationException("Could not authorize shimmer user " + shimmerResponse.getResponseData());
+            String callbackUrl= "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
+            model.addAttribute("loginSuccess", false);
+            logger.debug("HTTP " + shimmerResponse.getResponseCode() + " returned by Shimmer Auth response. Could not authorize shimmer user " +
+                    shimmerResponse.getResponseData() + "Error with Authentication. Redirecting to: " + callbackUrl);
+            return new ModelAndView(callbackUrl, model);
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
