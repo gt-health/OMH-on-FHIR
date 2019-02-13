@@ -103,8 +103,8 @@ component('activity', {
         //===================================================================================
 
         self.retrieveStepCount = function retrieveStepCount(){
-            self.queryActivity;
-            self.queryBinary;
+            self.queryActivity();
+            self.queryBinary();
         };
         self.queryActivity = function queryActivity(){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
