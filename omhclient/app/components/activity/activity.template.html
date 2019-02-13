@@ -19,7 +19,7 @@
                 <!-- input value is of the format yyyy-MM-dd by default -->
                 <input ng-model="$ctrl.endDate" type="date" id="endDate" name="endDate">
             </div>
-            <button class="btn btn-default" ng-click="$ctrl.queryActivity()">Search</button>
+            <button class="btn btn-default" ng-click="$ctrl.retrieveStepCount()">Search</button>
         </form>
 
         <div ng-if="$ctrl.waitingForSearch" class="alert alert-info">
