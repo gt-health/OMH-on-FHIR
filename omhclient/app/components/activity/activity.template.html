@@ -1,49 +1,82 @@
-<form>
-    <h4>Search activity for patient {{$ctrl.patientName}} between date range</h4>
-    <div class="form-group">
-        <label for="startDate">Start Date:</label>
-        <!-- Using date input type for details see: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date -->
-        <!-- input value is of the format yyyy-MM-dd by default -->
-        <input ng-model="$ctrl.startDate" type="date" id="startDate" name="startDate">
-    </div>
-    <div class="form-group">
-        <label for="endDate">End Date:</label>
-        <!-- Using date input type for details see: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date -->
-        <!-- input value is of the format yyyy-MM-dd by default -->
-        <input ng-model="$ctrl.endDate" type="date" id="endDate" name="endDate">
-    </div>
-    <button class="btn btn-default" ng-click="$ctrl.queryActivity()">Find step-count in OMH format</button>
-    <button class="btn btn-default" ng-click="$ctrl.queryObservation()">Find step-count as FHIR STU3 Observation</button>
-</form>
-
-<div ng-if="$ctrl.waitingForSearch" class="alert alert-info">
-    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-    Searching for OMH data...
+<div>
+    <h1>Activities for Patient {{$ctrl.patientName}}</h1>
 </div>
 
+<div class="panel panel-default">
+    <div class="panel-heading"><a href="#" ng-click="$ctrl.toggleStepCountVisibility()"><h2>Step Count</h2></a></div>
+    <div class="panel-body" ng-if="$ctrl.stepCountVisible == true">
+        <form>
+            <h1>Find daily step count for date range</h1>
+            <div class="form-group">
+                <label for="startDate">Start Date:</label>
+                <!-- Using date input type for details see: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date -->
+                <!-- input value is of the format yyyy-MM-dd by default -->
+                <input ng-model="$ctrl.startDate" type="date" id="startDate" name="startDate">
+            </div>
+            <div class="form-group">
+                <label for="endDate">End Date:</label>
+                <!-- Using date input type for details see: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date -->
+                <!-- input value is of the format yyyy-MM-dd by default -->
+                <input ng-model="$ctrl.endDate" type="date" id="endDate" name="endDate">
+            </div>
+            <button class="btn btn-default" ng-click="$ctrl.queryActivity()">Search</button>
+        </form>
 
-<div ng-if="$ctrl.waitingForObservationSearch" class="alert alert-info">
-    <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-    Searching for STU3 Observations...
-</div>
+        <div ng-if="$ctrl.waitingForSearch" class="alert alert-info">
+            <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+            Searching for step count...
+        </div>
 
-<div ng-if="$ctrl.observationResponse.length > 0" class="panel panel-default" id="observationResponse">
-    <div class="panel-heading observation-header" ng-click="$ctrl.toggleObservationVisibility()">Steps as STU3 Observations</div>
-    <div class="panel-body" ng-if="$ctrl.observationVisible == true">
-        <pre>{{$ctrl.observationResponse}}</pre>
+        <div ng-if="$ctrl.omhActivity">
+            <div class="chart-container">
+                <svg class="chart">
+                </svg>
+            </div>
+
+            <button class="btn btn-default" ng-if="$ctrl.showStepDataTable == false" ng-click="$ctrl.toggleShowStepDataTable()">Show Data Table</button>
+            <button class="btn btn-default" ng-if="$ctrl.showStepDataTable == true" ng-click="$ctrl.toggleShowStepDataTable()">Hide Data Table</button>
+
+            <h3 ng-if="$ctrl.showStepDataTable">All Step Data Points</h3>
+            <table ng-if="$ctrl.showStepDataTable" class="table table-striped">
+                <thead>
+                <tr>
+                    <td>Step Count</td>
+                    <td>Start Time</td>
+                    <td>End Time</td>
+                    <td>Source</td>
+                    <td>Origin</td>
+                    <td>Creation Date</td>
+                    <td>Schema</td>
+                    <td>Schema Namespace</td>
+                    <td>Schema Version</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="stepActivity in $ctrl.omhActivity.body">
+                    <td>{{stepActivity.body.step_count}}</td>
+                    <td>{{stepActivity.body.effective_time_frame.time_interval.start_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td><!--<td>{{stepActivity.body.effective_time_frame.time_interval.start_date_time}}</td>-->
+                    <td>{{stepActivity.body.effective_time_frame.time_interval.end_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td><!--<td>{{stepActivity.body.effective_time_frame.time_interval.end_date_time}}</td>-->
+                    <td>{{stepActivity.header.acquisition_provenance.source_name}}</td>
+                    <td>{{stepActivity.header.acquisition_provenance.source_origin_id}}</td>
+                    <td>{{stepActivity.header.creation_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td> <!--<td>{{stepActivity.header.creation_date_time}}</td>-->
+                    <td>{{stepActivity.header.schema_id.name}}</td>
+                    <td>{{stepActivity.header.schema_id.namespace}}</td>
+                    <td>{{stepActivity.header.schema_id.version}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<div ng-if="$ctrl.activityDocumentRef" class="container-fluid" id="activityResponse">
-    <div class="row">
-        <label>Resource Type: </label>{{$ctrl.activityResourceType}}
-    </div>
-    <div class="row">
-        <label>Data Type: </label>{{$ctrl.activityDataType}}
-    </div>
-
-    <div class="row">
-
+<div class="panel panel-default">
+    <div class="panel-heading"><a href="#" ng-click="$ctrl.toggleToolsVisibility()"><h2>Tools</h2></a></div>
+    <div class="panel-body" ng-if="$ctrl.toolsVisible == true">
+        <button class="btn btn-default" ng-click="$ctrl.queryActivity()">View step-count as FHIR STU3 DocumentReference</button>
+        <div ng-if="$ctrl.waitingForSearch" class="alert alert-info">
+            <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+            Retrieving step-count as STU3 Document Reference...
+        </div>
         <div class="panel panel-default" ng-if="$ctrl.activityDocumentRef" class="row">
             <div class="panel-heading observation-header" ng-click="$ctrl.toggleDocReferenceVisibility()">Steps as STU3 DocumentReference</div>
             <div class="panel-body" ng-if="$ctrl.docReferenceVisible == true">
@@ -51,48 +84,16 @@
             </div>
         </div>
 
-        <button class="btn btn-default" ng-click="$ctrl.queryBinary()" ng-disabled="$ctrl.disableBinaryQuery == true">Retrieve step-count in OMH format</button>
-
-        <div ng-if="$ctrl.waitingForData" class="alert alert-info">
+        <button class="btn btn-default" ng-click="$ctrl.queryObservation()">View step-count as FHIR STU3 Observation</button>
+        <div ng-if="$ctrl.waitingForObservationSearch" class="alert alert-info">
             <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-            Retrieving Activities...
+            Retrieving step-count as STU3 Observation...
         </div>
-
-        <div class="chart-container">
-            <h3 ng-if="$ctrl.omhActivity">Steps Per Day <small>(all step data points aggregated by day)</small></h3>
-            <svg class="chart">
-            </svg>
+        <div ng-if="$ctrl.observationResponse.length > 0" class="panel panel-default">
+            <div class="panel-heading observation-header" ng-click="$ctrl.toggleObservationVisibility()">Steps as STU3 Observations</div>
+            <div class="panel-body" ng-if="$ctrl.observationVisible == true">
+                <pre>{{$ctrl.observationResponse}}</pre>
+            </div>
         </div>
-
-        <h3 ng-if="$ctrl.omhActivity">All Step Data Points</h3>
-        <table ng-if="$ctrl.omhActivity" class="table table-striped">
-            <thead>
-            <tr>
-                <td>Step Count</td>
-                <td>Start Time</td>
-                <td>End Time</td>
-                <td>Source</td>
-                <td>Origin</td>
-                <td>Creation Date</td>
-                <td>Schema</td>
-                <td>Schema Namespace</td>
-                <td>Schema Version</td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="stepActivity in $ctrl.omhActivity.body">
-                <td>{{stepActivity.body.step_count}}</td>
-                <td>{{stepActivity.body.effective_time_frame.time_interval.start_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td><!--<td>{{stepActivity.body.effective_time_frame.time_interval.start_date_time}}</td>-->
-                <td>{{stepActivity.body.effective_time_frame.time_interval.end_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td><!--<td>{{stepActivity.body.effective_time_frame.time_interval.end_date_time}}</td>-->
-                <td>{{stepActivity.header.acquisition_provenance.source_name}}</td>
-                <td>{{stepActivity.header.acquisition_provenance.source_origin_id}}</td>
-                <td>{{stepActivity.header.creation_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td> <!--<td>{{stepActivity.header.creation_date_time}}</td>-->
-                <td>{{stepActivity.header.schema_id.name}}</td>
-                <td>{{stepActivity.header.schema_id.namespace}}</td>
-                <td>{{stepActivity.header.schema_id.version}}</td>
-            </tr>
-            </tbody>
-        </table>
-
     </div>
 </div>

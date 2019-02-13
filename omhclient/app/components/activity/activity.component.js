@@ -28,6 +28,9 @@ component('activity', {
         self.observationVisible = false;
         self.docReferenceVisible = false;
         self.startDateGap = 15;
+        self.showStepDataTable = false;
+        self.stepCountVisible = true;
+        self.toolsVisible = false;
 
         //===================================================================================
         // Variables for chart
@@ -99,6 +102,10 @@ component('activity', {
         // Functions
         //===================================================================================
 
+        self.retrieveStepCount = function retrieveStepCount(){
+            self.queryActivity;
+            self.queryBinary;
+        };
         self.queryActivity = function queryActivity(){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;
@@ -319,6 +326,17 @@ component('activity', {
         self.toggleDocReferenceVisibility = function toggleDocReferenceVisibility(){
             self.docReferenceVisible = !self.docReferenceVisible;
             console.log("Toggled DocReference Visibility to: " + self.docReferenceVisible);
+        };
+
+        self.toggleStepCountVisibility = function toggleStepCountVisibility(){
+            self.stepCountVisible = !self.stepCountVisible;
+        };
+        self.toggleToolsVisibility = function toggleToolsVisibility(){
+            self.toolsVisible = !self.toolsVisible;
+        };
+        self.toggleShowStepDataTable = function toggleShowStepDataTable(){
+            self.showStepDataTable = !self.showStepDataTable;
+            console.log("Toggled showStepDataTable to: " + self.showStepDataTable);
         };
 
         //===================================================================================
