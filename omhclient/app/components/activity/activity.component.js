@@ -103,10 +103,15 @@ component('activity', {
         //===================================================================================
 
         self.retrieveStepCount = function retrieveStepCount(){
-            self.queryActivity();
-            self.queryBinary();
+            console.log("Retrieve step count");
+            self.requestDocumentReference(true);
         };
         self.queryActivity = function queryActivity(){
+            console.log("Querying Action");
+            self.requestDocumentReference(false);
+        };
+
+        self.requestDocumentReference = function requestDocumentReference(requestBinary){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;
             self.activityDocumentRef = null;
@@ -149,6 +154,10 @@ component('activity', {
                     self.activityBinaryUrl = currDocRef.entry[0].resource.content[0].attachment.url;
                     self.waitingForSearch = false;
                     self.docReferenceVisible = true;
+                    if(requestBinary){
+                        console.log("Requesting Binary");
+                        self.queryBinary();
+                    }
                 });
         };
 

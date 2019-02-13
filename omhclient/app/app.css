@@ -27,3 +27,11 @@
 .observation-header {
   text-decoration: underline;
 }
+
+.omh-header {
+  background-image: url("img/omh_logo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 55px;
+  height: 55px;
+}
