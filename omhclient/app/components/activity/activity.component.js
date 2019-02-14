@@ -203,7 +203,7 @@ component('activity', {
                     //}
                     console.log("Processing Binary Response");
                     console.log(response);
-                    self.omhActivity = response.data; //to convert OmhActivity to JSON string use JSON.stringify(omhActivity)
+                    self.omhActivity = JSON.stringify(response.data, null, 2);
                     self.waitingForData = false;
                     self.disableBinaryQuery = true;
                     self.makeChart(self.omhActivity.body, d3.select('.chart-container'), "step_count", self.options);
@@ -324,7 +324,7 @@ component('activity', {
                     //}
                     console.log("Processing response");
                     //at the moment we are returning a single entry in the response
-                    self.observationResponse = JSON.stringify(response.data, null, 2);
+                    self.observationResponse = JSON.stringify(response.data, null, 2).substring(0,1000);
                     self.waitingForObservationSearch = false;
                     self.observationVisible = true;
                 });
