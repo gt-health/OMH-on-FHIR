@@ -14,6 +14,7 @@ component('activity', {
         self.waitingForSearch = false;
         self.waitingForObservationSearch = false;
         self.waitingForData = false;
+        self.waitingForGraph = false;
         self.startDate;
         self.endDate;
         self.shimmerId;
@@ -323,7 +324,7 @@ component('activity', {
                     //}
                     console.log("Processing response");
                     //at the moment we are returning a single entry in the response
-                    self.observationResponse = response.data; //JSON.stringify makes the JSON nice, but it's slow JSON.stringify(response.data, null, 2);
+                    self.observationResponse = JSON.stringify(response.data, null, 2);
                     self.waitingForObservationSearch = false;
                     self.observationVisible = true;
                 });
@@ -403,6 +404,7 @@ component('activity', {
 
         self.makeChart = function makeChart( data, element, measureList, configOptions ) {
             console.log("Making chart");
+            self.waitingForGraph = true;
             //if data is from shimmer, the points are in an array called 'body'
 
             if ( self.chart ){
@@ -428,6 +430,7 @@ component('activity', {
                 console.log("Could not initialize chart");
                 self.hideChart();
             }
+            self.waitingForGraph = false;
             console.log("Finished making chart");
         };
 

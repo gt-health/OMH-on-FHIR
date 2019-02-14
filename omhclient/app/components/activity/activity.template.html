@@ -22,7 +22,7 @@
             <button class="btn btn-default" ng-click="$ctrl.retrieveStepCount()">Search</button>
         </form>
 
-        <div ng-if="$ctrl.waitingForSearch" class="alert alert-info">
+        <div ng-if="$ctrl.waitingForSearch || $ctrl.waitingForGraph" class="alert alert-info">
             <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
             Searching for step count...
         </div>
@@ -77,13 +77,15 @@
         <div class="panel panel-default">
             <div class="panel-heading observation-header"><a href="#" ng-click="$ctrl.toggleDocReferenceVisibility()"><h4>Step Count as STU3 DocumentReference</h4></a></div>
             <div class="panel-body" ng-if="$ctrl.docReferenceVisible == true">
-                <pre>{{$ctrl.activityDocumentRef}}</pre>
+                <!--<pre>{{$ctrl.activityDocumentRef}}</pre>-->
+                {{$ctrl.activityDocumentRef}}
             </div>
         </div>
         <div class="panel panel-default">
             <div class="panel-heading observation-header"><a href="#" ng-click="$ctrl.toggleObservationVisibility()"><h4>Step Count as STU3 Observations</h4></a></div>
             <div class="panel-body" ng-if="$ctrl.observationVisible == true">
-                <pre>{{$ctrl.observationResponse}}</pre>
+                <!--<pre>{{$ctrl.observationResponse}}</pre>-->
+                {{$ctrl.observationResponse}}
             </div>
         </div>
     </div>
