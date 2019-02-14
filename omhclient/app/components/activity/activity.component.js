@@ -323,7 +323,7 @@ component('activity', {
                     //}
                     console.log("Processing response");
                     //at the moment we are returning a single entry in the response
-                    self.observationResponse = JSON.stringify(response.data, null, 2);
+                    self.observationResponse = response.data; //JSON.stringify makes the JSON nice, but it's slow JSON.stringify(response.data, null, 2);
                     self.waitingForObservationSearch = false;
                     self.observationVisible = true;
                 });
