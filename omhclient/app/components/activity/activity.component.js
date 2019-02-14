@@ -334,8 +334,7 @@ component('activity', {
 
         self.saveJsonObservation = function saveJsonObservation(){
             var fileName = "observation-step-count.json";
-            //self.saveJsonAsFile(fileName, angular.toJson(self.observationResponse, true));
-            self.saveJsonAsFile(fileName, self.observationResponse);
+            self.saveJsonAsFile(fileName, angular.toJson(self.observationResponse, true));
         };
 
         /*
