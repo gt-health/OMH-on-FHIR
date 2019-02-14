@@ -98,6 +98,11 @@ component('activity', {
         console.log("End Date " + self.endDate);
 
         //===================================================================================
+        // Handlers
+        //===================================================================================
+        $scope.$on('requestBinary', function(){ self.queryBinary(); });
+
+        //===================================================================================
         // Functions
         //===================================================================================
 
@@ -156,7 +161,7 @@ component('activity', {
                     self.docReferenceVisible = true;
                     if(requestBinary){
                         console.log("Requesting Binary");
-                        self.queryBinary();
+                        $scope.emit('requestBinary');
                     }
                 });
         };
