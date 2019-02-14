@@ -22,6 +22,9 @@
             <button class="btn btn-default" ng-click="$ctrl.retrieveStepCount()">Search</button>
         </form>
 
+        <p>{{$ctrl.waitingForSearch}}</p>
+        <p>{{$ctrl.waitingForGraph}}</p>
+
         <div ng-if="$ctrl.waitingForSearch || $ctrl.waitingForGraph" class="alert alert-info">
             <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
             Searching for step count...

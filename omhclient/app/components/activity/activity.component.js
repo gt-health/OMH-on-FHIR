@@ -12,8 +12,6 @@ component('activity', {
         console.log("Params passed to login");
         console.log($routeParams);
         self.waitingForSearch = false;
-        self.waitingForObservationSearch = false;
-        self.waitingForData = false;
         self.waitingForGraph = false;
         self.startDate;
         self.endDate;
@@ -23,7 +21,6 @@ component('activity', {
         self.activityDataType = "OMH JSON";
         self.activityBinaryUrl;
         self.omhActivity;
-        self.disableBinaryQuery = false;
         self.prunedObservationResponse = "";
         self.observationResponse = "";
         self.patientName;
@@ -120,7 +117,6 @@ component('activity', {
             self.waitingForSearch = true;
             self.activityDocumentRef = null;
             self.omhActivity = null;
-            self.disableBinaryQuery = false;
             self.omhOnFhirApi.requestDocumentReference(self.shimmerId, self.startDate, self.endDate)
                 .then(function(response){
                     console.log("Activity Response");
@@ -167,7 +163,6 @@ component('activity', {
 
         self.queryBinary = function queryBinary(){
             console.log("Querying binary " + self.activityBinaryUrl);
-            self.waitingForData = true;
             self.omhOnFhirApi.requestBinaryAsJson(self.activityBinaryUrl)
                 .then(function(response){
                     //sample response
@@ -205,8 +200,6 @@ component('activity', {
                     console.log("Processing Binary Response");
                     console.log(response);
                     self.omhActivity = response.data; //to convert OmhActivity to JSON string use JSON.stringify(omhActivity)
-                    self.waitingForData = false;
-                    self.disableBinaryQuery = true;
                     self.makeChart(self.omhActivity.body, d3.select('.chart-container'), "step_count", self.options);
                     console.log("processed response");
                 });
@@ -214,7 +207,6 @@ component('activity', {
 
         self.queryObservation = function queryObservation(){
             console.log("Querying Observation " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
-            self.waitingForObservationSearch = true;
             self.omhOnFhirApi.requestObservation(self.shimmerId, self.startDate, self.endDate)
                 .then(function(response){
                     console.log("Observation Response");
@@ -327,7 +319,6 @@ component('activity', {
                     //at the moment we are returning a single entry in the response
                     self.observationResponse = response.data;
                     self.prunedObservationResponse = JSON.stringify(self.observationResponse, null, 2).substring(0,1000);
-                    self.waitingForObservationSearch = false;
                     self.observationVisible = true;
                 });
         };
