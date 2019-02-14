@@ -27,7 +27,7 @@ component('activity', {
         self.patientName;
         self.observationVisible = false;
         self.docReferenceVisible = false;
-        self.startDateGap = 15;
+        self.startDateGap = 60;
         self.showStepDataTable = false;
         self.stepCountVisible = true;
         self.toolsVisible = false;
@@ -97,6 +97,9 @@ component('activity', {
         self.endDate = date;
         console.log("Start Date " + self.startDate);
         console.log("End Date " + self.endDate);
+
+        console.log("Loading last 60 days of data");
+        self.retrieveStepCount();
 
         //===================================================================================
         // Functions
