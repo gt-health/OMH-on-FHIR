@@ -103,7 +103,7 @@ component('activity', {
         $scope.$on('requestBinary', function(){ self.queryBinary(); });
 
         $scope.$on('$viewContentLoaded', function(event){
-            self.retrieveStepCount();
+            console.log("View Loaded");
         });
 
         //===================================================================================
