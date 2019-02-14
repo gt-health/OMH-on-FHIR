@@ -161,7 +161,7 @@ component('activity', {
                     self.docReferenceVisible = true;
                     if(requestBinary){
                         console.log("Requesting Binary");
-                        $scope.emit('requestBinary');
+                        $scope.$emit('requestBinary');
                     }
                 });
         };
