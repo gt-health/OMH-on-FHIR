@@ -27,14 +27,14 @@
             Searching for step count...
         </div>
 
-        <div ng-if="$ctrl.omhActivity">
+        <div>
             <div class="chart-container">
                 <svg class="chart">
                 </svg>
             </div>
 
-            <button class="btn btn-default" ng-if="$ctrl.showStepDataTable == false" ng-click="$ctrl.toggleShowStepDataTable()">Show Data Table</button>
-            <button class="btn btn-default" ng-if="$ctrl.showStepDataTable == true" ng-click="$ctrl.toggleShowStepDataTable()">Hide Data Table</button>
+            <button class="btn btn-default" ng-if="$ctrl.omhActivity && $ctrl.showStepDataTable == false" ng-click="$ctrl.toggleShowStepDataTable()">Show Data Table</button>
+            <button class="btn btn-default" ng-if="$ctrl.omhActivity && $ctrl.showStepDataTable == true" ng-click="$ctrl.toggleShowStepDataTable()">Hide Data Table</button>
 
             <h3 ng-if="$ctrl.showStepDataTable">All Step Data Points</h3>
             <table ng-if="$ctrl.showStepDataTable" class="table table-striped">
