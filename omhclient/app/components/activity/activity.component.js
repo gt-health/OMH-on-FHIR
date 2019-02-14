@@ -24,6 +24,7 @@ component('activity', {
         self.activityBinaryUrl;
         self.omhActivity;
         self.disableBinaryQuery = false;
+        self.prunedObservationResponse = "";
         self.observationResponse = "";
         self.patientName;
         self.observationVisible = false;
@@ -324,10 +325,52 @@ component('activity', {
                     //}
                     console.log("Processing response");
                     //at the moment we are returning a single entry in the response
-                    self.observationResponse = JSON.stringify(response.data, null, 2).substring(0,1000);
+                    self.observationResponse = response.data;
+                    self.prunedObservationResponse = JSON.stringify(self.observationResponse, null, 2).substring(0,1000);
                     self.waitingForObservationSearch = false;
                     self.observationVisible = true;
                 });
+        };
+
+        self.saveJsonObservation = function saveJsonObservation(){
+            var fileName = "observation-step-count.json";
+            //self.saveJsonAsFile(fileName, angular.toJson(self.observationResponse, true));
+            self.saveJsonAsFile(fileName, self.observationResponse);
+        };
+
+        /*
+         * Saves the passed in text to a file and saves it to the client machine.
+         * @param fileNameToSaveAs - the name to use for the file.
+         * @param textToWrite - the text to write to the file.
+         */
+        self.saveJsonAsFile = function (fileNameToSaveAs, textToWrite) {
+            /* Saves a text string as a blob file*/
+            var ie = navigator.userAgent.match(/MSIE\s([\d.]+)/),
+                ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/),
+                ieEDGE = navigator.userAgent.match(/Edge/g),
+                ieVer=(ie ? ie[1] : (ie11 ? 11 : (ieEDGE ? 12 : -1)));
+
+            if (ie && ieVer<10) {
+                console.log("No blobs on IE ver<10");
+                return;
+            }
+
+            var textFileAsBlob = new Blob([textToWrite], {
+                type: 'application/json;charset=utf-8'
+            });
+
+            if (ieVer>-1) {
+                window.navigator.msSaveBlob(textFileAsBlob, fileNameToSaveAs);
+
+            } else {
+                var downloadLink = document.createElement("a");
+                downloadLink.download = fileNameToSaveAs;
+                downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+                downloadLink.onclick = function(e) { document.body.removeChild(e.target); };
+                downloadLink.style.display = "none";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+            }
         };
 
         self.toggleObservationVisibility = function toggleObservationVisibility(){

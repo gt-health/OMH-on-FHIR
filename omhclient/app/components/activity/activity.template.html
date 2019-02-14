@@ -77,16 +77,15 @@
         <div class="panel panel-default">
             <div class="panel-heading observation-header"><a href="#" ng-click="$ctrl.toggleDocReferenceVisibility()"><h4>Step Count as STU3 DocumentReference</h4></a></div>
             <div class="panel-body" ng-if="$ctrl.docReferenceVisible == true">
-                <!--<pre>{{$ctrl.activityDocumentRef}}</pre>-->
-                {{$ctrl.activityDocumentRef}}
+                <pre>{{$ctrl.activityDocumentRef}}</pre>
             </div>
         </div>
         <div class="panel panel-default">
             <div class="panel-heading observation-header"><a href="#" ng-click="$ctrl.toggleObservationVisibility()"><h4>Step Count as STU3 Observations</h4></a></div>
             <div class="panel-body" ng-if="$ctrl.observationVisible == true">
-                <!--<pre>{{$ctrl.observationResponse}}</pre>-->
-                {{$ctrl.observationResponse}}
+                <pre>{{$ctrl.prunedObservationResponse}}</pre>
             </div>
+            <button class="btn btn-default" ng-click="$ctrl.saveJsonObservation()">Download Entire Observation</button>
         </div>
     </div>
 </div>
