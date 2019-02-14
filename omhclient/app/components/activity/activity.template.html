@@ -72,27 +72,16 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-heading"><a href="#" ng-click="$ctrl.toggleToolsVisibility()"><h2>Tools<small>to view message details</small></h2></a></div>
+    <div class="panel-heading"><a href="#" ng-click="$ctrl.toggleToolsVisibility()"><h2>Tools <small>to view message details</small></h2></a></div>
     <div class="panel-body" ng-if="$ctrl.toolsVisible == true">
-        <button class="btn btn-default" ng-click="$ctrl.queryActivity()">View step-count as FHIR STU3 DocumentReference</button>
-        <div ng-if="$ctrl.waitingForSearch" class="alert alert-info">
-            <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-            Retrieving step-count as STU3 Document Reference...
-        </div>
         <div class="panel panel-default" ng-if="$ctrl.activityDocumentRef" class="row">
-            <div class="panel-heading observation-header"><a href="#" ng-click="$ctrl.toggleDocReferenceVisibility()"><h3>Steps as STU3 DocumentReference</h3></a></div>
+            <div class="panel-heading observation-header"><a href="#" ng-click="$ctrl.toggleDocReferenceVisibility()"><h4>Step Count as STU3 DocumentReference</h4></a></div>
             <div class="panel-body" ng-if="$ctrl.docReferenceVisible == true">
                 <pre>{{$ctrl.activityDocumentRef}}</pre>
             </div>
         </div>
-
-        <button class="btn btn-default" ng-click="$ctrl.queryObservation()">View step-count as FHIR STU3 Observation</button>
-        <div ng-if="$ctrl.waitingForObservationSearch" class="alert alert-info">
-            <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-            Retrieving step-count as STU3 Observation...
-        </div>
         <div ng-if="$ctrl.observationResponse.length > 0" class="panel panel-default">
-            <div class="panel-heading observation-header"><a href="#" ng-click="$ctrl.toggleObservationVisibility()"><h3>Steps as STU3 Observations</h3></a></div>
+            <div class="panel-heading observation-header"><a href="#" ng-click="$ctrl.toggleObservationVisibility()"><h4>Step Count as STU3 Observations</h4></a></div>
             <div class="panel-body" ng-if="$ctrl.observationVisible == true">
                 <pre>{{$ctrl.observationResponse}}</pre>
             </div>

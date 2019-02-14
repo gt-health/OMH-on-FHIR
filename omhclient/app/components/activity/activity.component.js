@@ -105,6 +105,8 @@ component('activity', {
         self.retrieveStepCount = function retrieveStepCount(){
             console.log("Retrieve step count");
             self.requestDocumentReference(true);
+            //go ahead and get the data as an observation as well
+            self.queryObservation;
         };
         self.queryActivity = function queryActivity(){
             console.log("Querying Action");
