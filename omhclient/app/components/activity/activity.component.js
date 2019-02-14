@@ -113,9 +113,6 @@ component('activity', {
             self.requestDocumentReference(false);
         };
 
-        console.log("Loading last 60 days of data");
-        self.retrieveStepCount();
-
         self.requestDocumentReference = function requestDocumentReference(requestBinary){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;
