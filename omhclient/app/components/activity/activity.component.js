@@ -207,7 +207,7 @@ component('activity', {
                     self.omhActivity = JSON.stringify(response.data, null, 2);
                     self.waitingForData = false;
                     self.disableBinaryQuery = true;
-                    self.makeChart(self.omhActivity.body, d3.select('.chart-container'), "step_count", self.options);
+                    self.makeChart(response.data.body, d3.select('.chart-container'), "step_count", self.options);
                     console.log("processed response");
                 });
         };
