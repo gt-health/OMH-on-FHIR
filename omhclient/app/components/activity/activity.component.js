@@ -107,6 +107,10 @@ component('activity', {
             self.retrieveStepCount();
         };
 
+        self.$onChanges = function(changesObj){
+            console.log("Something changed");
+            console.log(changesObj);
+        };
 
         //===================================================================================
         // Functions
