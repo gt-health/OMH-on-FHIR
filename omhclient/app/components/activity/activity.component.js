@@ -102,20 +102,8 @@ component('activity', {
         //===================================================================================
         $scope.$on('requestBinary', function(){ self.queryBinary(); });
 
-        $scope.$on('$viewContentLoaded', function(event){
-            console.log("View Loaded");
-        });
-
-        $scope.init = function(){
-          console.log("INITIALIZING");
-        };
-
-        $window.onload = function(){
-            console.log("WINDOW LOADED");
-        };
-
+        //initialize graph in UI
         self.$onInit = function(){
-            console.log("WINDOW INITIALIZED");
             self.retrieveStepCount();
         };
 
