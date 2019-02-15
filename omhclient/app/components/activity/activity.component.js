@@ -114,6 +114,12 @@ component('activity', {
             console.log("WINDOW LOADED");
         };
 
+        self.$onInit = function(){
+            console.log("WINDOW INITIALIZED");
+            self.retrieveStepCount();
+        };
+
+
         //===================================================================================
         // Functions
         //===================================================================================
