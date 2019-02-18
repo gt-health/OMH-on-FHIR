@@ -2,6 +2,12 @@
 pipeline{
     agent any
 
+    environment {
+        GTRI_IMAGE_REGISTRY = credentials('gtri-image-registry-url')
+        GTRI_RANCHER_API_ENDPOINT = credentials('gtri-rancher-api-endpoint')
+        GTRI_HDAP_ENV_ID = credentials('gtri-hdap-env-id')
+    }
+
     //Define stages for the build process
     stages{
         //Define the deploy stage
@@ -13,7 +19,7 @@ pipeline{
                 //element. The script below registers the HDAP Docker registry with the Docker instance used by
                 //the Jenkins Pipeline, builds a Docker image of the project, and pushes it to the registry.
                 script{
-                    docker.withRegistry('https://gt-build.hdap.gatech.edu'){
+                    docker.withRegistry("${GTRI_IMAGE_REGISTRY}"){
                         //Build and push the database image
                         def webApiImage = docker.build("omhonfhirapp:1.0", "--no-cache -f ./omhserver/Dockerfile ./omhserver")
                         webApiImage.push('latest')
