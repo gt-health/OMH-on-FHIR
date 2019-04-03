@@ -37,6 +37,7 @@ The following environment variables need to be set for the containers
 | OPENMHEALTH_SHIM_GOOGLEFIT_CLIENT_ID | Client ID for Shimmer to use for Google Fit authentication |
 | OPENMHEALTH_SHIM_GOOGLEFIT_CLIENT_SECRET | Client secret for Shimmer to use for Google Fit authentication |
 
+For run time they can be set in the ./shimmer-resource-server.env file or explicitly in a Dockerfile or docker-compose.yml
 ### mongo
 none
 
@@ -51,6 +52,8 @@ none
 | POSTGRES_USER | The name of the database user |
 | POSTGRES_PASSWORD | The password for the database user |
 
+For run time they can be set in the ./omhserver/postgres.env file or explicitly in a Dockerfile or docker-compose.yml
+
 ### mdata-app
 
 | Variable | Description |
@@ -59,6 +62,8 @@ none
 | SHIMMER_REDIRECT_URL | The redirect URL to pass to the Shimmer API. It contains the URL to the mdata-app /authorize/fitbit/callback endpoint that handles successful user authentication. Shimmer only redirects to this URL after successful authentication.  |
 | OMH_ON_FHIR_CALLBACK | The URL to the OMH on FHIR UI application to use after successful Shimmer authentication.  |
 | OMH_ON_FHIR_LOGIN | The URL to the user interface that handles login to Fitbit and Google fit. |
+
+For run time they can be set in the ./omhserver/omh-server.env file or explicitly in a Dockerfile or docker-compose.yml
 
 ### omh-on-fhir-client
 none
@@ -79,3 +84,7 @@ If the start date uses a prefix it must be `ge`. If the end date uses a prefix i
 Swagger is used to document the endpoints made available by the mdata-app. Use the following URLs to view details on the web service endpoints.
 - *JSON* - <server_dns_name>/mdata/v2/api-docs
 - *UI* - <server_dns_name>/mdata/swagger-ui.html#/
+
+## Reference Deployment
+A reference deployment of the application can be found here: https://launch.smarthealthit.org/?auth_error=&fhir_version_1=r2&fhir_version_2=r3&iss=&launch_ehr=1&launch_url=https%3A%2F%2Fapps.hdap.gatech.edu%2Fomhonfhir%2Flaunch&patient=&prov_skip_auth=1&provider=&pt_skip_auth=1&pt_skip_login=0&public_key=&sb=&sde=&sim_ehr=1&token_lifetime=15&user_pt=undefined
+It uses the SMART Application Launcher to simulate an EHR launch.
