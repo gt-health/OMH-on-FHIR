@@ -19,12 +19,14 @@ public class ResourceConfig {
     @Column(name="resourceId")
     private String resourceId;
 
-//    @Type(type="jsonb")
     @Column(name="config")
     private String config;
 
-    private final Logger logger = LoggerFactory.getLogger(ResourceConfig.class);
     private ObjectMapper mapper = new ObjectMapper();
+
+    /*========================================================================*/
+    /* Constructors */
+    /*========================================================================*/
 
     public ResourceConfig() {
     }
@@ -34,23 +36,29 @@ public class ResourceConfig {
         this.config = config.toString();
     }
 
+    /*========================================================================*/
+    /* Getters */
+    /*========================================================================*/
+
     public String getResourceName() {
         return resourceId;
-    }
-
-    public void setResourceName(String resourceId) {
-        this.resourceId = resourceId;
     }
 
     public JsonNode getConfig() {
         try {
             return mapper.readTree(this.config);
         } catch (IOException e) {
-            System.err.println("Failed to parse json when retrieving resource config for resource :" + this.resourceId);
-            System.err.println(this.config);
             e.printStackTrace();
             return null;
         }
+    }
+
+    /*========================================================================*/
+    /* Setters */
+    /*========================================================================*/
+
+    public void setResourceName(String resourceId) {
+        this.resourceId = resourceId;
     }
 
     public void setConfig(JsonNode config) {
