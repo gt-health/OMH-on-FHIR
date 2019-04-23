@@ -32,3 +32,6 @@ shimmer-resource-server.env
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### Vim ###
+*.swp

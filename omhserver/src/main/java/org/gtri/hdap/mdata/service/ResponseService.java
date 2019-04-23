@@ -2,10 +2,13 @@ package org.gtri.hdap.mdata.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
+import org.gtri.hdap.mdata.jpa.entity.ResourceConfig;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
+import org.gtri.hdap.mdata.jpa.repository.ResourceConfigRepository;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
 import org.gtri.hdap.mdata.util.ShimmerUtil;
 import org.hl7.fhir.dstu3.model.*;
@@ -18,6 +21,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by es130 on 9/14/2018.
@@ -43,6 +48,8 @@ public class ResponseService {
     private ApplicationUserRepository applicationUserRepository;
     @Autowired
     private ShimmerDataRepository shimmerDataRepository;
+    @Autowired
+    private ResourceConfigRepository resourceConfigRepository;
     private final Logger logger = LoggerFactory.getLogger(ResponseService.class);
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private SimpleDateFormat sdfNoMilli = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -77,6 +84,55 @@ public class ResponseService {
             documentReference.setContent(documentContent);
         }
         return documentReference;
+    }
+
+    private JsonNode injectValues(JsonNode obj, JsonNode omhResponse, JsonNode meta) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        if (obj.isObject()) {
+            Iterator<JsonNode> i = obj.elements();
+            while (i.hasNext()) {
+                injectValues(i.next(), omhResponse, meta);
+                return obj;
+            }
+        } else if (obj.isArray()) {
+            for (final JsonNode arrayMem : obj) {
+                injectValues(arrayMem, omhResponse, meta);
+                return obj;
+            }
+        } else if (obj.isTextual()) {
+            // base case, value injection
+            Pattern p = Pattern.compile("\\$\\{(.*)\\}");
+            Matcher m = p.matcher(obj.get("value").asText());
+            if (m.matches()) {
+                String key[] = m.group(1).split(".");
+                JsonNode source;
+                // resolve the source object to inject from
+                if (key[0].equals("OmhDataPoint")) {
+                    source = omhResponse;
+                } else if (key[0].equals("meta")) {
+                    source = meta;
+                } else {
+                    throw new IOException(
+                            "Malformed template path: {" + String.join(".", key) + "}. Root node must be either \"meta\" or \"OmhDataPoint\""
+                    );
+                }
+                // resolve the rest of the value path
+                for (int i = 1; i < key.length; i++) {
+                    source = source.get(key[i]);
+                    if (source == null) {
+                        throw new IOException(
+                                "Malformed template path: {" + String.join(".", key) + "}. Child node " + key[i] + " not found."
+                        );
+                    } else {
+                        continue;
+                    }
+                }
+                ((ObjectNode)obj).set(obj.get("key").asText(), source.get("value"));
+            }
+        }
+        //not object, not array, not string
+        //ignore and return object
+        return obj;
     }
 
     public List<Resource> generateObservationList(String shimKey, String jsonResponse) throws IOException {
@@ -126,6 +182,125 @@ public class ResponseService {
             logger.debug("Looking at json node");
             logger.debug(omhStepCount.toString());
             observation = generateObservation(shimKey, timestamp, omhStepCount);
+            observationList.add(observation);
+        }
+        return observationList;
+    }
+
+    public List<Resource> generateObservationList2(String shimKey, String omhResponse, String resourceConfig) throws IOException {
+        //OMH Response
+        //{
+        //    "shim": "googlefit",
+        //    "timeStamp": 1534251049,
+        //    "body": [
+        //    {
+        //        "header": {
+        //            "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee",
+        //            "creation_date_time": "2018-08-14T12:50:49.383Z",
+        //            "acquisition_provenance": {
+        //                "source_name": "some application",
+        //                "source_origin_id": "some device"
+        //            },
+        //            "schema_id": {
+        //                "namespace": "omh",
+        //                "name": "step-count",
+        //                "version": "2.0"
+        //            }
+        //        },
+        //        "body": {
+        //            "effective_time_frame": {
+        //                "time_interval": {
+        //                    "start_date_time": "2018-08-14T00:00:17.805Z",
+        //                    "end_date_time": "2018-08-14T00:01:17.805Z"
+        //                }
+        //            },
+        //            "step_count": 7
+        //        }
+        //    },
+        // ...
+        //    ]
+        //}
+        //*****************************************************
+        //FHIR Config (template)
+        //{
+        //    "shimKeys" : ["fitbit"],
+        //    "mapping" : {
+        //    "resourceType" : "Observation",
+        //            "id" : "${meta.id}",
+        //            "meta" : {
+        //        "profile" : ["http://www.fhir.org/mfhir/StructureDefinition/omh_fhir_profile_quantitative_observation"]
+        //    },
+        //    "identifier" : [
+        //    {
+        //        "system" : "https://omh.org/shimmer/ids",
+        //            "value" : "${OmhDataPoint.header.id}"
+        //    }
+        //],
+        //    "status" : "unknown",
+        //            "category" : [
+        //    {
+        //        "coding" : [
+        //        {
+        //            "system" : "http://hl7.org/fhir/observation-category",
+        //                "code" : "physical-activity",
+        //                "display" : "Physical Activity"
+        //        }
+        //        ]
+        //    }
+        //],
+        //    "code" : {
+        //        "coding" : [
+        //        {
+        //            "system" : "http://loinc.org",
+        //                "code" : "55423-8",
+        //                "display" : "Number of steps in unspecified time."
+        //        }
+        //    ]
+        //    },
+        //    "subject" : {
+        //        "identifier" : {
+        //            "system" : "https://omh.org/shimmer/patient_ids",
+        //                    "value" : "${OmhDataPoint.header.user_id}"
+        //        }
+        //    },
+        //    "effectiveDateTime" : "${OmhDataPoint.body.effective_time_frame.date_time}",
+        //            "effectivePeriod" : {
+        //        "start" : "${OmhDataPoint.body.effective_time_frame.start_date_time}",
+        //                "end" : "${OmhDataPoint.body.effective_time_frame.end_date_time}"
+        //    },
+        //    "issued" : "${OmhDataPoint.header.creation_date_time}",
+        //            "valueQuantity" : {
+        //        "value" : "${OmhDataPoint.body.stepCount}",
+        //                "unit" : "steps",
+        //                "system" : "http://unitsofmeasure.org",
+        //                "code" : "{steps}"
+        //    },
+        //    "comment" : "${OmhDataPoint.body.user_notes}",
+        //            "device" : {
+        //        "display" : "${OmhDataPoint.header.acquisition_provenance.modality}"
+        //    }
+
+        //},
+        //    "meta" : {
+        //    "resourceId" : "stepcount-example-1"
+        //    }
+        //}
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode omhJsonNode = objectMapper.readTree(omhResponse);
+        JsonNode fhirJsonNode = objectMapper.readTree(resourceConfig).get("mapping");
+        JsonNode metaJsonNode = objectMapper.readTree(resourceConfig).get("meta");
+        List<Resource> observationList = new ArrayList<Resource>();
+        Observation observation;
+
+        logger.debug("Looking through JSON nodes");
+        long timestamp = omhJsonNode.get("timeStamp").asLong();
+        logger.debug("timestamp: " + timestamp);
+
+        for( JsonNode omhStepCount : omhJsonNode.get("body")){
+            logger.debug("Looking at json node");
+            logger.debug(omhStepCount.toString());
+            observation = generateObservation2(shimKey, timestamp, omhStepCount);
             observationList.add(observation);
         }
         return observationList;
@@ -215,6 +390,20 @@ public class ResponseService {
         componentList.add(occ);
         observation.setComponent(componentList);
         return observation;
+    }
+
+    public Observation generateObservation2(String shimKey, long timestamp, JsonNode omhData){
+        //get template based on shim key
+        JsonNode config = resourceConfigRepository.findOneByResourceId(shimKey).getConfig();
+        logger.debug("Getting omh data body");
+        JsonNode body = omhData.get("body");
+        logger.debug("Done.");
+        logger.debug("Getting omh data header");
+        JsonNode header = omhData.get("header");
+        logger.debug("Done.");
+        //transform template into observation object
+        //return that observation object
+        return null;
     }
 
     public Patient generatePatient(String shimKey){

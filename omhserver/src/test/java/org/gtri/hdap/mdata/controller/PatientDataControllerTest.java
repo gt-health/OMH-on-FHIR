@@ -99,6 +99,12 @@ public class PatientDataControllerTest {
         logger.debug("========== Exiting getFindDocumentReference ==========");
     }
 
+    @Test
+    public void testGenerateObservationWithConfiguration() {
+        logger.debug("========== Entering testObservationWithConfiguration ==========");
+
+    }
+
     private List<String> createDateList(String startDate, String endDate){
         List<String> validQueryDates = new ArrayList<String>();
         if(startDate != null) {

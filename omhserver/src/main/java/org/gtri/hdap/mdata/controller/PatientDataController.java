@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
+import org.gtri.hdap.mdata.jpa.entity.ResourceConfig;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
@@ -213,6 +214,39 @@ public class PatientDataController {
         List<Resource> observations;
         try {
             observations = responseService.generateObservationList(shimKey, shimmerResponse.getResponseData());
+        }
+        catch(IOException ioe){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not generate observation.");
+        }
+
+        Bundle responseBundle = responseService.makeBundle(observations);
+        return ResponseEntity.ok(responseBundle);
+    }
+
+    @ApiOperation(value="Retrieve an Observation with OMH data using a resource type configuration.")
+    @GetMapping(value="/Observation2", consumes={"application/json"})
+    public ResponseEntity findObservation2(@RequestParam(name="subject", required=true) String shimmerId,
+                                          @RequestParam(name="date") List<String> dateQueries, @RequestBody JsonNode config){
+        ResourceConfig resourceConfig = new ResourceConfig();
+
+        logger.debug("processing observation request");
+        //look up the user
+        ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
+        String shimKey = applicationUser.getApplicationUserId().getShimKey();
+
+        ShimmerResponse shimmerResponse;
+        //parse start and end dates
+        shimmerResponse = shimmerService.retrieveShimmerData(ShimmerService.SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
+        if( shimmerResponse.getResponseCode() != HttpStatus.OK.value()){
+            return ResponseEntity.status(shimmerResponse.getResponseCode()).body(shimmerResponse.getResponseData());
+        }
+
+        //generateObservationList
+        List<Resource> observations;
+        try {
+            observations = responseService.generateObservationList2(
+                shimKey, shimmerResponse.getResponseData(), config.toString()
+            );
         }
         catch(IOException ioe){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not generate observation.");
