@@ -5,8 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-@Component
-@Repository
+@Component("resourceConfigRepository")
 public interface ResourceConfigRepository extends JpaRepository<ResourceConfig, String> {
     ResourceConfig findOneByResourceId(String resourceId);
 }
