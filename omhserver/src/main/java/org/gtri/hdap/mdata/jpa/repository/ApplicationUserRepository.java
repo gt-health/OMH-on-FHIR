@@ -4,8 +4,6 @@ import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 /**
  * Created by es130 on 7/9/2018.
  */

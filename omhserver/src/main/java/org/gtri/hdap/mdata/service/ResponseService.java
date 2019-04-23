@@ -48,7 +48,7 @@ public class ResponseService {
     private ApplicationUserRepository applicationUserRepository;
     @Autowired
     private ShimmerDataRepository shimmerDataRepository;
-    @Autowired()
+    @Autowired
     private ResourceConfigRepository resourceConfigRepository;
     private final Logger logger = LoggerFactory.getLogger(ResponseService.class);
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");

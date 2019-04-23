@@ -6,6 +6,7 @@ import org.gtri.hdap.mdata.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.jpa.entity.ApplicationUserId;
 import org.gtri.hdap.mdata.jpa.entity.ShimmerData;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
+import org.gtri.hdap.mdata.jpa.repository.ResourceConfigRepository;
 import org.gtri.hdap.mdata.jpa.repository.ShimmerDataRepository;
 import org.gtri.hdap.mdata.util.ShimmerUtil;
 import org.hl7.fhir.dstu3.model.DocumentReference;
@@ -49,6 +50,8 @@ public class ResponseServiceTest {
 
     @MockBean
     private ApplicationUserRepository applicationUserRepository;
+    @MockBean
+    private ResourceConfigRepository resourceConfigRepository;
     @MockBean
     private ShimmerDataRepository shimmerDataRepository;
 
