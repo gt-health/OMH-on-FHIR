@@ -17,10 +17,8 @@ public class ResourceConfig {
     @Column(name="resourceId")
     private String resourceId;
 
-    @Column(name="config")
+    @Column(name="config", columnDefinition="TEXT")
     private String config;
-
-    private ObjectMapper mapper = new ObjectMapper();
 
     /*========================================================================*/
     /* Constructors */
@@ -43,6 +41,7 @@ public class ResourceConfig {
     }
 
     public JsonNode getConfig() {
+        ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readTree(this.config);
         } catch (IOException e) {

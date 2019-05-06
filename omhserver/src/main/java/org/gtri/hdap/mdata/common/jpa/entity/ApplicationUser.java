@@ -51,6 +51,6 @@ public class ApplicationUser {
 
     @Override
     public String toString(){
-        return String.format("ApplicationUser ehrId: '%s', shimmerId: '%s', shimKey: '%s', is logged in: '%s'", applicationUserId.getEhrId(), shimmerId, getApplicationUserId().getShimKey());
+        return String.format("ApplicationUser ehrId: '%s', shimmerId: '%s', shimKey: '%s'", applicationUserId.getEhrId(), shimmerId, getApplicationUserId().getShimKey());
     }
 }

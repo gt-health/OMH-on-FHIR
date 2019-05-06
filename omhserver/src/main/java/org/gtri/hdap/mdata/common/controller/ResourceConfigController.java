@@ -56,7 +56,7 @@ public class ResourceConfigController {
 
     @GetMapping("/{resourceId}")
     public ResponseEntity<ResourceConfig> getConfiguration(
-            @RequestParam("resourceId") String resourceId
+            @PathVariable("resourceId") String resourceId
     ) {
         ResourceConfig rc = rcRepo.findOneByResourceId(resourceId);
         if (rc == null) {
@@ -67,7 +67,7 @@ public class ResourceConfigController {
 
     @PutMapping(path = "/{resourceId}", produces = "application/json")
     public ResponseEntity<String> pushConfiguration(
-            @RequestParam("resourceId") String resourceId,
+            @PathVariable("resourceId") String resourceId,
             @RequestBody JsonNode configObj
     ) {
         ResourceConfig rc = new ResourceConfig(resourceId, configObj);
@@ -78,7 +78,7 @@ public class ResourceConfigController {
 
     @DeleteMapping("/{resourceId}")
     public ResponseEntity<String> deleteConfiguration(
-            @RequestParam("resourceId") String resourceId
+            @PathVariable("resourceId") String resourceId
     ) {
         try {
             rcRepo.deleteById(resourceId);

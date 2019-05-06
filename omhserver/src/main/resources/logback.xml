@@ -13,7 +13,9 @@
     <logger name="org.gtri.hdap.mdata.dstu3.controller" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.common.conf" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.common.jackson" level="DEBUG"/>
-    <logger name="org.gtri.hdap.mdata.dstu3.controller.Dstu3PatientDataController" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.dstu3.controller.Dstu3PatientDataController" level="TRACE"/>
+    <logger name=" org.gtri.hdap.mdata.dstu3.service.Dstu3ResponseService" level="TRACE"/>
+    <logger name="org.gtri.hdap.mdata.InitDatabase" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.common.jpa" level="DEBUG"/>
 
     <root level="ERROR">

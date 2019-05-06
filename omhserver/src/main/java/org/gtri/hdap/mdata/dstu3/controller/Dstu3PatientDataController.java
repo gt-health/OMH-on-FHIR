@@ -82,13 +82,16 @@ public class Dstu3PatientDataController {
         @RequestParam(name="shimkey", required=true) String shimkey,
         BindingResult bindingResult
     ){
+        logger.debug("Entering method authenticateWithShimmer");
         logger.debug("Trying to connect to " + shimkey + " API");
         // Make a request to http://<shimmer-host>:8083/authorize/{shimKey}?username={userId}
         // The shimKey path parameter should be one of the keys listed below, e.g. fitbit
         // for example https://gt-apps.hdap.gatech.edu:8083/authorize/fitbit?username={userId}
         // The username query parameter can be set to any unique identifier you'd like to use to identify the user.
 
+        logger.debug("calling getShimmerId");
         String userShimmerId = dstu3ResponseService.getShimmerId(ehrId, shimkey);
+        logger.debug("called getShimmerId");
         //add the shimmer id to the model
         model.addAttribute("shimmerId", userShimmerId);
 
@@ -200,13 +203,24 @@ public class Dstu3PatientDataController {
     ) {
         //Get the config for step_count
         ResourceConfig resourceConfig = resourceConfigRepository.findOneByResourceId(resourceId);
-        logger.debug("Processing observation request...");
-        //look up the userhttps://www.youtube.com/watch?v=ot3z7mrFLbs
         ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
+        if (resourceConfig == null) {
+            logger.error("Mapping config with ID: " + resourceId + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else if (applicationUser == null) {
+            logger.error("Application user with ID: " + shimmerId + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        logger.debug("Processing observation request...");
+        //look up the user
         String shimKey = applicationUser.getApplicationUserId().getShimKey();
 
         ShimmerResponse shimmerResponse;
         //parse start and end dates
+        logger.debug("Printing out application user:");
+        logger.debug(applicationUser.toString());
+        logger.debug("Printing out date queries:");
+        logger.debug(dateQueries.toString());
         shimmerResponse = shimmerService.retrieveShimmerData(ShimmerService.SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
         if( shimmerResponse.getResponseCode() != HttpStatus.OK.value()){
             logger.error("Shimmer service returned " + shimmerResponse.getResponseCode());

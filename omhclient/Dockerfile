@@ -15,7 +15,7 @@ COPY . /usr/local/app
 #RUN npm install
 # install bower and then install the project
 #RUN ls -la /usr/local/app
-RUN npm install && npm install -g bower && bower install --allow-root omh-web-visualizations
+RUN npm install && npm update && npm install -g bower && bower install --allow-root omh-web-visualizations
 
 # copy over project
 #COPY . /usr/local/app
