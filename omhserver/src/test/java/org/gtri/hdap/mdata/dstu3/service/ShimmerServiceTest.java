@@ -141,6 +141,16 @@ public class ShimmerServiceTest {
             assertTrue(e.getMessage().equals("Unsupported FHIR date prefix only GE and LE are supported."));
         }
 
+        logger.debug("Testing invalid date range; more than 3 years.");
+        validQueryDates = createDateList("2015-06-01", "2019-05-01");
+        try {
+            dateMap = shimmerService.parseDateQueries(validQueryDates);
+        } catch (Exception e) {
+            assertTrue(e.getMessage().equals(
+                "Dates are invalid. Ensure start date is before end date, and time margin is smaller than 3 years."
+            ));
+        }
+
         logger.debug("Testing too many dates");
         validQueryDates = createDateList("2018-06-01", "ge2018-07-01");
         validQueryDates.addAll(createDateList("2018-08-01", "ge2018-09-01"));

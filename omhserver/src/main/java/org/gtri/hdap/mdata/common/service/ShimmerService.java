@@ -25,8 +25,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.time.temporal.ChronoField.YEAR;
 
 /**
  * Created by es130 on 7/19/2018.
@@ -160,9 +163,8 @@ public class ShimmerService {
                 Map<String, LocalDate> dates = parseDateQueries(dateQueries);
                 startDate = dates.get(START_DATE_KEY);
                 endDate = dates.get(END_DATE_KEY);
-            }
-            catch(UnsupportedFhirDatePrefixException ufdpe){
-                String errorResponse = "{\"status\":" + HttpStatus.SC_BAD_REQUEST + ",\"exception\":\"" + ufdpe.getMessage() + "\"}";
+            } catch(Exception e) {
+                String errorResponse = "{\"status\":" + HttpStatus.SC_BAD_REQUEST + ",\"exception\":\"" + e.getMessage() + "\"}";
                 return new ShimmerResponse(HttpStatus.SC_BAD_REQUEST, errorResponse);
             }
         }
@@ -182,7 +184,17 @@ public class ShimmerService {
         return shimmerResponse;
     }
 
-    public Map<String, LocalDate> parseDateQueries(List<String> dateQueries) throws UnsupportedFhirDatePrefixException{
+    public boolean datesValid(LocalDate start, LocalDate end) {
+        if (start.compareTo(end) > 0) {
+            return false;
+        }
+        if (start.until(end, ChronoUnit.YEARS) >= 3) {
+            return false;
+        }
+        return true;
+    }
+
+    public Map<String, LocalDate> parseDateQueries(List<String> dateQueries) throws Exception{
         LocalDate startDate = null;
         LocalDate endDate = null;
         //if more than two dates throw an error
@@ -200,6 +212,12 @@ public class ShimmerService {
                 endDate = LocalDate.parse(dateParams.get(1).getValueAsString());
                 if(dateParams.get(1).getPrefix() != null && dateParams.get(1).getPrefix() != ParamPrefixEnum.LESSTHAN_OR_EQUALS){
                     throw new UnsupportedFhirDatePrefixException("Unsupported FHIR date prefix only LE is supported for end dates.");
+                }
+                // validate dates queries
+                if (!datesValid(startDate, endDate)) {
+                    throw new ShimmerQueryParsingException(
+                        "Dates are invalid. Ensure start date is before end date, and time margin is smaller than 3 years."
+                    );
                 }
             }//end if(dateParams.size() == 2)
 
