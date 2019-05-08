@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import org.gtri.hdap.mdata.common.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.common.jpa.entity.ResourceConfig;
 import org.gtri.hdap.mdata.common.jpa.repository.ApplicationUserRepository;
+import org.gtri.hdap.mdata.common.jpa.repository.FhirTemplateRepository;
 import org.gtri.hdap.mdata.common.jpa.repository.ResourceConfigRepository;
 import org.gtri.hdap.mdata.common.jpa.repository.ShimmerDataRepository;
 import org.gtri.hdap.mdata.dstu3.service.Dstu3ResponseService;
@@ -50,6 +51,8 @@ public class Dstu3PatientDataController {
     private ShimmerDataRepository shimmerDataRepository;
     @Autowired
     private ResourceConfigRepository resourceConfigRepository;
+    @Autowired
+    private FhirTemplateRepository fhirTemplateRepository;
 
 
     @ModelAttribute("shimmerId")
