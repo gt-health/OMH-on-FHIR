@@ -100,11 +100,11 @@ public class Dstu3ResponseService {
         ArrayNode omhPatches = (ArrayNode)configJson.at("/patches/omh");
         ArrayNode otherPatches = (ArrayNode)configJson.at("/patches/other");
         ArrayNode omhDatapoints = (ArrayNode)omhResponse.get("body");
+        FhirTemplate fhirTemplate = fhirTemplateRepository.findOneByTemplateId(configJson.at("/fhirTemplate").textValue());
+        if (fhirTemplate == null) {
+            throw new IOException("Fhir template specified in resource config not found. Please check your config.");
+        }
         for (int i = 0; i < omhDatapoints.size(); i++) {
-            FhirTemplate fhirTemplate = fhirTemplateRepository.findOneByTemplateId(configJson.at("/fhirTemplate").textValue());
-            if (fhirTemplate == null) {
-                throw new IOException("Fhir template specified in resource config not found. Please check your config.");
-            }
             fhirResource = fhirTemplate.getTemplate();
             ObjectNode omhData = (ObjectNode)omhDatapoints.get(i);
             for (int j = 0; j < omhPatches.size(); j++) {
