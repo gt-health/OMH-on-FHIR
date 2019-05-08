@@ -9,11 +9,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import org.gtri.hdap.mdata.common.jpa.entity.ApplicationUser;
-import org.gtri.hdap.mdata.common.jpa.entity.ApplicationUserId;
-import org.gtri.hdap.mdata.common.jpa.entity.ResourceConfig;
-import org.gtri.hdap.mdata.common.jpa.entity.ShimmerData;
+import org.gtri.hdap.mdata.common.jpa.entity.*;
 import org.gtri.hdap.mdata.common.jpa.repository.ApplicationUserRepository;
+import org.gtri.hdap.mdata.common.jpa.repository.FhirTemplateRepository;
 import org.gtri.hdap.mdata.common.jpa.repository.ResourceConfigRepository;
 import org.gtri.hdap.mdata.common.jpa.repository.ShimmerDataRepository;
 import org.gtri.hdap.mdata.common.util.ShimmerUtil;
@@ -54,6 +52,8 @@ public class Dstu3ResponseService {
     private ShimmerDataRepository shimmerDataRepository;
     @Autowired
     private ResourceConfigRepository resourceConfigRepository;
+    @Autowired
+    private FhirTemplateRepository fhirTemplateRepository;
     private final Logger logger = LoggerFactory.getLogger(Dstu3ResponseService.class);
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private SimpleDateFormat sdfNoMilli = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -91,21 +91,21 @@ public class Dstu3ResponseService {
     }
 
     public List<Resource> transformFhirTemplate(ResourceConfig config, JsonNode omhResponse) throws IOException, JsonPatchException {
+        JsonNode fhirResource;
         ObjectMapper mapper = new ObjectMapper();
         FhirContext ctx = FhirContext.forDstu3();
         IParser jsonParser = ctx.newJsonParser();
         List<Resource> finalList = new ArrayList<>();
-        JsonNode fhirResource;
         ObjectNode configJson = (ObjectNode)config.getConfig();
-        String configString = configJson.toString();
-        JsonNode input = configJson.at("/patches/omh");
         ArrayNode omhPatches = (ArrayNode)configJson.at("/patches/omh");
         ArrayNode otherPatches = (ArrayNode)configJson.at("/patches/other");
-        //below is temporary
-        // Apply patches from OMH resource
         ArrayNode omhDatapoints = (ArrayNode)omhResponse.get("body");
+        FhirTemplate fhirTemplate = fhirTemplateRepository.findOneByTemplateId(configJson.at("/fhirTemplate").textValue());
+        if (fhirTemplate == null) {
+            throw new IOException("Fhir template specified in resource config not found. Please check your config.");
+        }
         for (int i = 0; i < omhDatapoints.size(); i++) {
-            fhirResource = configJson.at("/fhirTemplate");
+            fhirResource = fhirTemplate.getTemplate();
             ObjectNode omhData = (ObjectNode)omhDatapoints.get(i);
             for (int j = 0; j < omhPatches.size(); j++) {
                 ObjectNode omhPatch = (ObjectNode)omhPatches.get(j);

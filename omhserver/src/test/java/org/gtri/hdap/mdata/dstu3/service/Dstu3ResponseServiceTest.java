@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.fhir.ucum.Decimal;
 import org.gtri.hdap.mdata.common.jpa.entity.ResourceConfig;
 import org.gtri.hdap.mdata.common.jpa.repository.ApplicationUserRepository;
+import org.gtri.hdap.mdata.common.jpa.repository.FhirTemplateRepository;
 import org.gtri.hdap.mdata.common.jpa.repository.ResourceConfigRepository;
 import org.gtri.hdap.mdata.common.jpa.repository.ShimmerDataRepository;
 import org.gtri.hdap.mdata.common.util.ShimmerUtil;
@@ -53,6 +54,8 @@ public class Dstu3ResponseServiceTest {
     private ApplicationUserRepository applicationUserRepository;
     @MockBean
     private ResourceConfigRepository resourceConfigRepository;
+    @MockBean
+    private FhirTemplateRepository fhirTemplateRepository;
     @MockBean
     private ShimmerDataRepository shimmerDataRepository;
 
@@ -139,7 +142,7 @@ public class Dstu3ResponseServiceTest {
         //}
         String sb = FileUtils.readFileToString(new File("src/test/resources/testomhresponse1.json"), UTF_8);
         ResourceConfig rc = new ResourceConfig();
-        rc.setResourceId("stepcount_3-1");
+        rc.setResourceId("dstu3_step-count");
         rc.setConfig(objectMapper.readTree(FileUtils.readFileToString(new File("src/test/resources/testconfig1.json"), UTF_8)));
         List<Resource> observationList = dstu3ResponseService.generateObservations(sb,rc);
         assertTrue(observationList.size() == 2);

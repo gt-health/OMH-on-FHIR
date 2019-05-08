@@ -1,63 +1,5 @@
 {
-  "fhirTemplate": {
-      "resourceType": "Observation",
-      "meta": {
-          "profile": [
-              "http://www.fhir.org/mfhir/StructureDefinition/omh_fhir_profile_quantitative_observation" ] },
-      "identifier": [
-          {
-              "system": "https://omh.org/shimmer/ids",
-              "value" : ""
-          }
-      ],
-      "status": "unknown",
-      "category": [
-          {
-              "coding": [
-                  {
-                      "system": "http://hl7.org/fhir/observation-category",
-                      "code" : "",
-                      "display" : ""
-                  }
-              ]
-          }
-      ],
-      "code": {
-          "coding": [
-              {
-                  "system": "",
-                  "code": "",
-                  "display": ""
-              }
-          ]
-      },
-      "subject": {
-          "identifier": {
-              "system": "https://omh.org/shimmer/patient_ids",
-              "value" : ""
-          }
-      },
-      "effectiveDateTime" : "",
-      "effectivePeriod" : {
-          "start" : "",
-          "end" : ""
-      },
-      "issued" : "",
-      "valueQuantity": {
-          "code": "",
-          "system": "",
-          "unit": "",
-          "value" : ""
-      },
-      "comment": "",
-      "device": {
-          "display": ""
-      },
-      "comment" : "",
-      "device" : {
-          "display" : ""
-      }
-  },
+  "fhirTemplate": "dstu3_Observation",
   "shimKeys": [
       "fitbit"
   ],
@@ -94,7 +36,7 @@
               "op": "replace",
               "fhirPath": "/effectivePeriod/end",
               "omhPath": "/body/effective_time_frame/time_interval/end_date_time",
-              "required" :  true
+              "required" :  false
           },
           {
               "op": "replace",
