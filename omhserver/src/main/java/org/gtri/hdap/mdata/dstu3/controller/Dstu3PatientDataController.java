@@ -202,9 +202,11 @@ public class Dstu3PatientDataController {
     public ResponseEntity<Bundle> findObservations(
         @RequestParam(name="subject", required=true) String shimmerId,
         @RequestParam(name="date") List<String> dateQueries,
-        @RequestParam(name="resourceId") String resourceId
+        @RequestParam(name="omhResource") String omhResource,
+        @RequestParam(name="fhirVersion", defaultValue = "dstu3") String fhirVersion
     ) {
         //Get the config for step_count
+        String resourceId = fhirVersion + "_" + omhResource;
         ResourceConfig resourceConfig = resourceConfigRepository.findOneByResourceId(resourceId);
         ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
         if (resourceConfig == null) {
@@ -224,7 +226,9 @@ public class Dstu3PatientDataController {
         logger.debug(applicationUser.toString());
         logger.debug("Printing out date queries:");
         logger.debug(dateQueries.toString());
-        shimmerResponse = shimmerService.retrieveShimmerData(ShimmerService.SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
+        shimmerResponse = shimmerService.retrieveShimmerData(
+            ShimmerService.SHIMMER_ACTIVITY_RANGE_URL, applicationUser, dateQueries, omhResource
+        );
         if( shimmerResponse.getResponseCode() != HttpStatus.OK.value()){
             logger.error("Shimmer service returned " + shimmerResponse.getResponseCode());
             logger.error(shimmerResponse.getResponseData());
