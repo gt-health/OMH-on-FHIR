@@ -27,33 +27,6 @@ public class ResourceConfigController {
         return "Greetings from Spring Boot!";
     }
 
-//    @GetMapping("/testResourceConfigStuff")
-//    public ResponseEntity<List<Observation>> testThisStuff() {
-//        try {
-////            String tmp = FileUtils.readFileToString(
-////                new File(
-////                    getClass().getClassLoader().getResource("testconfig1.json").getFile()
-////                ),
-////                StandardCharsets.UTF_8
-////            );
-//            String tmp = FileUtils.readFileToString(
-//                new File("/testconfig1.json"),
-//                StandardCharsets.UTF_8
-//            );
-//            JsonNode testConfig = mapper.readTree(tmp).get("config");
-//            tmp = FileUtils.readFileToString(
-//                new File("/testomhresponse1.json"),
-//                StandardCharsets.UTF_8
-//            );
-//            ObjectNode testOmhResponse = (ObjectNode)mapper.readTree(tmp);
-//            List<Observation> fhirObjects = dstu3ResponseService.transformFhirTemplate(testConfig, testOmhResponse);
-//            return ResponseEntity.ok().body(fhirObjects);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(500).build();
-//        }
-//    }
-
     @GetMapping("/{resourceId}")
     public ResponseEntity<ResourceConfig> getConfiguration(
             @PathVariable("resourceId") String resourceId

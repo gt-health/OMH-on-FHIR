@@ -8,6 +8,7 @@
         </encoder>
     </appender>
 
+    <logger name="org.gtri.hdap.mdata.MdataServerApplication" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.common.service.ShimmerService" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.service.dstu3.ResponseService" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.dstu3.controller" level="DEBUG"/>

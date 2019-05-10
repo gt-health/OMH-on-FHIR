@@ -69,6 +69,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.skyscreamer</groupId>
+					<artifactId>jsonassert</artifactId>
+				</exclusion>
+				<!--<exclusion>-->
+					<!--<groupId>com.jayway.jsonpath</groupId>-->
+					<!--<artifactId>json-path</artifactId>-->
+				<!--</exclusion>-->
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -80,7 +90,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20180130</version>
+			<version>20180813</version>
 		</dependency>
 
 		<!-- Needed for HTTP Client -->
@@ -114,6 +124,14 @@
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>2.9.2</version>
 		</dependency>
+
+		<!-- Brings in external config project -->
+		<dependency>
+			<groupId>org.gtri.hdap</groupId>
+			<artifactId>omh-mapping-config</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
