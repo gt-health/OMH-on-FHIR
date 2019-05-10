@@ -118,9 +118,9 @@ public class ShimmerService {
      * @param dateQueries A list of Strings of the format yyyy-MM-dd with start and end date parameters
      * @return ShimmerResponse with details of the search.
      */
-    public ShimmerResponse retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries){
+    public ShimmerResponse retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries, String omhResourceId){
         logger.debug("Requesting patient data");
-        ShimmerResponse shimmerResponse = retrieveShimmerData(SHIMMER_ACTIVITY_RANGE_URL, applicationUser, dateQueries);
+        ShimmerResponse shimmerResponse = retrieveShimmerData(SHIMMER_ACTIVITY_RANGE_URL, applicationUser, dateQueries, omhResourceId);
         //        ShimmerResponse shimmerResponse = retrieveShimmerData(SHIMMER_ACTIVITY_RANGE_URL, applicationUser, dateQueries);
         return shimmerResponse;
     }
@@ -160,7 +160,7 @@ public class ShimmerService {
         shimmerDataUrl = shimmerDataUrl.replace("{shim-key}", applicationUser.getApplicationUserId().getShimKey());
         shimmerDataUrl = shimmerDataUrl.replace("{username}", applicationUser.getShimmerId());
         shimmerDataUrl = shimmerDataUrl.replace("{normalize}", "true");
-        shimmerDataUrl = shimmerDataUrl.replace("{omh-resource-id}", omhResource);
+        shimmerDataUrl = shimmerDataUrl.replace("{omh-resource-id}", omhResource.replace("-", "_"));
 
         LocalDate startDate = null;
         LocalDate endDate = null;
