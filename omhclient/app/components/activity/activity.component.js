@@ -222,7 +222,7 @@ component('activity', {
 
         self.queryObservation = function queryObservation(){
             console.log("Querying Observation " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
-            self.omhOnFhirApi.requestObservation(self.shimmerId, self.startDate, self.endDate)
+            self.omhOnFhirApi.requestStepCount(self.shimmerId, self.startDate, self.endDate)
                 .then(function(response){
                     console.log("Observation Response");
                     console.log(response);

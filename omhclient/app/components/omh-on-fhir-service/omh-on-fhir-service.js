@@ -103,12 +103,16 @@ angular.module('omhOnFhirService', [])
         return $http.get(shimmerDocRefUrl);
     };
 
-    factory.requestObservation = function requestObservation(shimmerId, startDate, endDate){
-        return this.requestOmhResource("Observation", shimmerId, startDate, endDate);
-    };
+    //factory.requestObservation = function requestObservation(shimmerId, startDate, endDate){
+    //    return this.requestOmhResource("Observation", shimmerId, startDate, endDate, "dstu3");
+    //};
 
-    factory.requestOmhResource = function requestOmhResource(resource, shimmerId, startDate, endDate){
-        var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/" + resource + "?subject=" + shimmerId;
+	factory.requestStepCount = function requestStepCount(shimmerId, startDate, endDate) {
+		return this.requestOmhResource("Observation", "step-count", "dstu3", shimmerId, startDate, endDate);
+	}
+
+    factory.requestOmhResource = function requestOmhResource(resource, omhResource, fhirVersion, shimmerId, startDate, endDate) {
+        var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/" + resource + "?subject=" + shimmerId + "&omhResource=" + omhResource + "&fhirVersion=" + fhirVersion;
 
         if(startDate){
             shimmerDocRefUrl = shimmerDocRefUrl + "&date=" + startDate.toISOString().substring(0,10);//to make format 'yyyy-MM-dd'
