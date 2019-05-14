@@ -74,10 +74,6 @@
 					<groupId>org.skyscreamer</groupId>
 					<artifactId>jsonassert</artifactId>
 				</exclusion>
-				<!--<exclusion>-->
-					<!--<groupId>com.jayway.jsonpath</groupId>-->
-					<!--<artifactId>json-path</artifactId>-->
-				<!--</exclusion>-->
 			</exclusions>
 		</dependency>
 
