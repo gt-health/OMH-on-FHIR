@@ -108,7 +108,7 @@ angular.module('omhOnFhirService', [])
     //};
 
 	factory.requestStepCount = function requestStepCount(shimmerId, startDate, endDate) {
-		return this.requestOmhResource("Observation", "step-count", "dstu3", shimmerId, startDate, endDate);
+		return this.requestOmhResource("Observation", "step_count", "dstu3", shimmerId, startDate, endDate);
 	}
 
     factory.requestOmhResource = function requestOmhResource(resource, omhResource, fhirVersion, shimmerId, startDate, endDate) {
