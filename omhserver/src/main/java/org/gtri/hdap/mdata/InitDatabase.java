@@ -1,6 +1,7 @@
 package org.gtri.hdap.mdata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.gtri.hdap.mdata.common.jpa.entity.FhirTemplate;
 import org.gtri.hdap.mdata.common.jpa.entity.ResourceConfig;
@@ -16,10 +17,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,16 +39,16 @@ public class InitDatabase {
     /*========================================================================*/
 	/* CONSTANTS */
     /*========================================================================*/
-    public static String CATALOG_JSON_MAPPING_ARRAY_NAME = "mappings";
-    public static String CATALOG_JSON_MAPPING_TEMPLATE_ELEMENT_NAME = "template";
-    public static String CATALOG_JSON_MAPPING_CONFIG_ELEMENT_NAME = "config";
-    public static String JSON_FILE_PATTERN = "\\w+/(\\w+_[\\w-]+).json";
+
+    public static String RESOURCE_PATTERN = "resourceConfigs/*.json";
+    public static String TEMPLATE_PATTERN= "fhirTemplates/*.json";
+    public static String JSON_FILE_PATTERN = "(\\w+_[\\w-]+).json";
 
     /*========================================================================*/
 	/* VARIABLES */
     /*========================================================================*/
     private static final Logger logger = LoggerFactory.getLogger(InitDatabase.class);
-    private Pattern jsonFilePattern = Pattern.compile(JSON_FILE_PATTERN);
+    private static Pattern jsonFilePattern = Pattern.compile(JSON_FILE_PATTERN);
 
     /**
      * Runs at application start up to load the config files into the database
@@ -53,106 +60,69 @@ public class InitDatabase {
     CommandLineRunner loadData(ResourceConfigRepository rcRepo, FhirTemplateRepository ftRepo) {
         return args -> {
             logger.debug("Loading mapping config files");
-            //load json templates and configs
-            InputStream catalogInputStream = getClassPathResourceAsInputStream("catalog.json");;
-            parseCatalogFile(catalogInputStream, rcRepo, ftRepo);
+            PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver = new PathMatchingResourcePatternResolver(this.getClass().getClassLoader());
+            logger.debug("Finding resource configs");
+            Resource[] configResources = pathMatchingResourcePatternResolver.getResources(RESOURCE_PATTERN);
+            logger.debug("Finding template configs");
+            Resource[] templateResources = pathMatchingResourcePatternResolver.getResources(TEMPLATE_PATTERN);
+            processResources(configResources, InitDatabase::saveResourceConfig, rcRepo);
+            processResources(templateResources, InitDatabase::saveTemplateConfig, ftRepo);
             logger.debug("Finished loading mapping config files");
         };
     }
-
-    /**
-     * Returns the InputStream for the resource located at resourcePath
-     * @param resourcePath the path to the classpath resource to locate
-     * @return an InputStream for the resource if it is found, or null otherwise
-     */
-    private InputStream getClassPathResourceAsInputStream(String resourcePath){
-        Resource configCatalogResource = new ClassPathResource(resourcePath);
-        InputStream catalogInputStream = null;
-        try {
-            catalogInputStream = configCatalogResource.getInputStream();
-        }
-        catch(IOException ioe){
-            logger.warn("Could not get input stream for catalog.json");
-        }
-        return catalogInputStream;
-    }
-
-    /**
-     * Parses the catalog.json file that describes how config and template resources files are used.
-     * @param catalogInputStream the InputStream to the catalog
-     * @param rcRepo the ResourceConfigRepository to use
-     * @param ftRepo the FhirTemplateRepository to use
-     * @throws IOException thrown if the resource or template file on the classpath cannot be retrieved as an InputStream
-     */
-    private void parseCatalogFile(InputStream catalogInputStream, ResourceConfigRepository rcRepo, FhirTemplateRepository ftRepo) throws IOException{
-        logger.debug("Parsing Catalog File");
-        if( catalogInputStream != null ) {
-            JSONTokener tokener = new JSONTokener(catalogInputStream);
-            JSONObject catalogJsonObj = new JSONObject(tokener);
-            JSONArray catalogMappings = catalogJsonObj.getJSONArray(CATALOG_JSON_MAPPING_ARRAY_NAME);
-            logger.debug("Parsing mappings");
-            int numMappings = catalogMappings.length();
-            JSONObject currMappingObject = null;
-            for (int i = 0; i < numMappings; i++) {
-                currMappingObject = catalogMappings.getJSONObject(i);
-                parseMappingConfig(currMappingObject, rcRepo, ftRepo);
-            }
-        }
-        else{
-            logger.warn("Could not load OMH to FHIR configuration files.");
-        }
-        logger.debug("Finished Parsing Catalog File");
-    }
-
-    /**
-     * Parses a mapping entry in the catalog.json file.
-     * @param currMappingObject the mapping object to parse
-     * @param rcRepo the ResourceConfigRepository to use
-     * @param ftRepo the FhirTemplateRepository to use
-     * @throws IOException thrown if the resource or template file on the classpath cannot be retrieved as an InputStream
-     */
-    private void parseMappingConfig(JSONObject currMappingObject, ResourceConfigRepository rcRepo, FhirTemplateRepository ftRepo) throws IOException{
-        logger.debug("Parsing Mapping template");
-        String currTemplate = currMappingObject.getString(CATALOG_JSON_MAPPING_TEMPLATE_ELEMENT_NAME);
-        String currConfig = currMappingObject.getString(CATALOG_JSON_MAPPING_CONFIG_ELEMENT_NAME);
-        saveResourceConfig(currConfig, rcRepo);
-        saveTemplateConfig(currTemplate, ftRepo);
-        logger.debug("Finished Parsing Mapping template");
+    private void processResources(Resource[] resources, BiConsumer<Resource, JpaRepository> saveConfig, JpaRepository repository){
+        Arrays.asList(resources).forEach( resource -> {
+            saveConfig.accept(resource, repository);
+        });
     }
 
     /**
      * Saves the resource config to the database
-     * @param configResourcePath the path to the resource config on the classpath
+     * @param configResource the config resource on the classpath
      * @param rcRepo the ResourceConfigRepository to use
      * @throws IOException thrown if the resource or template file on the classpath cannot be retrieved as an InputStream
      */
-    private void saveResourceConfig(String configResourcePath, JpaRepository rcRepo) throws IOException{
+    private static void saveResourceConfig(Resource configResource, JpaRepository rcRepo){
         logger.debug("Saving Resource Config");
-        String configName = getConfigResourceFileName(configResourcePath);
+        String fileName = configResource.getFilename();
+        logger.debug("Processing config: " + fileName);
+        String configName = getConfigResourceFileName(fileName);
         ObjectMapper mapper = new ObjectMapper();
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig.setResourceId(configName);
-        InputStream in = getClassPathResourceAsInputStream(configResourcePath);
-        resourceConfig.setConfig(mapper.readTree(IOUtils.toString(in, UTF_8)));
-        rcRepo.save(resourceConfig);
+        try {
+            InputStream in = configResource.getInputStream();
+            resourceConfig.setConfig(mapper.readTree(IOUtils.toString(in, UTF_8)));
+            rcRepo.save(resourceConfig);
+        }
+        catch(IOException ioe){
+            logger.error("Could not read JSON config ", ioe);
+        }
         logger.debug("Finished Saving Resource Config");
     }
 
     /**
      * Saves the template config to the database
-     * @param templateResourcePath the path to the template config on the classpath
+     * @param templateResource the template resource on the classpath
      * @param ftRepo the FhirTemplateRepository to use
      * @throws IOException thrown if the resource or template file on the classpath cannot be retrieved as an InputStream
      */
-    private void saveTemplateConfig(String templateResourcePath, JpaRepository ftRepo) throws IOException{
+    private static void saveTemplateConfig(Resource templateResource, JpaRepository ftRepo){
         logger.debug("Saving Template Config");
-        String configName = getConfigResourceFileName(templateResourcePath);
+        String fileName = templateResource.getFilename();
+        logger.debug("Processing template: " + fileName);
+        String configName = getConfigResourceFileName(fileName);
         ObjectMapper mapper = new ObjectMapper();
         FhirTemplate fhirTemplate = new FhirTemplate();
         fhirTemplate.setTemplateId(configName);
-        InputStream in = getClassPathResourceAsInputStream(templateResourcePath);
-        fhirTemplate.setTemplate(mapper.readTree(IOUtils.toString(in, UTF_8)));
-        ftRepo.save(fhirTemplate);
+        try{
+            InputStream in = templateResource.getInputStream();
+            fhirTemplate.setTemplate(mapper.readTree(IOUtils.toString(in, UTF_8)));
+            ftRepo.save(fhirTemplate);
+        }
+        catch(IOException ioe){
+            logger.error("Could not read JSON template ", ioe);
+        }
         logger.debug("Finished Saving Template Config");
     }
 
@@ -161,8 +131,8 @@ public class InitDatabase {
      * @param configResourcePath the path to search
      * @return the name of the config file.
      */
-    private String getConfigResourceFileName(String configResourcePath){
-        //templates will be of the format resourceConfigs/dstu3_step-count.json
+    private static String getConfigResourceFileName(String configResourcePath){
+        //templates will be of the format dstu3_step-count.json
         //parse the config to get the
         logger.debug("Getting config file name from path");
         Matcher m = jsonFilePattern.matcher(configResourcePath);
@@ -171,5 +141,4 @@ public class InitDatabase {
         logger.debug("Config file name: " + configName);
         return configName;
     }
-
 }
