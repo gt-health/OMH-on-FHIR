@@ -29,8 +29,8 @@ public class InitDatabase {
         return args -> {
             ObjectMapper mapper = new ObjectMapper();
             ResourceConfig resourceConfig = new ResourceConfig();
-            resourceConfig.setResourceId("dstu3_step-count");
-            InputStream in = getClass().getResourceAsStream("/init/resourceConfigs/dstu3_step-count.json");
+            resourceConfig.setResourceId("dstu3_step_count");
+            InputStream in = getClass().getResourceAsStream("/init/resourceConfigs/dstu3_step_count.json");
             resourceConfig.setConfig(mapper.readTree(IOUtils.toString(in, UTF_8)));
             rcRepo.save(resourceConfig);
             FhirTemplate fhirTemplate = new FhirTemplate();

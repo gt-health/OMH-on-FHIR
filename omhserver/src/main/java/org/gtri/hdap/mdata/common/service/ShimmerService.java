@@ -160,7 +160,7 @@ public class ShimmerService {
         shimmerDataUrl = shimmerDataUrl.replace("{shim-key}", applicationUser.getApplicationUserId().getShimKey());
         shimmerDataUrl = shimmerDataUrl.replace("{username}", applicationUser.getShimmerId());
         shimmerDataUrl = shimmerDataUrl.replace("{normalize}", "true");
-        shimmerDataUrl = shimmerDataUrl.replace("{omh-resource-id}", omhResource.replace("-", "_"));
+        shimmerDataUrl = shimmerDataUrl.replace("{omh-resource-id}", omhResource);
 
         LocalDate startDate = null;
         LocalDate endDate = null;

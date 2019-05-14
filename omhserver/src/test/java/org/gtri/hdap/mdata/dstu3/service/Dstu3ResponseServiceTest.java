@@ -142,7 +142,7 @@ public class Dstu3ResponseServiceTest {
         //}
         String sb = FileUtils.readFileToString(new File("src/test/resources/testomhresponse1.json"), UTF_8);
         ResourceConfig rc = new ResourceConfig();
-        rc.setResourceId("dstu3_step-count");
+        rc.setResourceId("dstu3_step_count");
         rc.setConfig(objectMapper.readTree(FileUtils.readFileToString(new File("src/test/resources/testconfig1.json"), UTF_8)));
         List<Resource> observationList = dstu3ResponseService.generateObservations(sb,rc);
         assertTrue(observationList.size() == 2);
