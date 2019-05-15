@@ -2,6 +2,7 @@ package org.gtri.hdap.mdata.dstu3.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.gtri.hdap.mdata.common.controller.SessionMetaData;
 import org.gtri.hdap.mdata.common.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.common.jpa.entity.ResourceConfig;
 import org.gtri.hdap.mdata.common.jpa.repository.ApplicationUserRepository;
@@ -16,12 +17,16 @@ import org.hl7.fhir.dstu3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -32,7 +37,8 @@ import java.util.*;
  * Created by es130 on 6/27/2018.
  */
 @RestController
-@SessionAttributes("shimmerId")
+@CrossOrigin
+//@SessionAttributes("shimmerId")
 @Api(value="patientdatacontroller", description="OMH on FHIR web service operations." )
 public class Dstu3PatientDataController {
 
@@ -54,11 +60,8 @@ public class Dstu3PatientDataController {
     @Autowired
     private FhirTemplateRepository fhirTemplateRepository;
 
-
-    @ModelAttribute("shimmerId")
-    public String shimmerId(){
-        return "";
-    }
+    @Autowired
+    public SessionMetaData sessionMetaData;
 
     /*========================================================================*/
     /* Service Endpoint Methods */
@@ -79,11 +82,11 @@ public class Dstu3PatientDataController {
     @ApiOperation(value="Authenticate an EHR user to use a specific shim with the Shimmer library.")
     @GetMapping("/shimmerAuthentication")
     public ModelAndView authenticateWithShimmer(ModelMap model,
-        @ModelAttribute("shimmerId") String shimmerId,
-        RedirectAttributes attributes,
+        //@ModelAttribute("shimmerId") String shimmerId,
+        //RedirectAttributes attributes,
         @RequestParam(name="ehrId", required=true) String ehrId,
-        @RequestParam(name="shimkey", required=true) String shimkey,
-        BindingResult bindingResult
+        @RequestParam(name="shimkey", required=true) String shimkey
+        //BindingResult bindingResult
     ){
         logger.debug("Entering method authenticateWithShimmer");
         logger.debug("Trying to connect to " + shimkey + " API");
@@ -97,6 +100,7 @@ public class Dstu3PatientDataController {
         logger.debug("called getShimmerId");
         //add the shimmer id to the model
         model.addAttribute("shimmerId", userShimmerId);
+        this.sessionMetaData.setShimmerId(userShimmerId);
 
         ShimmerResponse shimmerResponse = shimmerService.requestShimmerAuthUrl(userShimmerId, shimkey);
         String oauthAuthUrl = null;
@@ -115,7 +119,7 @@ public class Dstu3PatientDataController {
         logger.debug("Finished connection to " + shimkey + " API");
 
         //tell spring we want the attribute to survive the redirect
-        attributes.addFlashAttribute("shimmerId", userShimmerId);
+        //attributes.addFlashAttribute("shimmerId", userShimmerId);
 
         //If the returned oauthAuthUrl equals the final callback URL for UI then the user has already
         //linked the EHR user to their device account via shimmer. Update the model to contain
@@ -199,7 +203,7 @@ public class Dstu3PatientDataController {
     }
 
     @ApiOperation(value="Retrieves Observation with OMH data using a resource type configuration.")
-    @GetMapping(value="/Observation", consumes={"application/json"})
+    @GetMapping(value="/Observation")
     public ResponseEntity<Bundle> findObservations(
         @RequestParam(name="subject", required=true) String shimmerId,
         @RequestParam(name="date") List<String> dateQueries,
@@ -253,14 +257,14 @@ public class Dstu3PatientDataController {
     @ApiOperation(value="Callback method for Shimmer to use during user authentication.")
     @GetMapping("/authorize/{shimkey}/callback")
     public ModelAndView handleShimmerOauthCallback(ModelMap model,
-       @ModelAttribute("shimmerId") String shimmerId,
+//       @ModelAttribute("shimmerId") String shimmerId,
        @PathVariable String shimkey,
        @RequestParam(name="code") String code,
        @RequestParam(name="state") String state
     ){
         logger.debug("Handling successful " + shimkey + " auth redirect");
         logger.debug("MODEL shimmer id " + model.get("shimmerId"));
-        logger.debug("Passed in shimmer id " + shimmerId);
+        logger.debug("Passed in shimmer id " + sessionMetaData.getShimmerId());
         logger.debug("Code " + code);
         logger.debug("State " + state);
 
@@ -278,7 +282,7 @@ public class Dstu3PatientDataController {
             return new ModelAndView(omhOnFhirUi, model);
         }
 
-        ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(shimmerId);
+        ApplicationUser applicationUser = applicationUserRepository.findByShimmerId(sessionMetaData.getShimmerId());
         if(applicationUser != null){
             applicationUserRepository.save(applicationUser);
         }
@@ -291,7 +295,7 @@ public class Dstu3PatientDataController {
 
         omhOnFhirUi = "redirect:" + System.getenv(ShimmerUtil.OMH_ON_FHIR_CALLBACK_ENV);
         model.addAttribute("loginSuccess", true);
-        model.addAttribute("shimmerId", shimmerId);
+        model.addAttribute("shimmerId", sessionMetaData.getShimmerId());
         logger.debug("Redirecting to: " + omhOnFhirUi);
         return new ModelAndView(omhOnFhirUi, model);
     }

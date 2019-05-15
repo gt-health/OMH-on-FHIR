@@ -78,16 +78,16 @@ public class Dstu3PatientDataControllerTest {
         ShimmerResponse failureResponse = new ShimmerResponse(HttpStatus.BAD_REQUEST.value(), "{\"status\":" + HttpStatus.BAD_REQUEST.value() + ", \"error\":\"Unsupported FHIR date prefix only GE is supported for start dates.\"}");
 
         given(applicationUserRepository.findByShimmerId(shimmerId)).willReturn(applicationUser);
-        given(shimmerService.retrievePatientData(applicationUser, validQueryDates, "step-count")).willReturn(shimmerResponse);
+        given(shimmerService.retrievePatientData(applicationUser, validQueryDates, "step_count")).willReturn(shimmerResponse);
         given(shimmerService.writePatientData(applicationUser, shimmerResponse)).willReturn(docId);
 
-        mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + validDate1 + "&date=" + validDate2 + "&omhResource=step-count"))
+        mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + validDate1 + "&date=" + validDate2 + "&omhResource=step_count"))
         .andExpect(status().isOk());
 //            .andExpect(content().json("{\"data\": \"activity data here\"}"));
 
-        given(shimmerService.retrievePatientData(applicationUser, inValidQueryDates, "step-count")).willReturn(failureResponse);// willThrow(new Exception("Unsupported FHIR date prefix only GE is supported for start dates."));
+        given(shimmerService.retrievePatientData(applicationUser, inValidQueryDates, "step_count")).willReturn(failureResponse);// willThrow(new Exception("Unsupported FHIR date prefix only GE is supported for start dates."));
 
-        mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + inValidDate1 + "&date=" + inValidDate2 + "&omhResource=step-count"))
+        mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + inValidDate1 + "&date=" + inValidDate2 + "&omhResource=step_count"))
                 .andExpect(status().is4xxClientError());
 
         logger.debug("========== Exiting getFindDocumentReference ==========");
