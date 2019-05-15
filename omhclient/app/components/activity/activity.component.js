@@ -132,7 +132,7 @@ component('activity', {
             self.waitingForSearch = true;
             self.activityDocumentRef = null;
             self.omhActivity = null;
-            self.omhOnFhirApi.requestDocumentReference(self.shimmerId, self.startDate, self.endDate)
+            self.omhOnFhirApi.requestStepCountDocumentReference(self.shimmerId, self.startDate, self.endDate)
                 .then(function(response){
                     console.log("Activity Response");
                     console.log(response);

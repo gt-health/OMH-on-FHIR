@@ -37,6 +37,7 @@ import java.util.*;
  * Created by es130 on 6/27/2018.
  */
 @RestController
+@CrossOrigin
 //@SessionAttributes("shimmerId")
 @Api(value="patientdatacontroller", description="OMH on FHIR web service operations." )
 public class Dstu3PatientDataController {
@@ -202,7 +203,7 @@ public class Dstu3PatientDataController {
     }
 
     @ApiOperation(value="Retrieves Observation with OMH data using a resource type configuration.")
-    @GetMapping(value="/Observation", consumes={"application/json"})
+    @GetMapping(value="/Observation")
     public ResponseEntity<Bundle> findObservations(
         @RequestParam(name="subject", required=true) String shimmerId,
         @RequestParam(name="date") List<String> dateQueries,

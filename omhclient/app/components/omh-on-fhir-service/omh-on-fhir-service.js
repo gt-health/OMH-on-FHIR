@@ -88,8 +88,12 @@ angular.module('omhOnFhirService', [])
         this.loginWindow = $window.open(shimmerAuthUrl, 'Sign In', 'left=100,top=100,width=500,height=600');
     };
 
-    factory.requestDocumentReference = function requestDocumentReference(shimmerId, startDate, endDate){
-        var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/DocumentReference?subject=" + shimmerId;
+    factory.requestStepCountDocumentReference = function requestStepCountDocumentReference(shimmerId, startDate, endDate){
+        return this.requestDocumentReference(shimmerId, startDate, endDate, "step_count");
+    }
+
+    factory.requestDocumentReference = function requestDocumentReference(shimmerId, startDate, endDate, omhResource){
+        var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/DocumentReference?subject=" + shimmerId + "&omhResource=" + omhResource;
 
         if(startDate){
             shimmerDocRefUrl = shimmerDocRefUrl + "&date=" + startDate.toISOString().substring(0,10);//to make format 'yyyy-MM-dd'
