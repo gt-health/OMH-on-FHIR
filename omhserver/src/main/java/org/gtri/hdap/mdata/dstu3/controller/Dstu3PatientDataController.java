@@ -17,18 +17,12 @@ import org.hl7.fhir.dstu3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.*;
@@ -38,7 +32,6 @@ import java.util.*;
  */
 @RestController
 @CrossOrigin
-//@SessionAttributes("shimmerId")
 @Api(value="patientdatacontroller", description="OMH on FHIR web service operations." )
 public class Dstu3PatientDataController {
 
@@ -82,11 +75,8 @@ public class Dstu3PatientDataController {
     @ApiOperation(value="Authenticate an EHR user to use a specific shim with the Shimmer library.")
     @GetMapping("/shimmerAuthentication")
     public ModelAndView authenticateWithShimmer(ModelMap model,
-        //@ModelAttribute("shimmerId") String shimmerId,
-        //RedirectAttributes attributes,
         @RequestParam(name="ehrId", required=true) String ehrId,
         @RequestParam(name="shimkey", required=true) String shimkey
-        //BindingResult bindingResult
     ){
         logger.debug("Entering method authenticateWithShimmer");
         logger.debug("Trying to connect to " + shimkey + " API");
@@ -117,9 +107,6 @@ public class Dstu3PatientDataController {
         }
 
         logger.debug("Finished connection to " + shimkey + " API");
-
-        //tell spring we want the attribute to survive the redirect
-        //attributes.addFlashAttribute("shimmerId", userShimmerId);
 
         //If the returned oauthAuthUrl equals the final callback URL for UI then the user has already
         //linked the EHR user to their device account via shimmer. Update the model to contain
@@ -257,7 +244,6 @@ public class Dstu3PatientDataController {
     @ApiOperation(value="Callback method for Shimmer to use during user authentication.")
     @GetMapping("/authorize/{shimkey}/callback")
     public ModelAndView handleShimmerOauthCallback(ModelMap model,
-//       @ModelAttribute("shimmerId") String shimmerId,
        @PathVariable String shimkey,
        @RequestParam(name="code") String code,
        @RequestParam(name="state") String state
