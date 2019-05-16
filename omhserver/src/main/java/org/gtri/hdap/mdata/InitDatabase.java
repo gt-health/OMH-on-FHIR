@@ -86,17 +86,20 @@ public class InitDatabase {
         logger.debug("Saving Resource Config");
         String fileName = configResource.getFilename();
         logger.debug("Processing config: " + fileName);
+
         String configName = getConfigResourceFileName(fileName);
-        ObjectMapper mapper = new ObjectMapper();
-        ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig.setResourceId(configName);
-        try {
-            InputStream in = configResource.getInputStream();
-            resourceConfig.setConfig(mapper.readTree(IOUtils.toString(in, UTF_8)));
-            rcRepo.save(resourceConfig);
-        }
-        catch(IOException ioe){
-            logger.error("Could not read JSON config ", ioe);
+        if(((ResourceConfigRepository)rcRepo).findOneByResourceId(configName) == null){
+            logger.debug("No config resource in database. Creating a new one");
+            ObjectMapper mapper = new ObjectMapper();
+            ResourceConfig resourceConfig = new ResourceConfig();
+            resourceConfig.setResourceId(configName);
+            try {
+                InputStream in = configResource.getInputStream();
+                resourceConfig.setConfig(mapper.readTree(IOUtils.toString(in, UTF_8)));
+                rcRepo.save(resourceConfig);
+            } catch (IOException ioe) {
+                logger.error("Could not read JSON config ", ioe);
+            }
         }
         logger.debug("Finished Saving Resource Config");
     }
@@ -112,16 +115,19 @@ public class InitDatabase {
         String fileName = templateResource.getFilename();
         logger.debug("Processing template: " + fileName);
         String configName = getConfigResourceFileName(fileName);
-        ObjectMapper mapper = new ObjectMapper();
-        FhirTemplate fhirTemplate = new FhirTemplate();
-        fhirTemplate.setTemplateId(configName);
-        try{
-            InputStream in = templateResource.getInputStream();
-            fhirTemplate.setTemplate(mapper.readTree(IOUtils.toString(in, UTF_8)));
-            ftRepo.save(fhirTemplate);
-        }
-        catch(IOException ioe){
-            logger.error("Could not read JSON template ", ioe);
+        if(((FhirTemplateRepository)ftRepo).findOneByTemplateId(configName) == null){
+            logger.debug("No Fhir Template in database. Creating a new one.");
+            ObjectMapper mapper = new ObjectMapper();
+            FhirTemplate fhirTemplate = new FhirTemplate();
+            fhirTemplate.setTemplateId(configName);
+            try{
+                InputStream in = templateResource.getInputStream();
+                fhirTemplate.setTemplate(mapper.readTree(IOUtils.toString(in, UTF_8)));
+                ftRepo.save(fhirTemplate);
+            }
+            catch(IOException ioe){
+                logger.error("Could not read JSON template ", ioe);
+            }
         }
         logger.debug("Finished Saving Template Config");
     }
