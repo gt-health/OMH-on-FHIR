@@ -47,8 +47,8 @@ public class ShimmerService {
     public static String SHIMMER_AUTH_CALLBACK = "/authorize/{shim-key}/callback?code={code}&state={state}";
 //    public static String SHIMMER_AUTH_CALLBACK = "/authorize/{shim-key}/callback?state={state}";
 //public static String SHIMMER_STEP_COUNT_RANGE_URL = "/data/{shim-key}/physical_activity?username={username}&normalize={normalize}";
-    public static String SHIMMER_STEP_COUNT_RANGE_URL = "/data/{shim-key}/step_count?username={username}&normalize={normalize}";
-    public static String SHIMMER_ACTIVITY_RANGE_URL = "/data/{shim-key}/step_count?username={username}&normalize={normalize}";
+    public static String SHIMMER_STEP_COUNT_RANGE_URL = "/data/{shim-key}/{omh-resource-id}?username={username}&normalize={normalize}";
+    public static String SHIMMER_ACTIVITY_RANGE_URL = "/data/{shim-key}/{omh-resource-id}?username={username}&normalize={normalize}";
     public static String SHIMMER_START_DATE_URL_PARAM = "&dateStart={start-date}";
     public static String SHIMMER_END_DATE_URL_PARAM = "&dateEnd={end-date}";
     public static String START_DATE_KEY = "startDate";
@@ -118,9 +118,9 @@ public class ShimmerService {
      * @param dateQueries A list of Strings of the format yyyy-MM-dd with start and end date parameters
      * @return ShimmerResponse with details of the search.
      */
-    public ShimmerResponse retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries){
+    public ShimmerResponse retrievePatientData(ApplicationUser applicationUser, List<String> dateQueries, String omhResourceId){
         logger.debug("Requesting patient data");
-        ShimmerResponse shimmerResponse = retrieveShimmerData(SHIMMER_STEP_COUNT_RANGE_URL, applicationUser, dateQueries);
+        ShimmerResponse shimmerResponse = retrieveShimmerData(SHIMMER_ACTIVITY_RANGE_URL, applicationUser, dateQueries, omhResourceId);
         //        ShimmerResponse shimmerResponse = retrieveShimmerData(SHIMMER_ACTIVITY_RANGE_URL, applicationUser, dateQueries);
         return shimmerResponse;
     }
@@ -149,12 +149,18 @@ public class ShimmerService {
      * @param dateQueries A list of Strings of the format yyyy-MM-dd with start and end date parameters
      * @return ShimmerResponse object with response details.
      */
-    public ShimmerResponse retrieveShimmerData(String shimmerDataUrlFragment, ApplicationUser applicationUser, List<String> dateQueries){
+    public ShimmerResponse retrieveShimmerData(
+        String shimmerDataUrlFragment,
+        ApplicationUser applicationUser,
+        List<String> dateQueries,
+        String omhResource
+    ){
         logger.debug("Querying Shimmer");
         String shimmerDataUrl = System.getenv(SHIMMER_SERVER_URL_BASE_ENV) + shimmerDataUrlFragment;
         shimmerDataUrl = shimmerDataUrl.replace("{shim-key}", applicationUser.getApplicationUserId().getShimKey());
         shimmerDataUrl = shimmerDataUrl.replace("{username}", applicationUser.getShimmerId());
         shimmerDataUrl = shimmerDataUrl.replace("{normalize}", "true");
+        shimmerDataUrl = shimmerDataUrl.replace("{omh-resource-id}", omhResource);
 
         LocalDate startDate = null;
         LocalDate endDate = null;
