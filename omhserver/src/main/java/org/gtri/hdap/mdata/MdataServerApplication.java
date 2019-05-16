@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 public class MdataServerApplication {
 
+	/*========================================================================*/
+	/* METHODS */
+    /*========================================================================*/
 	public static void main(String[] args) {
 		SpringApplication.run(MdataServerApplication.class, args);
 	}
