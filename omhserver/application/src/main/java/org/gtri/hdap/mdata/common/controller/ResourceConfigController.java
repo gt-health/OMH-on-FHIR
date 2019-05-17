@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import org.gtri.hdap.mdata.common.jpa.entity.ResourceConfig;
 import org.gtri.hdap.mdata.common.jpa.repository.ResourceConfigRepository;
-import org.gtri.hdap.mdata.dstu3.service.Dstu3ResponseService;
+import org.gtri.hdap.mdata.stu3.service.Stu3ResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class ResourceConfigController {
     @Autowired
     private ResourceConfigRepository rcRepo;
     @Autowired
-    private Dstu3ResponseService dstu3ResponseService;
+    private Stu3ResponseService stu3ResponseService;
 
     private final ObjectMapper mapper = new ObjectMapper();
 

@@ -1,4 +1,4 @@
-package org.gtri.hdap.mdata.dstu3.controller;
+package org.gtri.hdap.mdata.stu3.controller;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -39,9 +39,9 @@ import static org.mockito.BDDMockito.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:test.application.properties")
-public class Dstu3PatientDataControllerTest {
+public class Stu3PatientDataControllerTest {
 
-    private final Logger logger = LoggerFactory.getLogger(Dstu3PatientDataControllerTest.class);
+    private final Logger logger = LoggerFactory.getLogger(Stu3PatientDataControllerTest.class);
 
     @Autowired
     private MockMvc mvc;

@@ -1,4 +1,4 @@
-package org.gtri.hdap.mdata.dstu3.controller;
+package org.gtri.hdap.mdata.stu3.controller;
 
 
 import static org.hamcrest.Matchers.*;
@@ -25,7 +25,7 @@ import java.net.URL;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:test.application.properties")
-public class Dstu3PatientDataControllerIntegrationTest {
+public class Stu3PatientDataControllerIntegrationTest {
     @LocalServerPort
     private int port;
 

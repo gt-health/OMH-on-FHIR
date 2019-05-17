@@ -1,10 +1,10 @@
 {
-  "fhirTemplate": "dstu3_Observation",
+  "fhirTemplate": "stu3_Observation",
   "shimKeys": [
       "fitbit"
   ],
   "versions" : {
-      "fhir" : "dstu3",
+      "fhir" : "stu3",
       "openmhealth" : "1.0"
   },
   "patches": {

@@ -3,7 +3,7 @@ package org.gtri.hdap.mdata.common.conf;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.gtri.hdap.mdata.common.jackson.BindingResultSerializer;
-import org.gtri.hdap.mdata.dstu3.jackson.Dstu3HapiSerializer;
+import org.gtri.hdap.mdata.stu3.jackson.Dstu3HapiSerializer;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

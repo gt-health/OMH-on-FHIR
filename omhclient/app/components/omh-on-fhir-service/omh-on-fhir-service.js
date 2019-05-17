@@ -108,11 +108,11 @@ angular.module('omhOnFhirService', [])
     };
 
     //factory.requestObservation = function requestObservation(shimmerId, startDate, endDate){
-    //    return this.requestOmhResource("Observation", shimmerId, startDate, endDate, "dstu3");
+    //    return this.requestOmhResource("Observation", shimmerId, startDate, endDate, "stu3");
     //};
 
 	factory.requestStepCount = function requestStepCount(shimmerId, startDate, endDate) {
-		return this.requestOmhResource("Observation", "step_count", "dstu3", shimmerId, startDate, endDate);
+		return this.requestOmhResource("Observation", "step_count", "stu3", shimmerId, startDate, endDate);
 	}
 
     factory.requestOmhResource = function requestOmhResource(resource, omhResource, fhirVersion, shimmerId, startDate, endDate) {

@@ -1,4 +1,4 @@
-package org.gtri.hdap.mdata.dstu3.service;
+package org.gtri.hdap.mdata.stu3.service;
 
 import org.gtri.hdap.mdata.common.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.common.jpa.repository.ShimmerDataRepository;

@@ -1,4 +1,4 @@
-package org.gtri.hdap.mdata.dstu3.jackson;
+package org.gtri.hdap.mdata.stu3.jackson;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;

@@ -1,18 +1,15 @@
-package org.gtri.hdap.mdata.dstu3.controller;
+package org.gtri.hdap.mdata.stu3.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.gtri.hdap.mdata.common.controller.SessionMetaData;
 import org.gtri.hdap.mdata.common.jpa.entity.ApplicationUser;
 import org.gtri.hdap.mdata.common.jpa.entity.ResourceConfig;
 import org.gtri.hdap.mdata.common.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.common.jpa.repository.FhirTemplateRepository;
 import org.gtri.hdap.mdata.common.jpa.repository.ResourceConfigRepository;
-import org.gtri.hdap.mdata.common.jpa.repository.ShimmerDataRepository;
-import org.gtri.hdap.mdata.dstu3.service.Dstu3ResponseService;
+import org.gtri.hdap.mdata.stu3.service.Stu3ResponseService;
 import org.gtri.hdap.mdata.common.service.ShimmerResponse;
 import org.gtri.hdap.mdata.common.service.ShimmerService;
-import org.gtri.hdap.mdata.common.util.ShimmerUtil;
 import org.hl7.fhir.dstu3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,17 +28,17 @@ import java.util.*;
 @RestController
 @CrossOrigin
 @Api(value="patientdatacontroller", description="OMH on FHIR web service operations." )
-public class Dstu3PatientDataController {
+public class Stu3PatientDataController {
 
     /*========================================================================*/
     /* Variables */
     /*========================================================================*/
-    private final Logger logger = LoggerFactory.getLogger(Dstu3PatientDataController.class);
+    private final Logger logger = LoggerFactory.getLogger(Stu3PatientDataController.class);
 
     @Autowired
     private ShimmerService shimmerService;
     @Autowired
-    private Dstu3ResponseService dstu3ResponseService;
+    private Stu3ResponseService stu3ResponseService;
     @Autowired
     private ApplicationUserRepository applicationUserRepository;
     @Autowired
@@ -86,11 +83,11 @@ public class Dstu3PatientDataController {
             binaryRefId = shimmerService.writePatientData(applicationUser, shimmerResponse);
 
             //generate the document reference
-            DocumentReference documentReference = dstu3ResponseService.generateDocumentReference(binaryRefId, shimKey);
+            DocumentReference documentReference = stu3ResponseService.generateDocumentReference(binaryRefId, shimKey);
 
             logger.debug("finished processing document request");
 
-            Bundle responseBundle = dstu3ResponseService.makeBundleWithSingleEntry(documentReference);
+            Bundle responseBundle = stu3ResponseService.makeBundleWithSingleEntry(documentReference);
             return ResponseEntity.ok(responseBundle);
         }
         else{
@@ -108,7 +105,7 @@ public class Dstu3PatientDataController {
         @PathVariable String documentId
     ){
         logger.debug("Retrieving Binary with URL");
-        byte[] docBytes = dstu3ResponseService.makeByteArrayForDocument(documentId);
+        byte[] docBytes = stu3ResponseService.makeByteArrayForDocument(documentId);
         return docBytes;
     }
 
@@ -119,7 +116,7 @@ public class Dstu3PatientDataController {
         @RequestParam(name="_id", required = true)String documentId
     ) {
         logger.debug("Retriving Binary with URL param");
-        return dstu3ResponseService.makeBundleForDocument(documentId);
+        return stu3ResponseService.makeBundleForDocument(documentId);
     }
 
     @ApiOperation(value="Retrieves Observation with OMH data using a resource type configuration.")
@@ -128,7 +125,7 @@ public class Dstu3PatientDataController {
         @RequestParam(name="subject", required=true) String shimmerId,
         @RequestParam(name="date") List<String> dateQueries,
         @RequestParam(name="omhResource") String omhResource,
-        @RequestParam(name="fhirVersion", defaultValue = "dstu3") String fhirVersion
+        @RequestParam(name="fhirVersion", defaultValue = "stu3") String fhirVersion
     ) {
         //Get the config for step_count
         String resourceId = fhirVersion + "_" + omhResource;
@@ -163,7 +160,7 @@ public class Dstu3PatientDataController {
         //generateObservationList
         List<Resource> observations;
         try {
-            observations = dstu3ResponseService.generateObservations(
+            observations = stu3ResponseService.generateObservations(
                 shimmerResponse.getResponseData(), resourceConfig
             );
         }
@@ -171,7 +168,7 @@ public class Dstu3PatientDataController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-        return ResponseEntity.ok(dstu3ResponseService.makeBundle(observations));
+        return ResponseEntity.ok(stu3ResponseService.makeBundle(observations));
     }
 
 }
