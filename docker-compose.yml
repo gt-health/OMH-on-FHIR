@@ -11,11 +11,9 @@ services:
       - ./shimmer-resource-server.env
     ports:
       - "8084:8083"
-
   mongo:
     image: mongo
     restart: always
-
   console:
     image: openmhealth/shimmer-console
     restart: always
@@ -23,7 +21,6 @@ services:
       - "8083:8083"
     depends_on:
       - resource-server
-
   mdata-db:
     image: postgres:latest
     restart: always
@@ -31,7 +28,6 @@ services:
       - 5432
     env_file:
       - ./omhserver/postgres.env
-
   mdata-app:
     build:
       context: ./omhserver
@@ -43,7 +39,6 @@ services:
       - ./omhserver/omh-server.env
     depends_on:
       - mdata-db
-
   omh-on-fhir-client:
       build:
         #specifiy the project build context

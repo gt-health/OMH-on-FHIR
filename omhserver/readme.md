@@ -9,50 +9,59 @@ It makes web service endpoints available for:
 
 ## Project Structure
 ```
-src                                                                 --> Contains project source code
-    main                                                            --> Contains main project code
-        java
-            org
-                gtri
-                    hdap
-                        mdata
-                            conf                                    --> Contains project configuration
-                                JacksonConfig.java                  --> Configures Jackson for JSON serialization/deserialization
-                            controller
-                                PatientDataController.java          --> Defines controller with endpoints for patient endpoints
-                            jackson
-                                BindingResultSerializer.java        --> Serializer for BeanPropertyBindingResult
-                                HapiStu3Serializer.java             --> Serializer for HAPI FHIR STU3 Domain Objects
-                            jpa                                     --> Contains objects to configure database interactions
-                                entity                              --> Contains objects for data to persist to the database
-                                    ApplicationUser.java            --> Defines data structure for an application users
-                                    ApplicationUserId.java          --> Defines data structre user ids
-                                    ShimmerData.java                --> Defines data structure for shimmer data
-                                repository                          --> Exposes methods to search the database
-                                    ApplicationUserRepository.java  --> Defines CRUD methdos for the application_user database table
-                                    ShimmerDataRepository.java      --> Defines CRUD methods for the shimmer_data database table
-                            service
-                                ShimmerService.java                 --> Provides methods to interact with the Shimmer web service. It is used by the controllers.
-                            util
-                                ShimmerUtil.java                    --> Provides utility constants and methods.
-                            MdataServerApplication.java             --> Launches the application
-        resources                                                   --> Contains application resources
-            application.properties                                  --> Defines properties for the application
-            logback.xml                                             --> Configures application logging
-    test                                                            --> Contains project test code
-        java
-            org
-                gtri
-                    hdap
-                        mdata
-                            controller
-                                PatientDataControllerIntegrationTest--> Integration test for the PatientDataController
-                                PatientDataControllerTest           --> Unit test for the PatientDataController
-                            service
-                                ShimmerServiceTest                  --> Unit test for the ShimmerService
-                            MdataServerApplicationTests             --> Unit test for the MdataServerApplication
-        resources                                                   --> Contains testing resources
-            test.application.properties                             --> Properties to use for testing
+application
+    src                                                                 --> Contains project source code
+        main                                                            --> Contains main project code
+            java
+                org
+                    gtri
+                        hdap
+                            mdata
+                                conf                                    --> Contains project configuration
+                                    JacksonConfig.java                  --> Configures Jackson for JSON serialization/deserialization
+                                controller
+                                    PatientDataController.java          --> Defines controller with endpoints for patient endpoints
+                                jackson
+                                    BindingResultSerializer.java        --> Serializer for BeanPropertyBindingResult
+                                    HapiStu3Serializer.java             --> Serializer for HAPI FHIR STU3 Domain Objects
+                                jpa                                     --> Contains objects to configure database interactions
+                                    entity                              --> Contains objects for data to persist to the database
+                                        ApplicationUser.java            --> Defines data structure for an application users
+                                        ApplicationUserId.java          --> Defines data structre user ids
+                                        ShimmerData.java                --> Defines data structure for shimmer data
+                                    repository                          --> Exposes methods to search the database
+                                        ApplicationUserRepository.java  --> Defines CRUD methdos for the application_user database table
+                                        ShimmerDataRepository.java      --> Defines CRUD methods for the shimmer_data database table
+                                service
+                                    ShimmerService.java                 --> Provides methods to interact with the Shimmer web service. It is used by the controllers.
+                                util
+                                    ShimmerUtil.java                    --> Provides utility constants and methods.
+                                MdataServerApplication.java             --> Launches the application
+            resources                                                   --> Contains application resources
+                application.properties                                  --> Defines properties for the application
+                logback.xml                                             --> Configures application logging
+        test                                                            --> Contains project test code
+            java
+                org
+                    gtri
+                        hdap
+                            mdata
+                                controller
+                                    PatientDataControllerIntegrationTest--> Integration test for the PatientDataController
+                                    PatientDataControllerTest           --> Unit test for the PatientDataController
+                                service
+                                    ShimmerServiceTest                  --> Unit test for the ShimmerService
+                                MdataServerApplicationTests             --> Unit test for the MdataServerApplication
+            resources                                                   --> Contains testing resources
+                test.application.properties                             --> Properties to use for testing
+config                                                                  --> Contains the project with configuration for mapping OMH to FHIR resources
+    src                                                                 --> Contains project source code
+        main                                                            --> Contains main project code
+        resoruces                                                       --> Contains project resources
+            fhirTemplates                                               --> Contains templates files to use for FHIR resources
+                stu3_Observation.json                                   --> Template to use for STU3 Observatisons
+            resourceConfigs                                             --> Contains mappings for OMH to FHIR resources
+                stu3_step_count.json                                    --> Mapping for OMH step_count to FHIR STU3 Observation
 Dockerfile                                                          --> Configures the Docker image for this project
 pom.xml                                                             --> Configures Maven
 README.md                                                           --> This file.

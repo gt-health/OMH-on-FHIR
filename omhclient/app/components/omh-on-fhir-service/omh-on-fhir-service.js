@@ -88,8 +88,12 @@ angular.module('omhOnFhirService', [])
         this.loginWindow = $window.open(shimmerAuthUrl, 'Sign In', 'left=100,top=100,width=500,height=600');
     };
 
-    factory.requestDocumentReference = function requestDocumentReference(shimmerId, startDate, endDate){
-        var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/DocumentReference?subject=" + shimmerId;
+    factory.requestStepCountDocumentReference = function requestStepCountDocumentReference(shimmerId, startDate, endDate){
+        return this.requestDocumentReference(shimmerId, startDate, endDate, "step_count");
+    }
+
+    factory.requestDocumentReference = function requestDocumentReference(shimmerId, startDate, endDate, omhResource){
+        var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/DocumentReference?subject=" + shimmerId + "&omhResource=" + omhResource;
 
         if(startDate){
             shimmerDocRefUrl = shimmerDocRefUrl + "&date=" + startDate.toISOString().substring(0,10);//to make format 'yyyy-MM-dd'
@@ -103,12 +107,16 @@ angular.module('omhOnFhirService', [])
         return $http.get(shimmerDocRefUrl);
     };
 
-    factory.requestObservation = function requestObservation(shimmerId, startDate, endDate){
-        return this.requestOmhResource("Observation", shimmerId, startDate, endDate);
-    };
+    //factory.requestObservation = function requestObservation(shimmerId, startDate, endDate){
+    //    return this.requestOmhResource("Observation", shimmerId, startDate, endDate, "dstu3");
+    //};
 
-    factory.requestOmhResource = function requestOmhResource(resource, shimmerId, startDate, endDate){
-        var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/" + resource + "?subject=" + shimmerId;
+	factory.requestStepCount = function requestStepCount(shimmerId, startDate, endDate) {
+		return this.requestOmhResource("Observation", "step_count", "dstu3", shimmerId, startDate, endDate);
+	}
+
+    factory.requestOmhResource = function requestOmhResource(resource, omhResource, fhirVersion, shimmerId, startDate, endDate) {
+        var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/" + resource + "?subject=" + shimmerId + "&omhResource=" + omhResource + "&fhirVersion=" + fhirVersion;
 
         if(startDate){
             shimmerDocRefUrl = shimmerDocRefUrl + "&date=" + startDate.toISOString().substring(0,10);//to make format 'yyyy-MM-dd'
