@@ -28,13 +28,6 @@ services:
       - 5432
     env_file:
       - ./omhserver/postgres.env
-  mdata-config:
-    build:
-      context: ./omh-mapping-config
-      dockerfile: Dockerfile
-    restart: "no"
-    volumes:
-      - "maven:/root/.m2"
   mdata-app:
     build:
       context: ./omhserver
@@ -46,9 +39,6 @@ services:
       - ./omhserver/omh-server.env
     depends_on:
       - mdata-db
-      - mdata-config
-    volumes:
-      - "maven:/root/.m2"
   omh-on-fhir-client:
       build:
         #specifiy the project build context
@@ -59,5 +49,3 @@ services:
       #bind host port 8989 to container port 8080
       ports:
          - "8989:80"
-volumes:
-  maven:

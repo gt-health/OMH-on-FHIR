@@ -21,11 +21,11 @@ pipeline{
                 script{
                     docker.withRegistry("${GTRI_IMAGE_REGISTRY}"){
                         //Build and push the database image
-                        def webApiImage = docker.build("omhonfhirapp:1.0", "--no-cache -f ./omhserver/Dockerfile ./omhserver")
+                        def webApiImage = docker.build("dev-omhonfhirapp:1.0", "--no-cache -f ./omhserver/Dockerfile ./omhserver")
                         webApiImage.push('latest')
 
                         //Build and push the database image
-                        def uiImage = docker.build("omhonfhirui:1.0", "--no-cache -f ./omhclient/Dockerfile ./omhclient")
+                        def uiImage = docker.build("dev-omhonfhirui:1.0", "--no-cache -f ./omhclient/Dockerfile ./omhclient")
                         uiImage.push('latest')
                     }
                 }
