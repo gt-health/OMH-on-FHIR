@@ -21,11 +21,11 @@ pipeline{
                 script{
                     docker.withRegistry("${GTRI_IMAGE_REGISTRY}"){
                         //Build and push the database image
-                        def webApiImage = docker.build("omhonfhirapp:1.0", "--no-cache -f ./omhserver/Dockerfile ./omhserver")
+                        def webApiImage = docker.build("dev-omhonfhirapp:1.0", "--no-cache -f ./omhserver/Dockerfile ./omhserver")
                         webApiImage.push('latest')
 
                         //Build and push the database image
-                        def uiImage = docker.build("omhonfhirui:1.0", "--no-cache -f ./omhclient/Dockerfile ./omhclient")
+                        def uiImage = docker.build("dev-omhonfhirui:1.0", "--no-cache -f ./omhclient/Dockerfile ./omhclient")
                         uiImage.push('latest')
                     }
                 }
@@ -36,12 +36,12 @@ pipeline{
         stage('Notify'){
             steps{
                 script{
-                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'openmhealth/shimmer-resource-server', ports: '', service: 'OMHonFHIR/resource-server', timeout: 50
-                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'mongo', ports: '', service: 'OMHonFHIR/mongo', timeout: 50
-                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'openmhealth/shimmer-console', ports: '', service: 'OMHonFHIR/console', timeout: 50
-                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'postgres:latest', ports: '', service: 'OMHonFHIR/mdata-db', timeout: 50
-                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'gt-build.hdap.gatech.edu/omhonfhirapp:latest', ports: '', service: 'OMHonFHIR/mdata-app', timeout: 50
-                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'gt-build.hdap.gatech.edu/omhonfhirui:latest', ports: '', service: 'OMHonFHIR/omh-on-fhir-client', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'openmhealth/shimmer-resource-server', ports: '', service: 'OMHonFHIR-dev/resource-server', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'mongo', ports: '', service: 'OMHonFHIR-dev/mongo', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'openmhealth/shimmer-console', ports: '', service: 'OMHonFHIR-dev/console', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'postgres:latest', ports: '', service: 'OMHonFHIR-dev/mdata-db', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'gt-build.hdap.gatech.edu/dev-omhonfhirapp:latest', ports: '', service: 'OMHonFHIR-dev/mdata-app', timeout: 50
+                    rancher confirm: true, credentialId: 'gt-rancher-server', endpoint: "${GTRI_RANCHER_API_ENDPOINT}", environmentId: "${GTRI_HDAP_ENV_ID}", environments: '', image: 'gt-build.hdap.gatech.edu/dev-omhonfhirui:latest', ports: '', service: 'OMHonFHIR-dev/omh-on-fhir-client', timeout: 50
                 }
             }
         }
