@@ -4,7 +4,7 @@
       "fitbit"
   ],
   "versions" : {
-      "fhir" : "dstu3",
+      "fhir" : "stu3",
       "openmhealth" : "1.0"
   },
   "patches": {
@@ -23,13 +23,8 @@
           },
           {
               "op": "replace",
-              "fhirPath": "/effectivePeriod/start",
-              "omhPath": "/body/effective_time_frame/time_interval/start_date_time",
-              "required" :  true
-          }, {
-              "op": "replace",
-              "fhirPath": "/effectivePeriod/end",
-              "omhPath": "/body/effective_time_frame/time_interval/end_date_time",
+              "fhirPath": "/effectiveDateTime",
+              "omhPath": "/body/effective_time_frame/date_time",
               "required" :  false
           },
           {
@@ -47,7 +42,7 @@
           {
               "op": "replace",
               "fhirPath": "/valueQuantity/value",
-              "omhPath": "/body/step_count",
+              "omhPath": "/body/heart_rate/value",
               "required" :  true
           },
           {
@@ -60,17 +55,17 @@
       "other": [
           {
               "op" : "remove",
-              "path" : "/effectiveDateTime"
+              "path" : "/effectivePeriod"
           },
           {
               "op": "replace",
               "path": "/category/0/coding/0/code",
-              "value": "physical-activity"
+              "value": "vital-signs"
           },
           {
               "op": "replace",
               "path": "/category/0/coding/0/display",
-              "value": "Physical Activity"
+              "value": "Vital Signs"
           },
           {
               "op": "replace",
@@ -80,17 +75,17 @@
           {
               "op": "replace",
               "path": "/code/coding/0/code",
-              "value": "55423-8"
+              "value": "8867-4"
           },
           {
               "op": "replace",
               "path": "/code/coding/0/display",
-              "value": "Number of steps in unspecified time."
+              "value": "Heart rate"
           },
           {
               "op": "replace",
               "path": "/valueQuantity/unit",
-              "value": "steps"
+              "value": "beats/min"
           },
           {
               "op": "replace",
@@ -100,7 +95,7 @@
           {
               "op": "replace",
               "path": "/valueQuantity/code",
-              "value": "{steps}"
+              "value": "{/min}"
           }
       ]
   }
