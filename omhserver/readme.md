@@ -19,23 +19,39 @@ application
                             mdata
                                 conf                                    --> Contains project configuration
                                     JacksonConfig.java                  --> Configures Jackson for JSON serialization/deserialization
+                                    SwaggerConfig.java                  --> Configures swagger
                                 controller
-                                    PatientDataController.java          --> Defines controller with endpoints for patient endpoints
+                                    FhirTemplateController.java         --> Defines controller with endpoints for FHIR template endpoints
+                                    ResourceConfigController.java       --> Defines controller with endpoints for resource config endpoints
+                                    SessionMetaData.java                --> Defines an object to store session metadata
+                                    ShimmerAuthController.java          --> Defines controller with endpoints for Shimmer authentication endpoints
+                                    Stu3PatientDataController.java      --> Defines controller with endpoints for patient endpoints
                                 jackson
                                     BindingResultSerializer.java        --> Serializer for BeanPropertyBindingResult
                                     HapiStu3Serializer.java             --> Serializer for HAPI FHIR STU3 Domain Objects
                                 jpa                                     --> Contains objects to configure database interactions
                                     entity                              --> Contains objects for data to persist to the database
                                         ApplicationUser.java            --> Defines data structure for an application users
-                                        ApplicationUserId.java          --> Defines data structre user ids
+                                        ApplicationUserId.java          --> Defines data structure user ids
+                                        FhirTemplate.java               --> Defines data structure for FHIR templates
+                                        ResourceConfig.java             --> Defines data structure for resource configs
                                         ShimmerData.java                --> Defines data structure for shimmer data
                                     repository                          --> Exposes methods to search the database
-                                        ApplicationUserRepository.java  --> Defines CRUD methdos for the application_user database table
+                                        ApplicationUserRepository.java  --> Defines CRUD methods for the application_user database table
+                                        FhirTemplateRepository.java     --> Defines CRUD methods for the fhir_template database table
+                                        ResourceConfigRepository.java   --> Defines CRUD methods for the resource_config database table
                                         ShimmerDataRepository.java      --> Defines CRUD methods for the shimmer_data database table
                                 service
+                                    ShimmerAuthenticationException.java --> Provides an authentication exception.
+                                    ShimmerAuthService.java             --> Provides functionality to authenticate to Shimmer.
+                                    ShimmerQueryParsingException.java   --> Provides a query parsing exception.
+                                    ShimmerResponse.java                --> Provides an object to represent a response from Shimmer.
                                     ShimmerService.java                 --> Provides methods to interact with the Shimmer web service. It is used by the controllers.
+                                    Stu3ResponseService.java            --> Provides functionality to generate STU3 Responses.
+                                    UnsupportedFhirDatePrefixException.java --> Provides an unsupported FHIR date exception.
                                 util
                                     ShimmerUtil.java                    --> Provides utility constants and methods.
+                                InitDatabase.java                       --> Handles database initialization.
                                 MdataServerApplication.java             --> Launches the application
             resources                                                   --> Contains application resources
                 application.properties                                  --> Defines properties for the application
@@ -49,8 +65,12 @@ application
                                 controller
                                     PatientDataControllerIntegrationTest--> Integration test for the PatientDataController
                                     PatientDataControllerTest           --> Unit test for the PatientDataController
+                                jpa
+                                    repository
+                                        TestApplicationUserRepository   --> Unit test for the ApplicationUserRepository
                                 service
                                     ShimmerServiceTest                  --> Unit test for the ShimmerService
+                                    Stu3ResponseServiceTest             --> Unit test for the Stu3ResponseService
                                 MdataServerApplicationTests             --> Unit test for the MdataServerApplication
             resources                                                   --> Contains testing resources
                 test.application.properties                             --> Properties to use for testing
