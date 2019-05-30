@@ -9,15 +9,15 @@
     </appender>
 
     <logger name="org.gtri.hdap.mdata.MdataServerApplication" level="DEBUG"/>
-    <logger name="org.gtri.hdap.mdata.common.service.ShimmerService" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.service.ShimmerService" level="DEBUG"/>
     <logger name="org.gtri.hdap.mdata.service.dstu3.ResponseService" level="DEBUG"/>
-    <logger name="org.gtri.hdap.mdata.dstu3.controller" level="DEBUG"/>
-    <logger name="org.gtri.hdap.mdata.common.conf" level="DEBUG"/>
-    <logger name="org.gtri.hdap.mdata.common.jackson" level="DEBUG"/>
-    <logger name="org.gtri.hdap.mdata.dstu3.controller.Dstu3PatientDataController" level="TRACE"/>
-    <logger name=" org.gtri.hdap.mdata.dstu3.service.Dstu3ResponseService" level="TRACE"/>
+    <logger name="org.gtri.hdap.mdata.controller" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.conf" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.jackson" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.controller.Stu3PatientDataController" level="TRACE"/>
+    <logger name=" org.gtri.hdap.mdata.service.Stu3ResponseService" level="TRACE"/>
     <logger name="org.gtri.hdap.mdata.InitDatabase" level="DEBUG"/>
-    <logger name="org.gtri.hdap.mdata.common.jpa" level="DEBUG"/>
+    <logger name="org.gtri.hdap.mdata.jpa" level="DEBUG"/>
 
     <root level="ERROR">
         <appender-ref ref="STDOUT" />

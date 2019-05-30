@@ -4,7 +4,7 @@
       "fitbit"
   ],
   "versions" : {
-      "fhir" : "dstu3",
+      "fhir" : "stu3",
       "openmhealth" : "1.0"
   },
   "patches": {

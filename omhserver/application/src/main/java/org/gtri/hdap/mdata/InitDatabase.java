@@ -1,33 +1,24 @@
 package org.gtri.hdap.mdata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.gtri.hdap.mdata.common.jpa.entity.FhirTemplate;
-import org.gtri.hdap.mdata.common.jpa.entity.ResourceConfig;
-import org.gtri.hdap.mdata.common.jpa.repository.FhirTemplateRepository;
-import org.gtri.hdap.mdata.common.jpa.repository.ResourceConfigRepository;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.gtri.hdap.mdata.jpa.entity.FhirTemplate;
+import org.gtri.hdap.mdata.jpa.entity.ResourceConfig;
+import org.gtri.hdap.mdata.jpa.repository.FhirTemplateRepository;
+import org.gtri.hdap.mdata.jpa.repository.ResourceConfigRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
