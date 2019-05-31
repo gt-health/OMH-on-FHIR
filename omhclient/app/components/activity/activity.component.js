@@ -12,7 +12,6 @@ component('activity', {
         console.log("Params passed to login");
         console.log($routeParams);
         self.waitingForSearch = false;
-        self.waitingForHeartRateSearch = false;
         self.waitingForGraph = false;
         self.startDate;
         self.endDate;
@@ -22,23 +21,11 @@ component('activity', {
         self.activityDataType = "OMH JSON";
         self.activityBinaryUrl;
         self.omhActivity;
-
-        self.heartRateDocumentRef;
-        self.heartRateResourceType= "application/json";
-        self.heartRateDataType = "OMH JSON";
-        self.heartRateBinaryUrl;
-        self.omhHeartRate;
-
         self.prunedObservationResponse = "";
         self.observationResponse = "";
-        self.prunedHeartRateObservationResponse = "";
-        self.heartRateObservationResponse = "";
-
         self.patientName;
         self.observationVisible = false;
-        self.heartRateObservationVisible = false;
         self.docReferenceVisible = false;
-        self.heartRateReferenceVisible = false;
         self.startDateGap = 60;
         self.showStepDataTable = false;
         self.stepCountVisible = true;
@@ -90,14 +77,6 @@ component('activity', {
                         'type' : 'line',
                         'daysShownOnTimeline': undefined
                     }
-                },
-                'heart_rate': {
-                    'range': undefined,
-                    'timeQuantizationLevel': OMHWebVisualizations.QUANTIZE_DAY,
-                    'chart': {
-                        'type' : 'line',
-                        'daysShownOnTimeline': undefined
-                    }
                 }
             }
         };
@@ -122,11 +101,10 @@ component('activity', {
         // Handlers
         //===================================================================================
         $scope.$on('requestBinary', function(){ self.queryBinary(); });
-        $scope.$on('requestHeartRateBinary', function(){ self.queryHeartRateBinary(); });
 
         //initialize graph in UI
         self.$onInit = function(){
-            self.retrieveStepCountAndHeartRate();
+            self.retrieveStepCount();
         };
 
         self.$onChanges = function(changesObj){
@@ -138,11 +116,11 @@ component('activity', {
         // Functions
         //===================================================================================
 
-        self.retrieveStepCountAndHeartRate = function retrieveStepCountAndHeartRate(){
+        self.retrieveStepCount = function retrieveStepCount(){
             console.log("Retrieve step count");
             self.requestDocumentReference(true);
             //go ahead and get the data as an observation as well
-            self.queryObservations();
+            self.queryObservation();
         };
         self.queryActivity = function queryActivity(){
             console.log("Querying Action");
@@ -152,12 +130,8 @@ component('activity', {
         self.requestDocumentReference = function requestDocumentReference(requestBinary){
             console.log("Querying patient " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.waitingForSearch = true;
-            self.waitingForHeartRateSearch = true;
             self.activityDocumentRef = null;
-            self.heartRateDocumentRef = null;
             self.omhActivity = null;
-            self.omhHeartRate = null;
-            //request step count data
             self.omhOnFhirApi.requestStepCountDocumentReference(self.shimmerId, self.startDate, self.endDate)
                 .then(function(response){
                     console.log("Activity Response");
@@ -198,50 +172,6 @@ component('activity', {
                     if(requestBinary){
                         console.log("Requesting Binary");
                         $scope.$emit('requestBinary');
-                    }
-                });
-
-            //request heart rate data
-            self.omhOnFhirApi.requestHeartRateDocumentReference(self.shimmerId, self.startDate, self.endDate)
-                .then(function(response){
-                    console.log("Heart Rate Response");
-                    console.log(response);
-
-                    //sample response data
-                    //{
-                    // "resourceType":"DocumentReference",
-                    // "status":"current",
-                    // "type":{
-                    //    "text":"OMH fitbit data"
-                    // },
-                    // "indexed":"2018-07-31T22:02:11.408+00:00",
-                    // "content":[
-                    //     {
-                    //       "attachment":{
-                    //        "contentType":"application/json",
-                    //        "url":"Binary/1d1ddd60-0c42-4ed2-b0e3-8b43876ceb9b",
-                    //        "title":"OMH fitbit data",
-                    //        "creation":"2018-07-31T22:02:11+00:00"
-                    //       }
-                    //     }
-                    // ]
-                    //}
-                    console.log("Processing response");
-                    //at the moment we are returning a single entry in the response
-                    var currDocRef = response.data;
-                    self.heartRateDocumentRef = currDocRef;
-
-                    //make title
-                    self.heartRateResourceType = currDocRef.resourceType;
-                    //make type
-                    self.heartRateDataType = currDocRef.type;
-                    //make url
-                    self.heartRateBinaryUrl = currDocRef.entry[0].resource.content[0].attachment.url;
-                    self.waitingForHeartRateSearch = false;
-                    self.heartRateReferenceVisible = true;
-                    if(requestBinary){
-                        console.log("Requesting HeartRate Binary");
-                        $scope.$emit('requestHeartRateBinary');
                     }
                 });
         };
@@ -290,122 +220,7 @@ component('activity', {
                 });
         };
 
-        self.queryHeartRateBinary = function queryHeartRateBinary(){
-            console.log("Querying Heart Rate binary " + self.heartRateBinaryUrl);
-            //self.omhOnFhirApi.requestBinaryAsJson(self.heartRateBinaryUrl)
-            //    .then(function(response){
-            //        //sample response
-            //        //{
-            //        //    "shim": "googlefit",
-            //        //    "timeStamp": 1534251049,
-            //        //    "body": [
-            //        //    {
-            //        //        "header" : {
-            //        //            "id" : "3b9b68a2-e0fd-4bdd-ba85-4127a4e8gggg",
-            //        //            "creation_date_time" : "2018-08-14T12:50:49.383Z",
-            //        //            "acquisition_provenance" : {
-            //        //                "source_name" : "some source",
-            //        //                "source_origin_id" : "some device"
-            //        //            },
-            //        //            "schema_id" : {
-            //        //                "namespace" : "omh",
-            //        //                "name" : "heart-rate",
-            //        //                "version" : "2.0"
-            //        //            }
-            //        //        },
-            //        //        "body" : {
-            //        //            "heart_rate": {
-            //        //                "value": 50,
-            //        //                "unit": "beats/min"
-            //        //            },
-            //        //            "effective_time_frame": {
-            //        //                "date_time": "2013-02-05T07:25:00Z"
-            //        //            },
-            //        //            "temporal_relationship_to_physical_activity": "at rest",
-            //        //            "user_notes": "I felt quite dizzy"
-            //        //        }
-            //        //    },
-            //        // ...
-            //        //    ]
-            //        //}
-            //        console.log("Processing Heart Rate Binary Response");
-            //        console.log(response);
-            //        self.omhHeartRate = response.data; //to convert omhHeartRate to JSON string use JSON.stringify(omhHeartRate)
-            //        self.makeChart(self.omhHeartRate.body, d3.select('.chart-container'), "heart_rate", self.options);
-            //        console.log("processed response");
-            //    });
-
-            //sample for testing
-            console.log("Processing Heart Rate Binary Response");
-            self.omhHeartRate =
-                "{" +
-                "\"shim\" : \"googlefit\"," +
-                "\"timeStamp\" : 1534251049," +
-                "\"body\" : [" +
-                "{" +
-                "\"header\" : {" +
-                "\"id\" : \"3b9b68a2-e0fd-4bdd-ba85-4127a4e8gggg\"," +
-                "\"creation_date_time\" : \"2019-05-14T12:50:49.383Z\"," +
-                "\"acquisition_provenance\" : {" +
-                "\"source_name\" : \"some source\"," +
-                "\"source_origin_id\" : \"some device\"" +
-                "}," +
-                "\"schema_id\" : {" +
-                "\"namespace\" : \"omh\"," +
-                "\"name\" : \"heart-rate\"," +
-                "\"version\" : \"2.0\"" +
-                "}" +
-                "," +
-                "\"body\" : {" +
-                "\"heart_rate\": {" +
-                "\"value\": 50," +
-                "\"unit\": \"beats/min\"" +
-                "}," +
-                "\"effective_time_frame\": {" +
-                "\"date_time\": \"2019-05-05T07:25:00Z\"" +
-                "}," +
-                "\"temporal_relationship_to_physical_activity\": \"at rest\"," +
-                "\"user_notes\": \"I felt quite dizzy\"" +
-                "}" +
-                "}," +
-                "{" +
-                "\"header\" : {" +
-                "\"id\" : \"3b9b68a2-e0fd-4bdd-ba85-4127a4e8gggg\"," +
-                "\"creation_date_time\" : \"2019-05-14T12:50:49.383Z\"," +
-                "\"acquisition_provenance\" : {" +
-                "\"source_name\" : \"some source\"," +
-                "\"source_origin_id\" : \"some device\"" +
-                "}," +
-                "\"schema_id\" : {" +
-                "\"namespace\" : \"omh\"," +
-                "\"name\" : \"heart-rate\"," +
-                "\"version\" : \"2.0\"" +
-                "}" +
-                "," +
-                "\"body\" : {" +
-                "\"heart_rate\": {" +
-                "\"value\": 40," +
-                "\"unit\": \"beats/min\"" +
-                "}," +
-                "\"effective_time_frame\": {" +
-                "\"date_time\": \"2019-05-06T08:25:00Z\"" +
-                "}," +
-                "\"temporal_relationship_to_physical_activity\": \"at rest\"," +
-                "\"user_notes\": \"I felt quite dizzy\"" +
-                "}" +
-                "}" +
-                "]" +
-                "}";
-            self.makeChart(self.omhHeartRate.body, d3.select('.chart-container'), "heart_rate", self.options);
-            console.log("processed response");
-        };
-
-        self.queryObservations = function queryObservations(){
-            self.queryStepCountObservation();
-            self.queryHeartRateObservation();
-        };
-
-        self.queryStepCountObservation = function queryStepCountObservation(){
+        self.queryObservation = function queryObservation(){
             console.log("Querying Observation " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
             self.omhOnFhirApi.requestStepCount(self.shimmerId, self.startDate, self.endDate)
                 .then(function(response){
@@ -523,97 +338,6 @@ component('activity', {
                 });
         };
 
-        self.queryHeartRateObservation = function queryHeartRateObservation(){
-            console.log("Querying Observation " + self.shimmerId+ "activity from " + self.startDate + " to " + self.endDate);
-            self.omhOnFhirApi.requestHeartRate(self.shimmerId, self.startDate, self.endDate)
-                .then(function(response){
-                    console.log("Observation Response");
-                    console.log(response);
-
-                    //sample response data
-                    //{
-                    //    "resourceType": "Bundle",
-                    //    "id": "55f690f4-d5e5-4f26-8fa2-026be61019",
-                    //    "meta": {
-                    //    "lastUpdated": "2018-05-23T23:48:12Z"
-                    //},
-                    //    "type": "searchset",
-                    //    "total": 1,
-                    //    "link": [
-                    //    {
-                    //        "relation": "self",
-                    //        "url": "http://test.fhir.org/r3/Observation?_format=application/fhir+json&search-id=7db95351-c995-4cbc-b990-1760a91987&&patient.identifier=some%2Duser&_sort=_id"
-                    //    }
-                    //],
-                    //    "entry": [
-                    //    {
-                    //        "fullUrl": "http://test.fhir.org/r3/Observation/stepcount-example",
-                    //        "resource": {
-                    //            "resourceType":"Observation",
-                    //            "id":"omh-heart-rate-example",
-                    //            "meta":{
-                    //                "source":"generator",
-                    //                "profile":[
-                    //                    "http://www.fhir.org/guides/mfhir/StructureDefinition/heart-rate"
-                    //                ]
-                    //            },
-                    //            "identifier":[
-                    //                {
-                    //                    "system":"https://omh.org/shimmer/ids",
-                    //                    "value":"87ca4312-fbe3-4b24-bab4-17d47ba54e2a"
-                    //                }
-                    //            ],
-                    //            "status":"unknown",
-                    //            "category":[
-                    //                {
-                    //                    "coding":[
-                    //                        {
-                    //                            "system":"http://hl7.org/fhir/observation-category",
-                    //                            "code":"vital-signs",
-                    //                            "display":"Vital Signs"
-                    //                        }
-                    //                    ]
-                    //                }
-                    //            ],
-                    //            "code":{
-                    //                "coding":[
-                    //                    {
-                    //                        "system":"http://loinc.org",
-                    //                        "code":"8867-4",
-                    //                        "display":"Heart rate"
-                    //                    }
-                    //                ],
-                    //                "text":"Heart Rate"
-                    //            },
-                    //            "subject":{
-                    //                "identifier":{
-                    //                    "system":"https://omh.org/shimmer/patient_ids",
-                    //                    "value":"some-user"
-                    //                },
-                    //                "effectiveDateTime":"2014-01-03T09:13:41Z",
-                    //                "issued":"2014-01-03T09:14:41Z",
-                    //                "valueQuantity":{
-                    //                    "value":79.88711511574905,
-                    //                    "unit":"beats/min",
-                    //                    "system":"http://unitsofmeasure.org",
-                    //                    "code":"/min"
-                    //                }
-                    //            }
-                    //        },
-                    //        "search": {
-                    //            "mode": "match"
-                    //        }
-                    //    }
-                    //]
-                    //}
-                    console.log("Processing response");
-                    //at the moment we are returning a single entry in the response
-                    self.heartRateObservationResponse = response.data;
-                    self.prunedHeartRateObservationResponse = JSON.stringify(self.heartRateObservationResponse, null, 2).substring(0,1000);
-                    self.heartRateObservationVisible = true;
-                });
-        };
-
         self.saveJsonObservation = function saveJsonObservation(){
             var fileName = "observation-step-count.json";
             self.saveJsonAsFile(fileName, angular.toJson(self.observationResponse, true));
@@ -664,11 +388,6 @@ component('activity', {
             console.log("Toggled DocReference Visibility to: " + self.docReferenceVisible);
         };
 
-        self.toggleHeartRateReferenceVisibility = function toggleHeartRateReferenceVisibility(){
-            self.heartRateReferenceVisible = !self.heartRateReferenceVisible;
-            console.log("Toggled HeartRateReference Visibility to: " + self.heartRateReferenceVisible);
-        };
-
         self.toggleStepCountVisibility = function toggleStepCountVisibility(){
             self.stepCountVisible = !self.stepCountVisible;
         };
@@ -679,6 +398,7 @@ component('activity', {
             self.showStepDataTable = !self.showStepDataTable;
             console.log("Toggled showStepDataTable to: " + self.showStepDataTable);
         };
+
         //===================================================================================
         // D3 Config
         //===================================================================================
