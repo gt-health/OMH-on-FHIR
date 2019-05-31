@@ -3,10 +3,10 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-heading"><a href="#" ng-click="$ctrl.toggleStepCountVisibility()"><h2>Step Count</h2></a></div>
+    <div class="panel-heading"><a href="#" ng-click="$ctrl.toggleStepCountVisibility()"><h2>Step Count and Heart Rate</h2></a></div>
     <div class="panel-body" ng-if="$ctrl.stepCountVisible == true">
         <form>
-            <h1>Find daily step count for date range</h1>
+            <h1>Find daily step count and heart rate data for date range</h1>
             <div class="form-group">
                 <label for="startDate">Start Date:</label>
                 <!-- Using date input type for details see: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/date -->
@@ -19,12 +19,12 @@
                 <!-- input value is of the format yyyy-MM-dd by default -->
                 <input ng-model="$ctrl.endDate" type="date" id="endDate" name="endDate">
             </div>
-            <button class="btn btn-default" ng-click="$ctrl.retrieveStepCount()">Search</button>
+            <button class="btn btn-default" ng-click="$ctrl.retrieveStepCountAndHeartRate()">Search</button>
         </form>
 
-        <div ng-if="$ctrl.waitingForSearch || $ctrl.waitingForGraph" class="alert alert-info">
+        <div ng-if="$ctrl.waitingForSearch || $ctrl.waitingForGraph || $ctrl.waitingForHeartRateSearch" class="alert alert-info">
             <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
-            Searching for step count...
+            Searching for step count and heart rate data...
         </div>
 
         <div class="panel panel-default">
@@ -35,8 +35,8 @@
                 </svg>
             </div>
 
-            <button class="btn btn-default" ng-if="$ctrl.omhActivity && $ctrl.showStepDataTable == false" ng-click="$ctrl.toggleShowStepDataTable()">Show Data Table</button>
-            <button class="btn btn-default" ng-if="$ctrl.omhActivity && $ctrl.showStepDataTable == true" ng-click="$ctrl.toggleShowStepDataTable()">Hide Data Table</button>
+            <button class="btn btn-default" ng-if="($ctrl.omhActivity || $ctrl.omhHeartRate) && $ctrl.showStepDataTable == false" ng-click="$ctrl.toggleShowStepDataTable()">Show Data Table</button>
+            <button class="btn btn-default" ng-if="($ctrl.omhActivity || $ctrl.omhHeartRate) && $ctrl.showStepDataTable == true" ng-click="$ctrl.toggleShowStepDataTable()">Hide Data Table</button>
 
             <h3 ng-if="$ctrl.showStepDataTable">All Step Data Points</h3>
             <table ng-if="$ctrl.showStepDataTable" class="table table-striped">
@@ -64,6 +64,36 @@
                     <td>{{stepActivity.header.schema_id.name}}</td>
                     <td>{{stepActivity.header.schema_id.namespace}}</td>
                     <td>{{stepActivity.header.schema_id.version}}</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h3 ng-if="$ctrl.showStepDataTable">All Heart Rate Data Points</h3>
+            <table ng-if="$ctrl.showStepDataTable" class="table table-striped">
+                <thead>
+                <tr>
+                    <td>Heart Rate</td>
+                    <td>Unit</td>
+                    <td>Time</td>
+                    <td>Source</td>
+                    <td>Origin</td>
+                    <td>Creation Date</td>
+                    <td>Schema</td>
+                    <td>Schema Namespace</td>
+                    <td>Schema Version</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="heartRateActivity in $ctrl.omhHeartRate.body">
+                    <td>{{heartRateActivity.body.heart_rate.value}}</td>
+                    <td>{{heartRateActivity.body.heart_rate.unit}}</td>
+                    <td>{{heartRateActivity.body.effective_time_frame.date_time | date:"MM/dd/yyyy '-' h:mma"}}</td><!--<td>{{stepActivity.body.effective_time_frame.time_interval.start_date_time}}</td>-->
+                    <td>{{heartRateActivity.header.acquisition_provenance.source_name}}</td>
+                    <td>{{heartRateActivity.header.acquisition_provenance.source_origin_id}}</td>
+                    <td>{{heartRateActivity.header.creation_date_time | date:"MM/dd/yyyy '-' h:mma"}}</td> <!--<td>{{stepActivity.header.creation_date_time}}</td>-->
+                    <td>{{heartRateActivity.header.schema_id.name}}</td>
+                    <td>{{heartRateActivity.header.schema_id.namespace}}</td>
+                    <td>{{heartRateActivity.header.schema_id.version}}</td>
                 </tr>
                 </tbody>
             </table>

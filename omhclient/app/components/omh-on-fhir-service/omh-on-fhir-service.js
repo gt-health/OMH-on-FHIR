@@ -90,7 +90,11 @@ angular.module('omhOnFhirService', [])
 
     factory.requestStepCountDocumentReference = function requestStepCountDocumentReference(shimmerId, startDate, endDate){
         return this.requestDocumentReference(shimmerId, startDate, endDate, "step_count");
-    }
+    };
+
+    factory.requestHeartRateDocumentReference = function requestHeartRateDocumentReference(shimmerId, startDate, endDate){
+        return this.requestDocumentReference(shimmerId, startDate, endDate, "heart_rate");
+    };
 
     factory.requestDocumentReference = function requestDocumentReference(shimmerId, startDate, endDate, omhResource){
         var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/DocumentReference?subject=" + shimmerId + "&omhResource=" + omhResource;
@@ -113,7 +117,11 @@ angular.module('omhOnFhirService', [])
 
 	factory.requestStepCount = function requestStepCount(shimmerId, startDate, endDate) {
 		return this.requestOmhResource("Observation", "step_count", "stu3", shimmerId, startDate, endDate);
-	}
+	};
+
+    factory.requestHeartRate = function requestHeartRate(shimmerId, startDate, endDate) {
+		return this.requestOmhResource("Observation", "heart_rate", "stu3", shimmerId, startDate, endDate);
+	};
 
     factory.requestOmhResource = function requestOmhResource(resource, omhResource, fhirVersion, shimmerId, startDate, endDate) {
         var shimmerDocRefUrl = env.omhOnFhirAPIBase + "/" + resource + "?subject=" + shimmerId + "&omhResource=" + omhResource + "&fhirVersion=" + fhirVersion;
