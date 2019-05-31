@@ -1,6 +1,7 @@
 #Option 1: build project and run with Node
 FROM node:8 as builder
 
+#either prod or dev
 ARG buildEnv=prod
 
 # make a working directory
