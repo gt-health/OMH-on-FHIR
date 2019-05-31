@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -68,27 +69,17 @@ public class Stu3ResponseServiceTest {
     private Logger logger = LoggerFactory.getLogger(Stu3ResponseServiceTest.class);
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    private Map<String, InputStream> configMap = new HashMap<>();
-    private Map<String, InputStream> templatemap = new HashMap<>();
+    private Map<String, org.springframework.core.io.Resource> configMap = new HashMap<>();
+    private Map<String, org.springframework.core.io.Resource> templatemap = new HashMap<>();
+    private Map<String, org.springframework.core.io.Resource> testFiles = new HashMap<>();
 
     @Before
     public void init() throws Exception{
         logger.debug("Reading in Observation config");
         loadMap(this.configMap, "resourceConfigs/*.json");
         loadMap(this.templatemap, "fhirTemplates/*.json");
+        loadMap(this.testFiles, "testResources/*.json");
         logger.debug("Finished initializing config");
-    }
-    private void loadMap(Map map, String resourcePath) throws Exception{
-        logger.debug("Populating Map");
-        PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver = new PathMatchingResourcePatternResolver(this.getClass().getClassLoader());
-        org.springframework.core.io.Resource[] resources = pathMatchingResourcePatternResolver.getResources(resourcePath);
-        System.out.println("Resources: " + resources);
-        for(int i=0; i<resources.length; i++){
-            org.springframework.core.io.Resource resource = resources[i];
-            logger.debug(resource.getFilename());
-            map.put(resource.getFilename(), resource.getInputStream());
-        }
-        logger.debug("Finished populating map");
     }
 
     @Test
@@ -167,11 +158,13 @@ public class Stu3ResponseServiceTest {
         // ...
         //    ]
         //}
-        String sb = FileUtils.readFileToString(new File("src/test/resources/testomhresponse-stepcount.json"), UTF_8);
+        org.springframework.core.io.Resource testResource = this.testFiles.get("testomhresponse-stepcount.json");
+        String sb = FileUtils.readFileToString(testResource.getFile(), UTF_8);
+//        String sb = FileUtils.readFileToString(new File("src/test/resources/testomhresponse-stepcount.json"), UTF_8);
         ResourceConfig rc = new ResourceConfig();
         rc.setResourceId("stu3_step_count");
 
-        InputStream configInputStream = this.configMap.get("stu3_step_count.json");
+        InputStream configInputStream = this.configMap.get("stu3_step_count.json").getInputStream();
         assertNotNull(configInputStream);
         rc.setConfig(objectMapper.readTree(configInputStream));
         List<Resource> observationList = null;
@@ -179,7 +172,7 @@ public class Stu3ResponseServiceTest {
         //create the fhir template
         FhirTemplate fhirTemplate = new FhirTemplate();
         fhirTemplate.setTemplateId("stu3_Observation");
-        InputStream templateInputStream = this.templatemap.get("stu3_Observation.json");
+        InputStream templateInputStream = this.templatemap.get("stu3_Observation.json").getInputStream();
         assertNotNull(templateInputStream);
         fhirTemplate.setTemplate(objectMapper.readTree(templateInputStream));
 
@@ -238,26 +231,28 @@ public class Stu3ResponseServiceTest {
         //                "version": "2.0"
         //            }
         //        },
-//                "body": {
-//                    "heart_rate": {
-//                        "value": 50,
-//                                "unit": "beats/min"
-//                    },
-//                    "effective_time_frame": {
-//                        "date_time": "2013-02-05T07:25:00Z"
-//                    },
-//                    "temporal_relationship_to_physical_activity": "at rest",
-//                            "user_notes": "I felt quite dizzy"
-//                }
+        //        "body": {
+        //            "heart_rate": {
+        //                "value": 50,
+        //                        "unit": "beats/min"
+        //            },
+        //            "effective_time_frame": {
+        //                "date_time": "2013-02-05T07:25:00Z"
+        //            },
+        //            "temporal_relationship_to_physical_activity": "at rest",
+        //                    "user_notes": "I felt quite dizzy"
+        //        }
         //    },
         // ...
         //    ]
         //}
-        String sb = FileUtils.readFileToString(new File("src/test/resources/testomhresponse-heartrate.json"), UTF_8);
+        org.springframework.core.io.Resource testResource = this.testFiles.get("testomhresponse-heartrate.json");
+        String sb = FileUtils.readFileToString(testResource.getFile(), UTF_8);
+//        String sb = FileUtils.readFileToString(new File("src/test/resources/testomhresponse-heartrate.json"), UTF_8);
         ResourceConfig rc = new ResourceConfig();
         rc.setResourceId("stu3_heart_rate");
 
-        InputStream configInputStream = this.configMap.get("stu3_heart_rate.json");
+        InputStream configInputStream = this.configMap.get("stu3_heart_rate.json").getInputStream();
         assertNotNull(configInputStream);
         rc.setConfig(objectMapper.readTree(configInputStream));
         List<Resource> observationList = null;
@@ -265,7 +260,7 @@ public class Stu3ResponseServiceTest {
         //create the fhir template
         FhirTemplate fhirTemplate = new FhirTemplate();
         fhirTemplate.setTemplateId("stu3_Observation");
-        InputStream templateInputStream = this.templatemap.get("stu3_Observation.json");
+        InputStream templateInputStream = this.templatemap.get("stu3_Observation.json").getInputStream();
         assertNotNull(templateInputStream);
         fhirTemplate.setTemplate(objectMapper.readTree(templateInputStream));
 
@@ -297,5 +292,18 @@ public class Stu3ResponseServiceTest {
         assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getDisplay().equals(ShimmerUtil.OBSERVATION_HEART_RATE_CODE_DISPLAY) );
         assertTrue(((Observation)observationList.get(1)).getIssued() != null );
         logger.debug("========== Exiting testGenerateObservation ==========");
+    }
+
+    private void loadMap(Map map, String resourcePath) throws Exception{
+        logger.debug("Populating Map");
+        PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver = new PathMatchingResourcePatternResolver(this.getClass().getClassLoader());
+        org.springframework.core.io.Resource[] resources = pathMatchingResourcePatternResolver.getResources(resourcePath);
+        System.out.println("Resources: " + resources);
+        for(int i=0; i<resources.length; i++){
+            org.springframework.core.io.Resource resource = resources[i];
+            logger.debug(resource.getFilename());
+            map.put(resource.getFilename(), resource);
+        }
+        logger.debug("Finished populating map");
     }
 }

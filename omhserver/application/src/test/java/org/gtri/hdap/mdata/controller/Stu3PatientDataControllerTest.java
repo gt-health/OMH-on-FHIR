@@ -83,9 +83,8 @@ public class Stu3PatientDataControllerTest {
 
         mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + validDate1 + "&date=" + validDate2 + "&omhResource=step_count"))
         .andExpect(status().isOk());
-//            .andExpect(content().json("{\"data\": \"activity data here\"}"));
 
-        given(shimmerService.retrievePatientData(applicationUser, inValidQueryDates, "step_count")).willReturn(failureResponse);// willThrow(new Exception("Unsupported FHIR date prefix only GE is supported for start dates."));
+        given(shimmerService.retrievePatientData(applicationUser, inValidQueryDates, "step_count")).willReturn(failureResponse);
 
         mvc.perform(MockMvcRequestBuilders.get("/DocumentReference?subject=" + shimmerId + "&date=" + inValidDate1 + "&date=" + inValidDate2 + "&omhResource=step_count"))
                 .andExpect(status().is4xxClientError());
