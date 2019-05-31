@@ -213,7 +213,7 @@ public class Stu3ResponseService {
     }
 
     public List<CodeableConcept> createCategory(){
-        CodeableConcept codeableConcept = createCodeableConcept(ShimmerUtil.OBSERVATION_CATEGORY_SYSTEM, ShimmerUtil.OBSERVATION_CATEGORY_CODE, ShimmerUtil.OBSERVATION_CATEGORY_DISPLAY);
+        CodeableConcept codeableConcept = createCodeableConcept(ShimmerUtil.OBSERVATION_CATEGORY_SYSTEM, ShimmerUtil.OBSERVATION_PHYSICAL_ACTIVITY_CATEGORY_CODE, ShimmerUtil.OBSERVATION_PHYSICAL_ACTIVITY_CATEGORY_DISPLAY);
         List<CodeableConcept> codeableConceptList = new ArrayList<>();
         codeableConceptList.add(codeableConcept);
         return codeableConceptList;

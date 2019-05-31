@@ -1,0 +1,58 @@
+{
+	"shim" : "googlefit",
+	"timeStamp" : 1534251049,
+	"body" : [
+		{
+			"header" : {
+				"id" : "3b9b68a2-e0fd-4bdd-ba85-4127a4e8gggg",
+				"creation_date_time" : "2018-08-14T12:50:49.383Z",
+				"acquisition_provenance" : {
+					"source_name" : "some source",
+					"source_origin_id" : "some device"
+				},
+				"schema_id" : {
+					"namespace" : "omh",
+					"name" : "heart-rate",
+					"version" : "2.0"
+				}
+			},
+			"body" : {
+				"heart_rate": {
+					"value": 50,
+					"unit": "beats/min"
+				},
+				"effective_time_frame": {
+					"date_time": "2013-02-05T07:25:00Z"
+				},
+				"temporal_relationship_to_physical_activity": "at rest",
+				"user_notes": "I felt quite dizzy"
+			}
+		},
+		{
+			"header" : {
+				"id" : "3b9b68a2-e0fd-4bdd-ba85-4127a4e8eeee",
+				"creation_date_time" : "2018-08-14T12:50:49.383Z",
+				"acquisition_provenance" : {
+					"source_name" : "some source",
+					"source_origin_id" : "some device"
+				},
+				"schema_id" : {
+					"namespace" : "omh",
+					"name" : "heart-rate",
+					"version" : "2.0"
+				}
+			},
+			"body" : {
+				"heart_rate": {
+					"value": 40,
+					"unit": "beats/min"
+				},
+				"effective_time_frame": {
+					"date_time": "2013-02-05T08:25:00Z"
+				},
+				"temporal_relationship_to_physical_activity": "at rest",
+				"user_notes": "I felt quite dizzy"
+			}
+		}
+	]
+}

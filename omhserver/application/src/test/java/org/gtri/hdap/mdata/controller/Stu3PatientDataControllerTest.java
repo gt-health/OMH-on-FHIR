@@ -93,14 +93,6 @@ public class Stu3PatientDataControllerTest {
         logger.debug("========== Exiting getFindDocumentReference ==========");
     }
 
-    @Test
-    public void testFindHeartRate() {
-        logger.debug("========== Entering testFindHeartRate ==========");
-
-        logger.debug("========== Exiting testFindHeartRate ==========");
-
-    }
-
     private List<String> createDateList(String startDate, String endDate){
         List<String> validQueryDates = new ArrayList<String>();
         if(startDate != null) {
