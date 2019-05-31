@@ -94,8 +94,10 @@ public class Stu3PatientDataControllerTest {
     }
 
     @Test
-    public void testGenerateObservationWithConfiguration() {
-        logger.debug("========== Entering testObservationWithConfiguration ==========");
+    public void testFindHeartRate() {
+        logger.debug("========== Entering testFindHeartRate ==========");
+
+        logger.debug("========== Exiting testFindHeartRate ==========");
 
     }
 

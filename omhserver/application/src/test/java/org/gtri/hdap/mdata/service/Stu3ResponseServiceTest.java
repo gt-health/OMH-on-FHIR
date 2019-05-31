@@ -2,6 +2,7 @@ package org.gtri.hdap.mdata.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
+import org.gtri.hdap.mdata.jpa.entity.FhirTemplate;
 import org.gtri.hdap.mdata.jpa.entity.ResourceConfig;
 import org.gtri.hdap.mdata.jpa.repository.ApplicationUserRepository;
 import org.gtri.hdap.mdata.jpa.repository.FhirTemplateRepository;
@@ -12,6 +13,7 @@ import org.hl7.fhir.dstu3.model.DocumentReference;
 import org.hl7.fhir.dstu3.model.Enumerations;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Resource;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,15 +23,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.*;
 
 /**
  * Created by es130 on 9/14/2018.
@@ -57,8 +66,32 @@ public class Stu3ResponseServiceTest {
     @MockBean
     private ShimmerDataRepository shimmerDataRepository;
 
+
     private Logger logger = LoggerFactory.getLogger(Stu3ResponseServiceTest.class);
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    private Map<String, InputStream> configMap = new HashMap<>();
+    private Map<String, InputStream> templatemap = new HashMap<>();
+
+    @Before
+    public void init() throws Exception{
+        logger.debug("Reading in Observation config");
+        loadMap(this.configMap, "resourceConfigs/*.json");
+        loadMap(this.templatemap, "fhirTemplates/*.json");
+        logger.debug("Finished initializing config");
+    }
+    private void loadMap(Map map, String resourcePath) throws Exception{
+        logger.debug("Populating Map");
+        PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver = new PathMatchingResourcePatternResolver(this.getClass().getClassLoader());
+        org.springframework.core.io.Resource[] resources = pathMatchingResourcePatternResolver.getResources(resourcePath);
+        System.out.println("Resources: " + resources);
+        for(int i=0; i<resources.length; i++){
+            org.springframework.core.io.Resource resource = resources[i];
+            logger.debug(resource.getFilename());
+            map.put(resource.getFilename(), resource.getInputStream());
+        }
+        logger.debug("Finished populating map");
+    }
 
     @Test
     public void testParseDate() throws Exception{
@@ -103,7 +136,6 @@ public class Stu3ResponseServiceTest {
     }
 
     // FIXME
-    @Ignore
     @Test
     public void testGenerateObservation() throws Exception{
         logger.debug("========== Entering testGenerateObservation ==========");
@@ -141,14 +173,24 @@ public class Stu3ResponseServiceTest {
         String sb = FileUtils.readFileToString(new File("src/test/resources/testomhresponse1.json"), UTF_8);
         ResourceConfig rc = new ResourceConfig();
         rc.setResourceId("stu3_step_count");
-        rc.setConfig(objectMapper.readTree(FileUtils.readFileToString(new File("src/test/resources/testconfig1.json"), UTF_8)));
-        List<Resource> observationList = stu3ResponseService.generateObservations(sb,rc);
+
+        InputStream configInputStream = this.configMap.get("stu3_step_count.json");
+        assertNotNull(configInputStream);
+        rc.setConfig(objectMapper.readTree(configInputStream));
+        List<Resource> observationList = null;
+
+        //create the fhir template
+        FhirTemplate fhirTemplate = new FhirTemplate();
+        fhirTemplate.setTemplateId("stu3_Observation");
+        InputStream templateInputStream = this.templatemap.get("stu3_Observation.json");
+        assertNotNull(templateInputStream);
+        fhirTemplate.setTemplate(objectMapper.readTree(templateInputStream));
+
+        given(fhirTemplateRepository.findOneByTemplateId(anyString()))
+                .willReturn(fhirTemplate);
+        observationList = stu3ResponseService.generateObservations(sb, rc);
         assertTrue(observationList.size() == 2);
-
         assertTrue(((Observation)observationList.get(0)).getValueQuantity().getValue().intValue() == 7 );
-
-        assertTrue(((Observation)observationList.get(0)).getId() == null );
-        assertTrue(((Observation)observationList.get(0)).getContained().get(0).getId().equals(ShimmerUtil.PATIENT_RESOURCE_ID) );
         assertTrue(((Observation)observationList.get(0)).getIdentifier().get(0).getSystem().equals(ShimmerUtil.PATIENT_IDENTIFIER_SYSTEM) );
         assertTrue(((Observation)observationList.get(0)).getIdentifier().get(0).getValue().equals("3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee") );
         assertTrue(((Observation)observationList.get(0)).getStatus().equals(Observation.ObservationStatus.UNKNOWN) );
@@ -158,15 +200,11 @@ public class Stu3ResponseServiceTest {
         assertTrue(((Observation)observationList.get(0)).getCode().getCoding().get(0).getCode().equals(ShimmerUtil.OBSERVATION_CODE_CODE) );
         assertTrue(((Observation)observationList.get(0)).getCode().getCoding().get(0).getSystem().equals(ShimmerUtil.OBSERVATION_CODE_SYSTEM) );
         assertTrue(((Observation)observationList.get(0)).getCode().getCoding().get(0).getDisplay().equals(ShimmerUtil.OBSERVATION_CODE_DISPLAY) );
-        assertTrue(((Observation)observationList.get(0)).getSubject().getReference() != null );
         assertTrue(((Observation)observationList.get(0)).getEffectivePeriod().getStart() != null );
         assertTrue(((Observation)observationList.get(0)).getEffectivePeriod().getEnd() != null );
         assertTrue(((Observation)observationList.get(0)).getIssued() != null );
-        assertTrue(((Observation)observationList.get(0)).getDevice().getDisplay().equals("some source,some step counter,1534251049") );
 
-        assertTrue(((Observation)observationList.get(1)).getComponent().get(0).getValueQuantity().getValue().intValue() == 27);
-        assertTrue(((Observation)observationList.get(1)).getId() != null );
-        assertTrue(((Observation)observationList.get(1)).getContained().get(0).getId().equals(ShimmerUtil.PATIENT_RESOURCE_ID) );
+        assertTrue(((Observation)observationList.get(1)).getValueQuantity().getValue().intValue() == 27);
         assertTrue(((Observation)observationList.get(1)).getIdentifier().get(0).getSystem().equals(ShimmerUtil.PATIENT_IDENTIFIER_SYSTEM) );
         assertTrue(((Observation)observationList.get(1)).getIdentifier().get(0).getValue().equals("3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcff") );
         assertTrue(((Observation)observationList.get(1)).getStatus().equals(Observation.ObservationStatus.UNKNOWN) );
@@ -176,7 +214,6 @@ public class Stu3ResponseServiceTest {
         assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getCode().equals(ShimmerUtil.OBSERVATION_CODE_CODE) );
         assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getSystem().equals(ShimmerUtil.OBSERVATION_CODE_SYSTEM) );
         assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getDisplay().equals(ShimmerUtil.OBSERVATION_CODE_DISPLAY) );
-        assertTrue(((Observation)observationList.get(1)).getSubject().getReference() != null );
         assertTrue(((Observation)observationList.get(1)).getEffectivePeriod().getStart() != null );
         assertTrue(((Observation)observationList.get(1)).getEffectivePeriod().getEnd() != null );
         assertTrue(((Observation)observationList.get(1)).getIssued() != null );
