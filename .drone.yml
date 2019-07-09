@@ -1,0 +1,14 @@
+kind: pipeline
+name: default
+
+steps:
+- name: build
+  image: maven:3.6.1-jdk-8
+  commands:
+  - mvn install
+
+trigger:
+  branch:
+  - drone
+  event:
+- push
