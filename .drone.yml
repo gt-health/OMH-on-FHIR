@@ -5,10 +5,5 @@ steps:
 - name: build
   image: maven:3.6.1-jdk-8
   commands:
+  - cd omhserver
   - mvn install
-
-trigger:
-  branch:
-  - drone
-  event:
-- push
