@@ -2,7 +2,7 @@ kind: pipeline
 name: default
 
 steps:
-- name: build
+- name: build server
   image: maven:3.6.1-jdk-8
   commands:
   - cd omhserver
