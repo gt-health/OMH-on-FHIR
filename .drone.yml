@@ -7,3 +7,9 @@ steps:
   commands:
   - cd omhserver
   - mvn install
+- name: build_client
+  image: node:8
+  commands:
+  - cd omhclient
+  - cp app/js/prod-env.js app/js/env.js && rm app/js/*-env.js
+  - npm install && npm install -g bower && bower install --allow-root omh-web-visualizations
