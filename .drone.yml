@@ -13,3 +13,9 @@ steps:
   - cd omhclient
   - cp app/js/prod-env.js app/js/env.js && rm app/js/*-env.js
   - npm install && npm install -g bower && bower install --allow-root omh-web-visualizations
+- name: view_artifacts
+  image: maven
+  commands:
+  - ls -la omhclient/app
+  - ls -la omhclient/app/bower_components
+  - ls -la omhserver/target
