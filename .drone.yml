@@ -6,7 +6,7 @@ steps:
   image: maven:3.6.1-jdk-8
   commands:
   - cd omhserver
-  - mvn install
+  - mvn clean package
 - name: build_client
   image: node:8
   commands:
