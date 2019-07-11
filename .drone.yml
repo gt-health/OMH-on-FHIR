@@ -18,4 +18,5 @@ steps:
   commands:
   - ls -la omhclient/app
   - ls -la omhclient/app/bower_components
+  - ls -la omhserver
   - ls -la omhserver/target
