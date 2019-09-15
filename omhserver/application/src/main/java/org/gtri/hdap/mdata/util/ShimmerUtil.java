@@ -20,8 +20,10 @@ public class ShimmerUtil {
     public static String OBSERVATION_CODE_SYSTEM = "http://loinc.org";
     public static String OBSERVATION_PHYSICAL_ACTIVITY_CODE_CODE = "55423-8";
     public static String OBSERVATION_HEART_RATE_CODE_CODE = "8867-4";
+    public static String OBSERVATION_BLOOD_PRESSURE_CODE_CODE = "85354-9";
     public static String OBSERVATION_PHYSICAL_ACTIVITY_CODE_DISPLAY = "Number of steps in unspecified time.";
     public static String OBSERVATION_HEART_RATE_CODE_DISPLAY = "Heart rate";
+    public static String OBSERVATION_BLOOD_PRESSURE_CODE_DISPLAY = "Blood pressure panel with all children optional";
     public static String OBSERVATION_COMPONENT_CODE_SYSTEM = "http://hl7.org/fhir/observation-statistics";
     public static String OBSERVATION_COMPONENT_CODE_CODE = "maximum";
     public static String OBSERVATION_COMPONENT_CODE_DISPLAY = "Maximum";

@@ -294,6 +294,91 @@ public class Stu3ResponseServiceTest {
         logger.debug("========== Exiting testGenerateObservation ==========");
     }
 
+    @Test
+    public void testGenerateBloodPressure() throws Exception{
+        logger.debug("========== Entering testGenerateObservation ==========");
+        //{
+        //    "shim": "googlefit",
+        //    "timeStamp": 1534251049,
+        //    "body": [
+        //    {
+        //        "header": {
+        //            "id": "3b9b68a2-e0fd-4bdd-ba85-4127a4e8bcee",
+        //            "creation_date_time": "2018-08-14T12:50:49.383Z",
+        //            "acquisition_provenance": {
+        //                "source_name": "Google Fit API",
+        //                "source_origin_id": "raw:com.google.step_count.cumulative:Google:Pixel 2 XL:5f9e1b9964be5834:LSM6DSM Step Counter"
+        //            },
+        //            "schema_id": {
+        //                "namespace": "omh",
+        //                "name": "step-count",
+        //                "version": "2.0"
+        //            }
+        //        },
+        //        "body": {
+        //            "heart_rate": {
+        //                "value": 50,
+        //                        "unit": "beats/min"
+        //            },
+        //            "effective_time_frame": {
+        //                "date_time": "2013-02-05T07:25:00Z"
+        //            },
+        //            "temporal_relationship_to_physical_activity": "at rest",
+        //                    "user_notes": "I felt quite dizzy"
+        //        }
+        //    },
+        // ...
+        //    ]
+        //}
+        org.springframework.core.io.Resource testResource = this.testFiles.get("testomhresponse-bloodpressure.json");
+        String sb = FileUtils.readFileToString(testResource.getFile(), UTF_8);
+        //        String sb = FileUtils.readFileToString(new File("src/test/resources/testomhresponse-heartrate.json"), UTF_8);
+        ResourceConfig rc = new ResourceConfig();
+        rc.setResourceId("stu3_blood_pressure");
+        InputStream configInputStream = this.configMap.get("stu3_blood_pressure.json").getInputStream();
+        assertNotNull(configInputStream);
+        rc.setConfig(objectMapper.readTree(configInputStream));
+        List<Resource> observationList = null;
+
+        //create the fhir template
+        FhirTemplate fhirTemplate = new FhirTemplate();
+        fhirTemplate.setTemplateId("stu3_Observation");
+        InputStream templateInputStream = this.templatemap.get("stu3_Observation.json").getInputStream();
+        assertNotNull(templateInputStream);
+        fhirTemplate.setTemplate(objectMapper.readTree(templateInputStream));
+
+        given(fhirTemplateRepository.findOneByTemplateId(anyString()))
+                .willReturn(fhirTemplate);
+
+        observationList = stu3ResponseService.generateObservations(sb, rc);
+        assertTrue(observationList.size() == 2);
+        assertTrue(((Observation)observationList.get(0)).getComponent().get(0).getValueQuantity().getValue().intValue() == 160 );
+        assertTrue(((Observation)observationList.get(0)).getComponent().get(1).getValueQuantity().getValue().intValue() == 60 );
+        assertTrue(((Observation)observationList.get(0)).getIdentifier().get(0).getSystem().equals(ShimmerUtil.PATIENT_IDENTIFIER_SYSTEM) );
+        assertTrue(((Observation)observationList.get(0)).getIdentifier().get(0).getValue().equals("3b9b68a2-e0fd-4bdd-ba85-4127a4e8gggg") );
+        assertTrue(((Observation)observationList.get(0)).getStatus().equals(Observation.ObservationStatus.UNKNOWN) );
+        assertTrue(((Observation)observationList.get(0)).getCategory().get(0).getCoding().get(0).getCode().equals(ShimmerUtil.OBSERVATION_HEART_RATE_CATEGORY_CODE) );
+        assertTrue(((Observation)observationList.get(0)).getCategory().get(0).getCoding().get(0).getSystem().equals(ShimmerUtil.OBSERVATION_CATEGORY_SYSTEM) );
+        assertTrue(((Observation)observationList.get(0)).getCategory().get(0).getCoding().get(0).getDisplay().equals(ShimmerUtil.OBSERVATION_HEART_RATE_CATEGORY_DISPLAY) );
+        assertTrue(((Observation)observationList.get(0)).getCode().getCoding().get(0).getCode().equals(ShimmerUtil.OBSERVATION_BLOOD_PRESSURE_CODE_CODE) );
+        assertTrue(((Observation)observationList.get(0)).getCode().getCoding().get(0).getSystem().equals(ShimmerUtil.OBSERVATION_CODE_SYSTEM) );
+        assertTrue(((Observation)observationList.get(0)).getCode().getCoding().get(0).getDisplay().equals(ShimmerUtil.OBSERVATION_BLOOD_PRESSURE_CODE_DISPLAY) );
+        assertTrue(((Observation)observationList.get(0)).getIssued() != null );
+
+        assertTrue(((Observation)observationList.get(1)).getComponent().get(0).getValueQuantity().getValue().intValue() == 140 );
+        assertTrue(((Observation)observationList.get(1)).getComponent().get(1).getValueQuantity().getValue().intValue() == 80 );
+        assertTrue(((Observation)observationList.get(1)).getStatus().equals(Observation.ObservationStatus.UNKNOWN) );
+        assertTrue(((Observation)observationList.get(1)).getCategory().get(0).getCoding().get(0).getCode().equals(ShimmerUtil.OBSERVATION_HEART_RATE_CATEGORY_CODE) );
+        assertTrue(((Observation)observationList.get(1)).getCategory().get(0).getCoding().get(0).getSystem().equals(ShimmerUtil.OBSERVATION_CATEGORY_SYSTEM) );
+        assertTrue(((Observation)observationList.get(1)).getCategory().get(0).getCoding().get(0).getDisplay().equals(ShimmerUtil.OBSERVATION_HEART_RATE_CATEGORY_DISPLAY) );
+        assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getCode().equals(ShimmerUtil.OBSERVATION_BLOOD_PRESSURE_CODE_CODE) );
+        assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getSystem().equals(ShimmerUtil.OBSERVATION_CODE_SYSTEM) );
+        assertTrue(((Observation)observationList.get(1)).getCode().getCoding().get(0).getDisplay().equals(ShimmerUtil.OBSERVATION_BLOOD_PRESSURE_CODE_DISPLAY) );
+        assertTrue(((Observation)observationList.get(1)).getIssued() != null );
+
+        logger.debug("========== Exiting testGenerateObservation ==========");
+    }
+
     private void loadMap(Map map, String resourcePath) throws Exception{
         logger.debug("Populating Map");
         PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver = new PathMatchingResourcePatternResolver(this.getClass().getClassLoader());
