@@ -80,5 +80,10 @@ component('login', {
             self.omhOnFhirApi.login(self.env.googleFitShim);
         };
 
+        self.loginWithIHealth = function loginWithIHealth(){
+            console.log("Logging in with iHealth");
+            self.omhOnFhirApi.login(self.env.iHealthShim);
+        };
+
     }]
 });
