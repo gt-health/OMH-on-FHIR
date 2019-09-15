@@ -36,6 +36,19 @@ The following environment variables need to be set for the containers
 | OPENMHEALTH_SHIM_FITBIT_CLIENT_SECRET |  Client Secret for Shimmer to use for FitBit authentication |
 | OPENMHEALTH_SHIM_GOOGLEFIT_CLIENT_ID | Client ID for Shimmer to use for Google Fit authentication |
 | OPENMHEALTH_SHIM_GOOGLEFIT_CLIENT_SECRET | Client secret for Shimmer to use for Google Fit authentication |
+| OPENMHEALTH_SHIM_IHEALTH_CLIENT_ID | Client ID for Shimmer to use for iHealth Authentication |
+| OPENMHEALTH_SHIM_IHEALTH_CLIENT_SECRET | Client Secret for Shimmer to use for iHealth authentication |
+| OPENMHEALTH_SHIM_IHEALTH_SANBOXED | true or false value if sandboxed |
+| OPENMHEALTH_SHIM_IHEALTH_CLIENT_SERIAL_NUMBER | iHealth serial number |
+| OPENMHEALTH_SHIM_IHEALTH_ACTIVITY_ENDPOINT_SECRET | Secret for Shimmer to use for iHealth blood pressure endpoint |
+| OPENMHEALTH_SHIM_IHEALTH_BLOOD_GLUCOSE_ENDPOINT_SECRET | Secret for Shimmer to use for iHealth glucose endpoint |
+| OPENMHEALTH_SHIM_IHEALTH_BLOOD_PRESSURE_ENDPOINT_SECRET | Secret for Shimmer to use for iHealth blood pressure endpoint |
+| OPENMHEALTH_SHIM_IHEALTH_SLEEP_ENDPOINT_SECRET | Secret for Shimmer to use for iHealth sleep endpoint |
+| OPENMHEALTH_SHIM_IHEALTH_SP_O2_ENDPOINT_SECRET | Secret for Shimmer to use for iHealth O2 endpoint |
+| OPENMHEALTH_SHIM_IHEALTH_SPORT_ENDPOINT_SECRET | Secret for Shimmer to use for iHealth sport endpoint |
+| OPENMHEALTH_SHIM_IHEALTH_WEIGHT_ENDPOINT_SECRET | Secret for Shimmer to use for iHealth weight endpoint |
+
+* See the Shimmer resource.env here for a list of environment variables that can be set.
 
 For run time they can be set in the ./shimmer-resource-server.env file or explicitly in a Dockerfile or docker-compose.yml
 ### mongo
