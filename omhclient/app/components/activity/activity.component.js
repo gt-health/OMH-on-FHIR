@@ -61,15 +61,23 @@ component('activity', {
                     }
                 },
                 'systolic_blood_pressure': {
-                    'thresholds': { 'max': 120 },
-                    'range': undefined,
-                    'chart': {
-                        'daysShownOnTimeline': { 'min': 0, 'max': Infinity }
+                    'data': {
+                        'yValuePath': 'body.systolic_blood_pressure.value'
+                    },
+                    'yAxis': {
+                        'range': { 'min': 30, 'max': 200 },
+                        'label': 'mmHg'
                     }
                 },
                 'diastolic_blood_pressure': {
-                    'thresholds': undefined
-                },
+                    'data': {
+                        'yValuePath': 'body.diastolic_blood_pressure.value'
+                    },
+                    'yAxis':{
+                        'range': { 'min': 30, 'max': 200 },
+                        'label': 'mmHg'
+                    }
+                }
                 'step_count': {
                     'range': undefined,
                     'timeQuantizationLevel': OMHWebVisualizations.QUANTIZE_DAY,
