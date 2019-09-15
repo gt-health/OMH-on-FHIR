@@ -63,6 +63,10 @@
               "path" : "/effectiveDateTime"
           },
           {
+              "op" : "remove",
+              "path" : "/component"
+          },
+          {
               "op": "replace",
               "path": "/category/0/coding/0/code",
               "value": "physical-activity"

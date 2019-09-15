@@ -41,9 +41,27 @@
           },
           {
               "op": "replace",
-              "fhirPath": "/valueQuantity/value",
-              "omhPath": "/body/heart_rate/value",
-              "required" :  true
+              "fhirPath": "/component/0/valueQuantity/value",
+              "omhPath": "/body/systolic_blood_pressure/value",
+              "required":  true
+          },
+          {
+              "op": "replace",
+              "fhirPath": "/component/0/valueQuantity/unit",
+              "omhPath": "/body/systolic_blood_pressure/unit",
+              "required":  true
+          },
+          {
+              "op": "replace",
+              "fhirPath": "/component/1/valueQuantity/value",
+              "omhPath": "/body/diastolic_blood_pressure/value",
+              "required":  true
+          },
+          {
+              "op": "replace",
+              "fhirPath": "/component/1/valueQuantity/unit",
+              "omhPath": "/body/diastolic_blood_pressure/unit",
+              "required":  true
           },
           {
               "op": "replace",
@@ -58,8 +76,8 @@
               "path" : "/effectivePeriod"
           },
           {
-              "op" : "remove",
-              "path" : "/component"
+              "op": "remove",
+              "path": "/valueQuantity"
           },
           {
               "op": "replace",
@@ -79,27 +97,32 @@
           {
               "op": "replace",
               "path": "/code/coding/0/code",
-              "value": "8867-4"
+              "value": "85354-9"
           },
           {
               "op": "replace",
               "path": "/code/coding/0/display",
-              "value": "Heart rate"
+              "value": "Blood pressure panel with all children optional"
           },
           {
               "op": "replace",
-              "path": "/valueQuantity/unit",
-              "value": "beats/min"
+              "path": "/component/0/valueQuantity/system",
+              "value": "http://loinc.org"
           },
           {
               "op": "replace",
-              "path": "/valueQuantity/system",
-              "value": "http://unitsofmeasure.org"
+              "path": "/component/0/valueQuantity/code",
+              "value": "{8480-6}"
           },
           {
               "op": "replace",
-              "path": "/valueQuantity/code",
-              "value": "{/min}"
+              "path": "/component/0/valueQuantity/system",
+              "value": "http://loinc.org"
+          },
+          {
+              "op": "replace",
+              "path": "/component/0/valueQuantity/code",
+              "value": "{8462-4}"
           }
       ]
   }

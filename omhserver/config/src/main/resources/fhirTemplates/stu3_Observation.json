@@ -53,5 +53,22 @@
     "comment": "",
     "device": {
       "display": ""
-    }
+    },
+    "component": [
+      {
+        "valueQuantity": {
+          "code": "",
+          "system": "",
+          "unit": "",
+          "value": ""
+        }
+      },{
+        "valueQuantity": {
+          "code": "",
+          "system": "",
+          "unit": "",
+          "value": ""
+        }
+      }
+    ]
 }
