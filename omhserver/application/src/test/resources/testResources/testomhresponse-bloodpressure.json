@@ -1,0 +1,72 @@
+{
+  "shim" : "googlefit",
+  "timeStamp" : 1534251049,
+  "body" : [
+    {
+      "header" : {
+        "id" : "3b9b68a2-e0fd-4bdd-ba85-4127a4e8gggg",
+        "creation_date_time" : "2018-08-14T12:50:49.383Z",
+        "acquisition_provenance" : {
+          "source_name" : "some source",
+          "source_origin_id" : "some device"
+        },
+        "schema_id" : {
+          "namespace" : "omh",
+          "name" : "heart-rate",
+          "version" : "2.0"
+        }
+      },
+      "body" : {
+        "systolic_blood_pressure": {
+          "value": 160,
+          "unit": "mmHg"
+        },
+        "diastolic_blood_pressure": {
+          "value": 60,
+          "unit": "mmHg"
+        },
+        "effective_time_frame": {
+          "time_interval": {
+            "start_date_time": "2018-08-14T07:25:00Z",
+            "end_date_time": "2018-08-14T07:25:00Z"
+          }
+        },
+        "body_posture": "sitting",
+        "descriptive_statistic": "maximum"
+      }
+    },
+    {
+      "header" : {
+        "id" : "3b9b68a2-e0fd-4bdd-ba85-4127a4e8eeee",
+        "creation_date_time" : "2018-08-14T12:50:49.383Z",
+        "acquisition_provenance" : {
+          "source_name" : "some source",
+          "source_origin_id" : "some device"
+        },
+        "schema_id" : {
+          "namespace" : "omh",
+          "name" : "heart-rate",
+          "version" : "2.0"
+        }
+      },
+      "body" : {
+        "systolic_blood_pressure": {
+          "value": 140,
+          "unit": "mmHg"
+        },
+        "diastolic_blood_pressure": {
+          "value": 80,
+          "unit": "mmHg"
+        },
+        "effective_time_frame": {
+          "time_interval": {
+            "start_date_time": "2018-08-14T07:25:00Z",
+            "end_date_time": "2018-08-14T07:25:00Z"
+          }
+        },
+        "body_posture": "sitting",
+        "descriptive_statistic": "maximum"
+      }
+    }
+  ]
+}
