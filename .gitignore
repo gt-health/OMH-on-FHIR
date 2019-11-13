@@ -7,9 +7,13 @@ omhclient/.travis.yml
 omhclient/yarn.lock
 omhserver/*.env
 !.mvn/wrapper/maven-wrapper.jar
-shimmer-resource-server.env
 ./omhclient/package-lock.json
 **/target
+error.log
+
+### ENV ###
+shimmer-resource-server.env
+omhserver/*-prod.env
 
 ### STS ###
 .apt_generated

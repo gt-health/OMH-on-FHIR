@@ -45,6 +45,8 @@ services:
         context: ./omhclient
         #specifiy the Dockerfile to use
         dockerfile: Dockerfile
+        args:
+          buildEnv: dev
       restart: always
       #bind host port 8989 to container port 8080
       ports:
