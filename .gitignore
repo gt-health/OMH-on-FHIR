@@ -5,7 +5,6 @@ omhclient/app/bower_components
 omhclient/node_modules
 omhclient/.travis.yml
 omhclient/yarn.lock
-omhserver/*.env
 !.mvn/wrapper/maven-wrapper.jar
 ./omhclient/package-lock.json
 **/target
