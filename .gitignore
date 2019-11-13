@@ -11,7 +11,7 @@ omhclient/yarn.lock
 error.log
 
 ### ENV ###
-shimmer-resource-server.env
+shimmer-resource-server-prod.env
 omhserver/*-prod.env
 
 ### STS ###
